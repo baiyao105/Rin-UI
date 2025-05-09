@@ -242,9 +242,9 @@ FluentPage {
                 ComboBox {
                     id: stateComboBox
                     model: ListModel {
-                        ListElement { text: "Running"; state: ProgressBar.States.Running }
-                        ListElement { text: "Paused"; state: ProgressBar.States.Paused }
-                        ListElement { text: "Error"; state: ProgressBar.States.Error }
+                        ListElement { text: "Running"; state: ProgressBar.Running }
+                        ListElement { text: "Paused"; state: ProgressBar.Paused }
+                        ListElement { text: "Error"; state: ProgressBar.Error }
                     }
                     textRole: "text"
                     currentIndex: 0

@@ -56,6 +56,14 @@ QtObject {
             desc: qsTr("A dialog box that can be customized to contain any QML content."),
             page: Qt.resolvedUrl("../pages/controls/Dialog.qml"),
         },
+            {
+            icon: Qt.resolvedUrl("controls/DatePicker.png"),
+            title: qsTr("DatePicker"),
+            type: "date&time",
+            desc: qsTr("A configurable control that lets a user pick a time value."),
+            page: Qt.resolvedUrl("../pages/controls/DatePicker.qml"),
+            added: true,
+        },
         {
             icon: Qt.resolvedUrl("controls/DropDownButton.png"),
             title: qsTr("DropDownButton"),

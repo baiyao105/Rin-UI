@@ -17,15 +17,21 @@ Popup {
     property var value2: undefined
     property var value3: undefined
 
+    property alias index1: hours.currentIndex
+    property alias index2: minutes.currentIndex
+    property alias index3: added.currentIndex
+
     property var model1: 12
     property var model2: 60
     property var model3: [qsTr("AM"), qsTr("PM")]
 
-    readonly property bool gotData: typeof value1!== "undefined" && typeof value2!== "undefined"
+    property bool gotData: typeof value1!== "undefined" && typeof value2!== "undefined"
+
+    signal valueChanged(var value1, var value2, var value3)
 
     function formatText(count, modelData) {
-        let data = count === 60 ? modelData : modelData;
-        return data.toString().length < 2 && count !== 12  ? "0" + data
+        let data = modelData;
+        return data.toString().length < 2 && count === 60  ? "0" + data
             : data === 0 && count === 12 ? 12 : data
     }
 
@@ -136,6 +142,7 @@ Popup {
                     value1 = hours.currentItem.text
                     value2 = minutes.currentItem.text
                     typeof model3 !== "undefined" ? value3 = added.currentItem.text : undefined
+                    valueChanged(value1, value2, value3)
                     root.close()
                 }
             }
@@ -184,7 +191,7 @@ Popup {
                     )
                     added.positionViewAtIndex(
                         typeof value3 === "undefined" ? 0
-                        : typeof model3 === "number" ? value3 : model3.indexOf(value3), Tumbler.Center
+                        : typeof model3 === "number" ? value3 : model3.indexOf(parseInt(value3)), Tumbler.Center
                     )
                 }
             }

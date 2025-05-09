@@ -1,4 +1,3 @@
-import platform
 import sys
 
 from PySide6.QtCore import Slot, QObject

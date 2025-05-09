@@ -73,7 +73,6 @@ class RinUIWindow:
             raise FileNotFoundError(f"Cannot find RinUI module: {rinui_import_path}")
 
         # 主题管理器
-
         self.engine.rootContext().setContextProperty("ThemeManager", self.theme_manager)
         try:
             self.engine.load(self.qml_path)
@@ -84,7 +83,6 @@ class RinUIWindow:
             raise RuntimeError(f"Error loading QML file: {self.qml_path}")
 
         # 窗口设置
-
         self.root_window = self.engine.rootObjects()[0]
 
         self.theme_manager.set_window(self.root_window)
