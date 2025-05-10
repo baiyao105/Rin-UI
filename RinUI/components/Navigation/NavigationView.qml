@@ -18,6 +18,8 @@ RowLayout {
     property int pushEnterFromY: height
     property var window: parent  // 窗口对象
 
+    signal pageChanged()  // 页面切换信号
+
     id: navigationView
     anchors.fill: parent
 
@@ -195,6 +197,7 @@ RowLayout {
         navigationBar.lastPages.push(navigationBar.currentPage)  // 记录当前页面
         navigationBar.lastPages = navigationBar.lastPages  // refresh
         navigationBar.currentPage = page.toString()
+        pageChanged()
 
         if (page instanceof Component) {
             // let obj = page.createObject(stackView)
