@@ -11,27 +11,31 @@ Button {
 
     property alias year: pickerView.value3
     property alias month: pickerView.value1
+    property alias monthIndex: pickerView.index1
     property alias day: pickerView.value2
 
     property int startYear: 1925
     property int endYear: 2125
 
-    property var monthModel: (new Array(12)).fill(0).map((_, i) => i + 1).map(getMonthName)
+    readonly property var monthModel: (new Array(12)).fill(0).map((_, i) => i + 1).map(getMonthName)
+    readonly property int maxDays: new Date(pickerView.value3 || new Date().getFullYear(), pickerView.index1 + 1, 0).getDate()
 
     implicitWidth: 250
     padding: 0
 
     property string date: {
         if (!pickerView.gotData) return ""
-        let y = yearVisible && !isNaN(year) ? parseInt(year) : new Date().getFullYear()
-        let m = parseInt(month)
+        let y = typeof year === "number"? parseInt(year) : new Date().getFullYear()
+        let m = parseInt(monthModel.indexOf(month) + 1)
         let d = parseInt(day)
-        function pad(n) { return n < 10 ? "0" + n : "" + n }
-        return y + "-" + pad(m) + "-" + pad(d)
+        return y + "-" + m + "-" + d
     }
 
     function setDate(yyyymmdd) {
-        if (!yyyymmdd || typeof yyyymmdd !== "string" || !yyyymmdd.match(/^\d{4}[-\/]\d{2}[-\/]\d{2}$/)) return
+        // format
+        if (!yyyymmdd || typeof yyyymmdd !== "string"
+            || !yyyymmdd.match(/^\d{4}[-\/]\d{1,2}[-\/]\d{1,2}$/))
+            return false
         let parts = yyyymmdd.split(/[-\/]/)  // 使用正则分割符号 '-' 或 '/'
         let y = parseInt(parts[0])
         let m = parseInt(parts[1])
@@ -39,10 +43,12 @@ Button {
 
         if (m >= 1 && m <= 12 && d >= 1 && d <= 31) {
             pickerView.value3 = y.toString()
-            pickerView.value1 = m.toString()
+            pickerView.value1 = getMonthName(m)
             pickerView.value2 = d.toString()
             pickerView.gotData = true
+            return true
         }
+        return -1
     }
 
     // 根据 locale 决定顺序
@@ -121,7 +127,7 @@ Button {
             )
             : undefined
         model1: monthModel
-        model2: (new Date(pickerView.value3 || new Date().getFullYear(), pickerView.index1 + 1, 0).getDate())
+        model2: Array.from({ length: maxDays }, (_, i) => i + 1) // 天
 
         // 初始值
         value3: yearVisible ? (new Date().getFullYear()) : undefined

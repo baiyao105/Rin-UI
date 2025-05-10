@@ -30,6 +30,7 @@ ControlPage {
         ControlShowcase {
             width: parent.width
             DatePicker {
+                id: datePicker1
                 enabled: !pickerSwitch.checked
             }
 
@@ -37,6 +38,15 @@ ControlPage {
                 CheckBox {
                     id: pickerSwitch
                     text: qsTr("Disable DatePicker")
+                },
+                Button {
+                    text: qsTr("Set Random Date")
+                    onClicked: {
+                        let year = Math.floor(Math.random() * (datePicker1.endYear - datePicker1.startYear) + datePicker1.startYear)
+                        let month = Math.floor(Math.random() * (12 - 1) + 1)
+                        let day = Math.floor(Math.random() * (28 - 1) + 1)
+                        datePicker1.setDate(year + "-" + month + "-" + day)
+                    }
                 }
             ]
         }
@@ -68,6 +78,15 @@ ControlPage {
                     currentIndex: 0
                     onCurrentIndexChanged: {
                         datePicker.locale = Qt.locale(model[currentIndex])
+                    }
+                },
+                Button {
+                    text: qsTr("Set Random Date")
+                    onClicked: {
+                        let year = Math.floor(Math.random() * (datePicker.endYear - datePicker.startYear) + datePicker.startYear)
+                        let month = Math.floor(Math.random() * (12 - 1) + 1)
+                        let day = Math.floor(Math.random() * (28 - 1) + 1)
+                        datePicker.setDate(year + "-" + month + "-" + day)
                     }
                 }
             ]
