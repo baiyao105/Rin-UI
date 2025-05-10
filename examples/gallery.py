@@ -14,11 +14,8 @@ class Gallery(RinUIWindow):
         super().__init__("gallery.qml")
         self.setProperty("title", f"RinUI Gallery {datetime.now().year}")  # 前后端交互示例
 
-        self.backend = Backend()
-        self.engine.rootContext().setContextProperty("Backend", self.backend)
+        self.engine.rootContext().setContextProperty("Backend", self)  # 注入
 
-
-class Backend(QObject):
     @Slot(str)
     def copyToClipboard(self, text):
         clipboard = QGuiApplication.clipboard()

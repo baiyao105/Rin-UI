@@ -1,7 +1,7 @@
 import os
 import sys
 
-from PySide6.QtCore import QCoreApplication
+from PySide6.QtCore import QCoreApplication, QObject
 from PySide6.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout
 from PySide6.QtQml import QQmlApplicationEngine
 from .theme import ThemeManager
@@ -29,7 +29,7 @@ class TestWindow(QWidget):
         self.resize(400, 300)
 
 
-class RinUIWindow:
+class RinUIWindow(QObject):
     # _instance = None
     #
     # def __new__(cls, *args, **kwargs):  # 单例模式管理
@@ -42,6 +42,7 @@ class RinUIWindow:
         创建基于 RinUI 的 QML 应用程序。
         :param qml_path: str, QML 文件路径
         """
+        super().__init__()
         if hasattr(self, "_initialized") and self._initialized:
             return
         self._initialized = True
