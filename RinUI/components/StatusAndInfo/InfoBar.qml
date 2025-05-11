@@ -118,7 +118,13 @@ Frame {
             }
             Text {
                 id: bodyText
-                property bool wrap: (infoBar.width - titleText.width - custom.width - 24) < implicitWidth
+                property bool wrap: (
+                    (
+                        infoBar.width - iconWidget.width - rights.width - main.spacing * 2 - infoBar.padding * 2
+                        - (titleText.width + custom.width + 24)
+                    )
+                    < implicitWidth
+                )
                 width: wrap ?
                     parent.width : implicitWidth
                 typography: Typography.Body
