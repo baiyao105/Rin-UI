@@ -42,12 +42,6 @@ ApplicationWindow {
         }
     }
 
-    FloatLayer {
-        id: floatLayer
-        anchors.topMargin: titleBarHeight
-        z: 998
-    }
-
     // 布局
     ColumnLayout {
         anchors.fill: parent
@@ -115,6 +109,12 @@ ApplicationWindow {
         ColorAnimation {
             duration: Utils.appearanceSpeed
         }
+    }
+
+    FloatLayer {
+        id: floatLayer
+        anchors.topMargin: titleBarHeight
+        z: 998
     }
 
 

@@ -5,5 +5,5 @@ import "../../windows"
 FluentWindowBase {
     id: baseWindow
     frameless: false
-    default property alias content: baseWindow.data
+    default property alias content: baseWindow.content
 }

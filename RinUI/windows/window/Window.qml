@@ -11,6 +11,7 @@ Window {
 
     color: frameless ? "transparent" : Theme.currentTheme.colors.backgroundColor
     property bool frameless: false
+    property alias floatLayer: baseWindow.floatLayer
     default property alias content: baseWindow.data
     property int titleBarHeight: Theme.currentTheme.appearance.dialogTitleBarHeight
 
@@ -35,6 +36,12 @@ Window {
             Layout.fillWidth: true
             Layout.fillHeight: true
         }
+    }
+
+    FloatLayer {
+        id: floatLayer
+        anchors.topMargin: titleBarHeight
+        z: 998
     }
 
     // 标题栏
