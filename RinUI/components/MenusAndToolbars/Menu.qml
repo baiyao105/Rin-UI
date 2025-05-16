@@ -19,7 +19,8 @@ Menu {
             case Position.Right:
                 return parent.width + 5
             default:
-                return (parent.width - root.width) / 2
+                // return (parent.width - root.width) / 2
+                return root.x
         }
     }
 
@@ -33,7 +34,8 @@ Menu {
             case Position.Right:
                 return (parent.height - root.height) / 2
             default:
-                return -root.height + 5  // 默认顶部
+                // return -root.height + 5  // 默认顶部
+                return root.y
         }
     }
 
@@ -49,7 +51,7 @@ Menu {
                 property: "opacity"
                 from: 0
                 to: 1
-                duration: 70
+                duration: Utils.animationSpeed
                 easing.type: Easing.InOutQuart
             }
             NumberAnimation {

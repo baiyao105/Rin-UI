@@ -70,7 +70,6 @@ QtObject {
             type: "basicInput",
             desc: qsTr("A button that display a flyout of choices when clicked."),
             page: Qt.resolvedUrl("../pages/controls/DropDownButton.qml"),
-            added: true,
         },
         {
             icon: Qt.resolvedUrl("controls/Expander.png"),
@@ -203,12 +202,19 @@ QtObject {
             added: true,
         },
         {
+            icon: Qt.resolvedUrl("controls/Button.png"),
+            title: qsTr("PillButton"),
+            type: "basicInput",
+            desc: qsTr("A button that can toggled between 2 states like a ToggleButton."),
+            page: Qt.resolvedUrl("../pages/controls/PillButton.qml"),
+            added: true,
+        },
+        {
             icon: Qt.resolvedUrl("controls/ToggleButton.png"),
             title: qsTr("ToggleButton"),
             type: "basicInput",
             desc: qsTr("A button that can toggled between 2 states like a CheckBox."),
             page: Qt.resolvedUrl("../pages/controls/ToggleButton.qml"),
-            added: true,
         },
         {
             icon: Qt.resolvedUrl("controls/ToggleSwitch.png"),
@@ -234,6 +240,7 @@ QtObject {
             type: "text",
             desc: qsTr("A single-line or multi-line plain text field."),
             page: Qt.resolvedUrl("../pages/controls/TextField.qml"),
+            updated: true,
         },
         {
             icon: Qt.resolvedUrl("controls/TimePicker.png"),
