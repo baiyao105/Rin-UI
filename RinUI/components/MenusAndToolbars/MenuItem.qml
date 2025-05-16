@@ -116,4 +116,17 @@ MenuItem {
 
         Behavior on color { ColorAnimation { duration: Utils.animationSpeed; easing.type: Easing.OutQuart } }
     }
+
+    // States //
+    // 状态变化
+    states: [
+        State {
+        name: "disabled"
+            when: !enabled
+            PropertyChanges {
+                target: root
+                opacity: 0.3628
+            }
+        }
+    ]
 }
