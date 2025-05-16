@@ -162,6 +162,14 @@ QtObject {
             page: Qt.resolvedUrl("../pages/controls/RadioButton.qml"),
         },
         {
+            icon: Qt.resolvedUrl("controls/Button.png"),
+            title: qsTr("RoundButton"),
+            type: "basicInput",
+            desc: qsTr("A control likes Button except that it has a radius property."),
+            page: Qt.resolvedUrl("../pages/controls/RoundButton.qml"),
+            added: true,
+        },
+        {
             icon: Qt.resolvedUrl("controls/Pivot.png"),
             title: qsTr("SelectorBar"),
             type: "navigation",
