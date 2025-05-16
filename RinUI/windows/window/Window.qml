@@ -3,6 +3,7 @@ import QtQuick.Controls 2.15
 import QtQuick.Layouts 2.15
 import "../../windows"
 import "../../themes"
+import "../../utils"
 
 Window {
     id: baseWindow
@@ -11,7 +12,6 @@ Window {
 
     color: frameless ? "transparent" : Theme.currentTheme.colors.backgroundColor
     property bool frameless: false
-    property alias floatLayer: baseWindow.floatLayer
     default property alias content: baseWindow.data
     property int titleBarHeight: Theme.currentTheme.appearance.dialogTitleBarHeight
 
