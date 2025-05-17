@@ -103,6 +103,7 @@ TextArea {
     // 字体 / Font //
     font.pixelSize: Theme.currentTheme.typography.bodySize
 
+    wrapMode: Text.WordWrap  // 自动换行
     selectionColor: Theme.currentTheme.colors.primaryColor
     color: Theme.currentTheme.colors.textColor
     placeholderTextColor: Theme.currentTheme.colors.textSecondaryColor

@@ -49,6 +49,7 @@ ControlPage {
         Frame {
             width: parent.width
             TextField {
+                width: 175
                 placeholderText: qsTr("Name")
             }
         }

@@ -31,4 +31,21 @@ ControlPage {
             }
         }
     }
+
+    Column {
+        Layout.fillWidth: true
+        spacing: 4
+
+        Text {
+            typography: Typography.BodyStrong
+            text: qsTr("A simple TextArea.")
+        }
+        Frame {
+            width: parent.width
+            TextArea {
+                placeholderText: qsTr("Enter your profile...")
+                width: 200
+            }
+        }
+    }
 }
