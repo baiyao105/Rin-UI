@@ -236,9 +236,17 @@ QtObject {
         // },
         {
             icon: Qt.resolvedUrl("controls/TextBox.png"),
+            title: qsTr("TextArea"),
+            type: "text",
+            desc: qsTr("A multi-line plain text field."),
+            page: Qt.resolvedUrl("../pages/controls/TextArea.qml"),
+            added: true,
+        },
+        {
+            icon: Qt.resolvedUrl("controls/TextBox.png"),
             title: qsTr("TextField"),
             type: "text",
-            desc: qsTr("A single-line or multi-line plain text field."),
+            desc: qsTr("A single-lineplain text field."),
             page: Qt.resolvedUrl("../pages/controls/TextField.qml"),
             updated: true,
         },

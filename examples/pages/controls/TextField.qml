@@ -24,9 +24,17 @@ ControlPage {
             typography: Typography.BodyStrong
             text: qsTr("A simple TextField.")
         }
-        Frame {
+        ControlShowcase {
             width: parent.width
-            TextField {}
+            TextField {
+                editable: !readOnlyBox.checked
+            }
+
+            showcase: CheckBox {
+                id: readOnlyBox
+                text: qsTr("ReadOnly")
+                checked: false
+            }
         }
     }
 

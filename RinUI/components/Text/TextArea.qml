@@ -4,7 +4,7 @@ import QtQuick.Controls.Basic 2.15
 import "../../themes"
 import "../../components"
 
-TextField {
+TextArea {
     id: root
 
     property bool frameless: false
@@ -112,7 +112,10 @@ TextField {
     topPadding: 5
     bottomPadding: 7
 
-    // 状态变化
+    // 动画 / Animation //
+    Behavior on implicitHeight { NumberAnimation { duration: Utils.animationSpeed; easing.type: Easing.OutQuint } }
+
+    // 状态
     states: [
         State {
         name: "disabled"
