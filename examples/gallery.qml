@@ -1,30 +1,17 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
 import QtQuick.Layouts 2.15
-import Qt.labs.platform 1.1 as Platform  // tray
 import "./assets/"
 import RinUI
 
 FluentWindow {
     id: window
     visible: true
-    title: qsTr("Gallery")
+    // title: qsTr("Gallery")
     width: 1200
     height: 700
     minimumWidth: 550
     minimumHeight: 400
-
-    // 托盘图标 / Tray Icon //
-    Platform.SystemTrayIcon {
-        visible: Platform.SystemTrayIcon.isAvailable
-        icon.source: "assets/gallery.ico"
-        menu: Platform.Menu {
-            Platform.MenuItem {
-                text: qsTr("Quit")
-                onTriggered: Qt.quit()
-            }
-        }
-    }
 
     // 从 ItemData 获取控件数据
     function generateSubItems(type) {
