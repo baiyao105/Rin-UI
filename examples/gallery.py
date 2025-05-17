@@ -12,6 +12,7 @@ from RinUI import RinUIWindow
 class Gallery(RinUIWindow):
     def __init__(self):
         super().__init__("gallery.qml")
+        self.setIcon("assets/BA_Pic_Shiroko-chibi.png")
         self.backend = Backend()
         self.setProperty("title", f"RinUI Gallery {datetime.now().year}")  # 前后端交互示例
 
@@ -29,7 +30,6 @@ class Backend(QObject):
 if __name__ == '__main__':
     print(RinUI.__file__)
     app = QApplication(sys.argv)
-    app.setWindowIcon(QIcon("assets/gallery.ico"))
     gallery = Gallery()
     app.exec()
     # app = QGuiApplication([])

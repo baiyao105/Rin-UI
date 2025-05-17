@@ -1,7 +1,8 @@
 import os
 import sys
 
-from PySide6.QtCore import QCoreApplication, QObject
+from PySide6.QtCore import QCoreApplication, QUrl
+from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout
 from PySide6.QtQml import QQmlApplicationEngine
 from .theme import ThemeManager
@@ -22,7 +23,7 @@ class TestWindow(QWidget):
         self.resize(400, 300)
 
 
-class RinUIWindow():
+class RinUIWindow:
     def __init__(self, qml_path: str):
         """
         创建基于 RinUI 的 QML 应用程序。
@@ -73,6 +74,19 @@ class RinUIWindow():
 
         self.theme_manager.set_window(self.root_window)
         self._apply_windows_effects() if self.autoSetWindowsEffect else None
+
+    def setIcon(self, path: str) -> None:
+        """
+        设置应用程序图标。
+        :param path: str, 图标路径
+        :return:
+        """
+        app_instance = QApplication.instance()
+        if app_instance:
+            app_instance.setWindowIcon(QIcon(path))  # 设置应用程序图标
+            self.root_window.setProperty('icon', QUrl.fromLocalFile(path))
+        else:
+            raise RuntimeError("Cannot set icon before QApplication is created.")
 
     def _apply_windows_effects(self):
         """
