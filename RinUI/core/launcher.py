@@ -5,14 +5,7 @@ from PySide6.QtCore import QCoreApplication, QObject
 from PySide6.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout
 from PySide6.QtQml import QQmlApplicationEngine
 from .theme import ThemeManager
-from .config import BackdropEffect, is_windows, Theme
-
-
-def resource_path(relative_path):
-    """兼容 PyInstaller 打包和开发环境的路径"""
-    if hasattr(sys, '_MEIPASS'):
-        return os.path.join(sys._MEIPASS, relative_path)
-    return os.path.abspath(relative_path)
+from .config import BackdropEffect, is_windows, Theme, RINUI_PATH
 
 
 class TestWindow(QWidget):
@@ -29,14 +22,7 @@ class TestWindow(QWidget):
         self.resize(400, 300)
 
 
-class RinUIWindow(QObject):
-    # _instance = None
-    #
-    # def __new__(cls, *args, **kwargs):  # 单例模式管理
-    #     if cls._instance is None:
-    #         cls._instance = super().__new__(cls)
-    #     return cls._instance
-
+class RinUIWindow():
     def __init__(self, qml_path: str):
         """
         创建基于 RinUI 的 QML 应用程序。
@@ -64,8 +50,7 @@ class RinUIWindow(QObject):
     def _setup_application(self):
         """Setup"""
         # RInUI 模块
-        rinui_path = os.path.abspath(os.path.dirname(__file__))  # RinUI/core 目录
-        rinui_import_path = resource_path(os.path.join(rinui_path, "../../"))  # 使用 resource_path 处理路径
+        rinui_import_path = RINUI_PATH
         print(f"UI Module Path: {rinui_import_path}")
 
         if os.path.exists(rinui_import_path):
