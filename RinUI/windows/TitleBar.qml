@@ -57,6 +57,10 @@ Item {
 
             onPressed: {
                 clickPos = Qt.point(mouseX, mouseY)
+
+                if ((Qt.platform.os !== "windows" || Qt.platform.os !== "winrt") && Theme.isThemeMgrInitialized()) {
+                    return  // 在win环境使用原生方法拖拽
+                }
                 Theme.sendDragWindowEvent(window)
             }
             onDoubleClicked: toggleMaximized()
