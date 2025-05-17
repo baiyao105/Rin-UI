@@ -1,6 +1,7 @@
 import os
 import json
 import platform
+import sys
 from enum import Enum
 
 
@@ -22,8 +23,18 @@ def is_windows():
     return platform.system() == 'Windows'
 
 
+def resource_path(relative_path):
+    """兼容 PyInstaller 打包和开发环境的路径"""
+    if hasattr(sys, '_MEIPASS'):
+        return os.path.join(sys._MEIPASS, relative_path)
+    return os.path.abspath(relative_path)
+
+
+rinui_core_path = os.path.abspath(os.path.dirname(__file__))  # RinUI/core 目录
+
 BASE_DIR = os.path.abspath(os.getcwd())
 PATH = os.path.join(BASE_DIR, "RinUI/config")
+RINUI_PATH = resource_path(os.path.join(rinui_core_path, "../../"))  # 使用 resource_path 处理路径
 DEFAULT_CONFIG = {
     "language": "zh_CN",
     "theme": {

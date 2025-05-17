@@ -12,10 +12,13 @@ from RinUI import RinUIWindow
 class Gallery(RinUIWindow):
     def __init__(self):
         super().__init__("gallery.qml")
+        self.backend = Backend()
         self.setProperty("title", f"RinUI Gallery {datetime.now().year}")  # 前后端交互示例
 
-        self.engine.rootContext().setContextProperty("Backend", self)  # 注入
+        self.engine.rootContext().setContextProperty("Backend", self.backend)  # 注入
 
+
+class Backend(QObject):
     @Slot(str)
     def copyToClipboard(self, text):
         clipboard = QGuiApplication.clipboard()
@@ -26,7 +29,7 @@ class Gallery(RinUIWindow):
 if __name__ == '__main__':
     print(RinUI.__file__)
     app = QApplication(sys.argv)
-    app.setWindowIcon(QIcon("../RinUI/assets/img/default_app_icon.png"))
+    app.setWindowIcon(QIcon("assets/gallery.ico"))
     gallery = Gallery()
     app.exec()
     # app = QGuiApplication([])
