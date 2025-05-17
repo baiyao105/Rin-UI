@@ -104,6 +104,7 @@ Frame {
         }
 
         Flow {
+            id: flow
             Layout.alignment: Qt.AlignTop
             Layout.fillWidth: true
             Layout.topMargin: 3
@@ -121,7 +122,6 @@ Frame {
                 property bool wrap: (
                     (
                         infoBar.width - iconWidget.width - rights.width - main.spacing * 2 - infoBar.padding * 2
-                        - (titleText.width + custom.width + 24)
                     )
                     < implicitWidth
                 )
