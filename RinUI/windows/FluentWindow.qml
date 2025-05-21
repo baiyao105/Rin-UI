@@ -8,7 +8,6 @@ import "../windows"
 FluentWindowBase {
     id: window
     // visible: true
-    title: qsTr("Fluent Window")
     width: 900
     height: 600
     minimumWidth: 400

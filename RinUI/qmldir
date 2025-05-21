@@ -28,6 +28,7 @@ PickerView 1.0 components/DateAndTime/PickerView.qml
 # Dialogs & Flyouts
 Dialog 1.0 components/DialogsAndFlyouts/Dialog.qml
 Flyout 1.0 components/DialogsAndFlyouts/Flyout.qml
+TeachingTip 1.0 components/DialogsAndFlyouts/TeachingTip.qml
 
 # Layout
 Expander 1.0 components/Layout/Expander.qml
@@ -60,6 +61,7 @@ TableViewDelegate 1.0 components/ListAndCollections/TableViewDelegate.qml
 
 # Menus & Toolbars
 Menu 1.0 components/MenusAndToolbars/Menu.qml
+TextInputMenu 1.0 components/MenusAndToolbars/TextInputMenu.qml
 MenuItem 1.0 components/MenusAndToolbars/MenuItem.qml
 MenuItemGroup 1.0 components/MenusAndToolbars/MenuItemGroup.qml
 MenuSeparator 1.0 components/MenusAndToolbars/MenuSeparator.qml

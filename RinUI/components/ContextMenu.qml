@@ -101,9 +101,9 @@ Popup {
             }
 
             onClicked: {
+                contextMenu.close()
                 listView.currentIndex = index
                 contextMenu.itemSelected(index)
-                contextMenu.close()
             }
         }
     }

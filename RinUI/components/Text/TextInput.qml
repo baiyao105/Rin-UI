@@ -13,6 +13,25 @@ TextInput {
     color: Theme.currentTheme.colors.textColor
     selectionColor: Theme.currentTheme.colors.primaryColor
 
+    // Menu
+    TextInputMenu {
+        id: contextMenu
+    }
+
+    MouseArea {
+        anchors.fill: parent
+        acceptedButtons: Qt.RightButton
+        propagateComposedEvents: true
+        onPressed: (mouse) => {
+            if (mouse.button === Qt.RightButton)
+                contextMenu.popup(mouse.scenePosition)
+            mouse.accepted = false
+        }
+
+        // 鼠标
+        cursorShape: Qt.IBeamCursor
+    }
+
     font.pixelSize: {
         switch (typography) {
             case Typography.Display: return Theme.currentTheme.typography.displaySize;

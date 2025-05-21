@@ -1,33 +1,20 @@
 import os
 import sys
 
-from PySide6.QtCore import QCoreApplication, QUrl
+from PySide6.QtCore import QCoreApplication, QUrl, QObject
 from PySide6.QtGui import QIcon
-from PySide6.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout
+from PySide6.QtWidgets import QApplication
 from PySide6.QtQml import QQmlApplicationEngine
+
 from .theme import ThemeManager
-from .config import BackdropEffect, is_windows, Theme, RINUI_PATH
-
-
-class TestWindow(QWidget):
-    def __init__(self, theme_manager):
-        super().__init__()
-        layout = QVBoxLayout()
-        self.setLayout(layout)
-        self.setWindowTitle("Test Window")
-        btn = QPushButton(theme_manager.current_theme)
-        btn.clicked.connect(
-            lambda: theme_manager.toggle_theme("Light" if theme_manager.current_theme == "Dark" else "Dark")
-        )
-        self.layout().addWidget(btn)
-        self.resize(400, 300)
+from .config import BackdropEffect, is_windows, Theme, RINUI_PATH, RinConfig
 
 
 class RinUIWindow:
     def __init__(self, qml_path: str):
         """
-        创建基于 RinUI 的 QML 应用程序。
-        :param qml_path: str, QML 文件路径
+        Create an application window with RinUI.
+        :param qml_path: str, QML file path (eg = "path/to/main.qml")
         """
         super().__init__()
         if hasattr(self, "_initialized") and self._initialized:
@@ -35,29 +22,29 @@ class RinUIWindow:
         self._initialized = True
         print("✨ RinUIWindow Initializing")
 
+        # 退出清理
+        app_instance = QCoreApplication.instance()
+        if not app_instance:
+            raise RuntimeError("QApplication must be created before RinUIWindow.")
+
         self.engine = QQmlApplicationEngine()
         self.theme_manager = ThemeManager()
         self.qml_path = qml_path
         self.autoSetWindowsEffect = True
 
+        app_instance.aboutToQuit.connect(self.theme_manager.clean_up)
         self._setup_application()
         self.print_startup_info()
 
-        # 退出清理
-        app_instance = QCoreApplication.instance()
-        if app_instance:
-            app_instance.aboutToQuit.connect(self.theme_manager.clean_up)
-
-    def _setup_application(self):
+    def _setup_application(self) -> None:
         """Setup"""
         # RInUI 模块
-        rinui_import_path = RINUI_PATH
-        print(f"UI Module Path: {rinui_import_path}")
+        print(f"UI Module Path: {RINUI_PATH}")
 
-        if os.path.exists(rinui_import_path):
-            self.engine.addImportPath(rinui_import_path)
+        if os.path.exists(RINUI_PATH):
+            self.engine.addImportPath(RINUI_PATH)
         else:
-            raise FileNotFoundError(f"Cannot find RinUI module: {rinui_import_path}")
+            raise FileNotFoundError(f"Cannot find RinUI module: {RINUI_PATH}")
 
         # 主题管理器
         self.engine.rootContext().setContextProperty("ThemeManager", self.theme_manager)
@@ -77,8 +64,8 @@ class RinUIWindow:
 
     def setIcon(self, path: str) -> None:
         """
-        设置应用程序图标。
-        :param path: str, 图标路径
+        Sets the icon for the application.
+        :param path: str, icon file path (eg = "path/to/icon.png")
         :return:
         """
         app_instance = QApplication.instance()
@@ -88,7 +75,7 @@ class RinUIWindow:
         else:
             raise RuntimeError("Cannot set icon before QApplication is created.")
 
-    def _apply_windows_effects(self):
+    def _apply_windows_effects(self) -> None:
         """
         Apply Windows effects to the window.
         :return:
@@ -98,7 +85,7 @@ class RinUIWindow:
             self.theme_manager.apply_window_effects()
 
     # func名称遵循 Qt 命名规范
-    def setBackdropEffect(self, effect: BackdropEffect):
+    def setBackdropEffect(self, effect: BackdropEffect) -> None:
         """
         Sets the backdrop effect for the window. (Only available on Windows)
         :param effect: BackdropEffect, type of backdrop effect（Acrylic, Mica, Tabbed, None_）
@@ -108,7 +95,7 @@ class RinUIWindow:
             raise OSError("Only can set backdrop effect on Windows platform.")
         self.theme_manager.apply_backdrop_effect(effect.value)
 
-    def setTheme(self, theme: Theme):
+    def setTheme(self, theme: Theme) -> None:
         """
         Sets the theme for the window.
         :param theme: Theme, type of theme（Auto, Dark, Light）
@@ -116,7 +103,7 @@ class RinUIWindow:
         """
         self.theme_manager.toggle_theme(theme.value)
 
-    def __getattr__(self, name):
+    def __getattr__(self, name) -> QObject:
         """获取 QML 窗口属性"""
         try:
             root = object.__getattribute__(self, "root_window")
@@ -124,7 +111,7 @@ class RinUIWindow:
         except AttributeError:
             raise AttributeError(f"\"RinUIWindow\" object has no attribute '{name}'")
 
-    def print_startup_info(self):
+    def print_startup_info(self) -> None:
         border = "=" * 40
         print(f"\n{border}")
         print("✨ RinUIWindow Loaded Successfully!")

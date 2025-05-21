@@ -23,16 +23,16 @@ FluentWindow {
 
     navigationItems: [
         {
-            title: "Home",
+            title: qsTr("Home"),
             page: Qt.resolvedUrl("pages/Home.qml"),
             icon: "ic_fluent_home_20_regular",
         },
         {
-            title: "Design guidance",
+            title: qsTr("Design guidance"),
             icon: "ic_fluent_design_ideas_20_regular",  // 找了半天没找到和WinUIGallery一样的图标(?)
             subItems: [
                 {
-                    title: "Iconography",
+                    title: qsTr("Iconography"),
                     page: Qt.resolvedUrl("pages/Iconography.qml"),
                     icon: "ic_fluent_symbols_20_regular"
                 }
@@ -41,72 +41,78 @@ FluentWindow {
 
         // 控件示例 / Sample //
         {
-            title: "All Samples",
+            title: qsTr("All Samples"),
             page: Qt.resolvedUrl("pages/AllSamples.qml"),
             icon: "ic_fluent_apps_list_20_regular"
 
         },
         {
-            title: "Basic Input",
+            title: qsTr("Basic Input"),
             page: Qt.resolvedUrl("pages/BasicInput.qml"),
             icon: "ic_fluent_checkbox_checked_20_regular",
             subItems: generateSubItems("basicInput")
         },
         {
-            title: "Collections",
+            title: qsTr("Collections"),
             page: Qt.resolvedUrl("pages/Collections.qml"),
             icon: "ic_fluent_table_20_regular",
             subItems: generateSubItems("collections")
         },
         {
-            title: "Date & Time",
+            title: qsTr("Date & Time"),
             page: Qt.resolvedUrl("pages/DateAndTime.qml"),
             icon: "ic_fluent_calendar_clock_20_regular",
             subItems: generateSubItems("date&time")
         },
         {
-            title: "Dialogs & Flyouts",
+            title: qsTr("Dialogs & Flyouts"),
             page: Qt.resolvedUrl("pages/DialogsAndFlyouts.qml"),
             icon: "ic_fluent_chat_20_regular",
             subItems: generateSubItems("dialogs&flyouts")
         },
         {
-            title: "Layout",
+            title: qsTr("Layout"),
             page: Qt.resolvedUrl("pages/Layout.qml"),
             icon: "ic_fluent_content_view_20_regular",
             subItems: generateSubItems("layout")
         },
         {
-            title: "Menus & Toolbars",
+            title: qsTr("Media"),
+            page: Qt.resolvedUrl("pages/Media.qml"),
+            icon: "ic_fluent_video_clip_20_regular",
+            subItems: generateSubItems("media")
+        },
+        {
+            title: qsTr("Menus & Toolbars"),
             page: Qt.resolvedUrl("pages/MenusAndToolbars.qml"),
             icon: "ic_fluent_save_20_regular",
             subItems: generateSubItems("menus&toolbars")
         },
         {
-            title: "Navigation",
+            title: qsTr("Navigation"),
             page: Qt.resolvedUrl("pages/Navigation.qml"),
             icon: "ic_fluent_save_20_regular",
             subItems: generateSubItems("navigation")
         },
         {
-            title: "Status & Info",
+            title: qsTr("Status & Info"),
             page: Qt.resolvedUrl("pages/StatusAndInfo.qml"),
             icon: "ic_fluent_chat_multiple_minus_20_regular",
             subItems: generateSubItems("status&info")
         },
         {
-            title: "Text & Typography",
+            title: qsTr("Text & Typography"),
             page: Qt.resolvedUrl("pages/Text.qml"),
             icon: "ic_fluent_text_font_20_regular",
             subItems: generateSubItems("text")
         },
         {
-            title: "Error Interface Test",
+            title: qsTr("Error Interface Test"),
             page: Qt.resolvedUrl("unexist/page"),
             icon: "ic_fluent_document_error_20_regular"
         },
         {
-            title: "Settings",
+            title: qsTr("Settings"),
             page: Qt.resolvedUrl("pages/Settings.qml"),
             icon: "ic_fluent_settings_20_regular"
         }

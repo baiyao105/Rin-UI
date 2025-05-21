@@ -2,6 +2,7 @@ import os
 import json
 import platform
 import sys
+from PySide6.QtCore import QLocale
 from enum import Enum
 
 
@@ -36,7 +37,6 @@ BASE_DIR = os.path.abspath(os.getcwd())
 PATH = os.path.join(BASE_DIR, "RinUI/config")
 RINUI_PATH = resource_path(os.path.join(rinui_core_path, "../../"))  # 使用 resource_path 处理路径
 DEFAULT_CONFIG = {
-    "language": "zh_CN",
     "theme": {
         "current_theme": "Auto",
     },
@@ -62,8 +62,13 @@ class BackdropEffect(Enum):
     Tabbed = "tabbed"
 
 
-class ConfigCenter:
+class ConfigManager:
     def __init__(self, path, filename):
+        """
+        Json Config Manager
+        :param path: json config file path
+        :param filename: json config file name (eg: rin_ui.json)
+        """
         self.path = path
         self.filename = filename
         self.config = {}
@@ -118,3 +123,7 @@ class ConfigCenter:
 
     def __repr__(self):
         return json.dumps(self.config, ensure_ascii=False, indent=4)
+
+
+RinConfig = ConfigManager(path=PATH, filename='rin_ui.json')
+RinConfig.load_config(DEFAULT_CONFIG)  # 加载配置

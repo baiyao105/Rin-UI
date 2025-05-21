@@ -29,6 +29,16 @@ QtObject {
 
     property var allControls: [
         {
+            icon: Qt.resolvedUrl("controls/PersonPic.png"),
+            title: qsTr("SelectorBar"),
+            type: "navigation",
+            desc: qsTr(
+                "Presents information from a small set of  different sources. The user can pick one of them."
+            ),
+            page: Qt.resolvedUrl("../pages/controls/SelectorBar.qml"),
+            added: true,
+        },
+        {
             icon: Qt.resolvedUrl("controls/Button.png"),
             title: qsTr("Button"),
             type: "basicInput",

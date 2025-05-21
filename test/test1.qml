@@ -1,5 +1,5 @@
 import QtQuick 2.15
-import QtQuick.Controls 2.15
+import QtQuick.Controls.Universal 2.15
 import QtQuick.Layouts 1.15
 import RinUI
 
@@ -10,10 +10,19 @@ ApplicationWindow {
     height: 600
     title: "Demo Settings Panel"
 
+    Component.onCompleted: {
+        Utils.fontFamily = "Microsoft YaHei"
+    }
+
     ColumnLayout {
         anchors.fill: parent
         anchors.margins: 24
         spacing: 24
+
+        InfoBar {
+            title: qsTr("提示")
+            text: qsTr("请先填写所有必填项")
+        }
 
         Text {
             text: "应用设置"
@@ -103,6 +112,15 @@ ApplicationWindow {
             Button {
                 text: "保存"
                 highlighted: true
+
+                onClicked: {
+                    onAccepted: {
+                    floatLayer.createInfoBar({
+                        severity: Severity.Success,
+                        title: qsTr("成功"),
+                        text: qsTr("您现在应该可以使用功能了，如果还不能使用，请切换一下界面")
+                    })}
+                }
             }
         }
     }

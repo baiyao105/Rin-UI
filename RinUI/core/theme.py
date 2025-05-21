@@ -4,7 +4,7 @@ import time
 
 from PySide6.QtCore import QObject, Signal, Slot, QThread
 
-from .config import DEFAULT_CONFIG, ConfigCenter, PATH, is_win10, is_windows, is_win11, BackdropEffect
+from .config import DEFAULT_CONFIG, RinConfig, is_win10, is_windows, is_win11, BackdropEffect
 import sys
 import darkdetect
 
@@ -99,7 +99,7 @@ class ThemeManager(QObject):
         清理资源并停止主题监听。
         """
         if self.listener:
-            self.config.save_config()
+            RinConfig.save_config()
             print("Save config.")
             self.listener.stop()
             self.listener.wait()  # 等待线程结束
@@ -129,11 +129,8 @@ class ThemeManager(QObject):
         self.current_theme = DEFAULT_CONFIG["theme"]["current_theme"]  # 当前主题
         self.is_darkdetect_supported = check_darkdetect_support()
 
-        self.config = ConfigCenter(PATH, "rin_ui.json")  # 配置中心
-        self.config.load_config(DEFAULT_CONFIG)  # 加载配置
-
         try:
-            self.current_theme = self.config["theme"]["current_theme"]
+            self.current_theme = RinConfig["theme"]["current_theme"]
         except Exception as e:
             print(f"Failed to load config because of {e}, using default config")
 
@@ -154,7 +151,7 @@ class ThemeManager(QObject):
         self.windows.append(hwnd)
         print(f"Window handle set: {hwnd}")
 
-    def _handle_system_theme(self, system_theme):
+    def _handle_system_theme(self):
         if self.current_theme == "Auto":
             self._update_window_theme()
             self.themeChanged.emit(self._actual_theme())
@@ -190,7 +187,7 @@ class ThemeManager(QObject):
             elif is_win10() and effect_type == BackdropEffect.Acrylic.value:
                 self._apply_win10_effect(effect_type, hwnd)
 
-        self.config["backdrop_effect"] = effect_type
+        RinConfig["backdrop_effect"] = effect_type
         print(
             f"Applied \"{effect_type.strip().capitalize()}\" effect with "
             f"{platform.system() + '11' if is_win11() else '10'}"
@@ -202,7 +199,7 @@ class ThemeManager(QObject):
         应用 Windows 10 背景效果
         :param effect_type: str, 背景效果类型（acrylic, tabbed(actually blur)
         """
-        backdrop_color = self.config["win10_feat"]["backdrop_dark" if self.is_dark_theme() else "backdrop_light"]
+        backdrop_color = RinConfig["win10_feat"]["backdrop_dark" if self.is_dark_theme() else "backdrop_light"]
 
         accent = ACCENT_POLICY()
         accent.AccentState = ACCENT_STATES[effect_type]
@@ -257,8 +254,8 @@ class ThemeManager(QObject):
                     ctypes.byref(ctypes.c_int(self.theme_dict[actual_theme])),
                     ctypes.sizeof(ctypes.c_int)
                 )
-            elif is_win10() and self.config["backdrop_effect"] == BackdropEffect.Acrylic.value:
-                self._apply_win10_effect(self.config["backdrop_effect"], hwnd)
+            elif is_win10() and RinConfig["backdrop_effect"] == BackdropEffect.Acrylic.value:
+                self._apply_win10_effect(RinConfig["backdrop_effect"], hwnd)
             else:
                 print(f"Cannot apply backdrop on {platform.system()}")
 
@@ -281,7 +278,7 @@ class ThemeManager(QObject):
         if self.current_theme != theme:
             print(f"Switching to '{theme}' theme")
             self.current_theme = theme
-            self.config["theme"]["current_theme"] = theme
+            RinConfig["theme"]["current_theme"] = theme
             self._update_window_theme()
             self.themeChanged.emit(self._actual_theme())
 
@@ -301,18 +298,18 @@ class ThemeManager(QObject):
     @Slot(result=str)
     def get_backdrop_effect(self):
         """获取当前背景效果"""
-        return self.config["backdrop_effect"]
+        return RinConfig["backdrop_effect"]
 
     @Slot(result=str)
     def get_theme_color(self):
         """获取当前主题颜色"""
-        return self.config["theme_color"]
+        return RinConfig["theme_color"]
 
     @Slot(result=str)
     def set_theme_color(self, color):
         """设置当前主题颜色"""
-        self.config["theme_color"] = color
-        self.config.save_config()
+        RinConfig["theme_color"] = color
+        RinConfig.save_config()
 
     @Slot(QObject, result=int)
     def getWindowId(self, window):

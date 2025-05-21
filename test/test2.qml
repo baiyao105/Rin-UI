@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Controls
+import QtQuick.Layouts
 import QtQuick.Window
 import RinUI
 
@@ -8,33 +9,76 @@ Window {
     width: 640
     height: 480
     visible: true
-    title: qsTr("Hello World 2")
+    title: qsTr("Example")
 
-    Row {
-        anchors.bottom: parent.bottom
-        anchors.horizontalCenter: parent.horizontalCenter
-        anchors.margins: 16
-        spacing: 4
-        Button {
-            highlighted: true
-            text: qsTr("Click me!")
-            onClicked: dialog.open()
+    // 题1
+    // RowLayout {
+    //     anchors.centerIn: parent
+    //     spacing: 10
+    //
+    //     RoundButton {
+    //         width: 100
+    //         height: 100
+    //         text: "Take action"
+    //     }
+    //     RoundButton {
+    //         width: 100
+    //         height: 100
+    //         text: "Cancel action"
+    //     }
+    // }
 
-            Dialog {
-                id: dialog
-                modal: true
-                title: qsTr("Are you sure to toggle theme?")
-                Text {
-                    text: qsTr("This is a dialog.")
-                }
-                onAccepted: {
-                    Theme.toggleMode()
-                }
-                standardButtons: Dialog.Ok | Dialog.Cancel
-            }
-        }
-        Button {
-            text: qsTr("Button")
-        }
-    }
+    property var subjects: ["Chinese", "Math", "English"]
+
+    // 题2
+    // Column {
+    //     anchors.centerIn: parent
+    //     ListView {
+    //         id: subjectMgr
+    //         width: 300
+    //         height: 200
+    //         model: subjects
+    //     }
+    //     Row {
+    //         spacing: 10
+    //         TextField {
+    //             id: subjectName
+    //             placeholderText: "Subject Name"
+    //         }
+    //
+    //         Button {
+    //             highlighted: true
+    //             text: "Add"
+    //             onClicked: {
+    //                 subjects.push(subjectName.text)
+    //                 console.log(subjects)
+    //             }
+    //         }
+    //         Button {
+    //             text: "Remove"
+    //             onClicked: subjects.splice(subjectMgr.currentIndex, 1)
+    //         }
+    //     }
+    // }
+
+    // 题3
+    // Item {
+    //     signal clicked()
+    //     property string text: "Button"
+    //
+    //     width: 100
+    //     height: 32
+    //     Rectangle {
+    //         anchors.fill: parent
+    //         color: "lightgray"
+    //     }
+    //     Text {
+    //         anchors.centerIn: parent
+    //         text: parent.text
+    //     }
+    //     MouseArea {
+    //         anchors.fill: parent
+    //         onClicked: clicked
+    //     }
+    // }
 }
