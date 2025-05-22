@@ -20,7 +20,8 @@ With simple configuration, you can quickly develop elegant UI interfaces in the 
 * Elegant Fluent Design controls (WIP)
 * Dark and light mode, automatic switching
 * Compatible with original QML control names
-* Multi-language support (WIP)
+* i18n Internationalization
+* Multi-programming language support (WIP)
 * Theme system (WIP)
 * Development documentation, [preview](https://ui.rinlit.cn/) now. (WIP)
 
