@@ -110,8 +110,9 @@ ApplicationWindow {
                 text: "取消"
             }
             Button {
-                text: "保存"
+                text: "Button with Custom Color"
                 highlighted: true
+                primaryColor: "#444"
 
                 onClicked: {
                     onAccepted: {

@@ -12,6 +12,10 @@ QtObject {
     property var fontIconIndex: Icons.FluentIcons // 字体图标索引
 
     property color primaryColor: "#605ed2" // 默认主题色
+    property QtObject colors: Theme.currentTheme.colors // 主题颜色
+    property QtObject appearance: Theme.currentTheme.appearance // 界面外观
+    property QtObject typography: Theme.currentTheme.typography // 字体
+
     property int windowDragArea: 5 // 窗口可拖动范围 (px)
     property int dialogMaximumWidth: 600 // 对话框最大宽度 (px)
     property int dialogMinimumWidth: 320 // 对话框最小宽度 (px)

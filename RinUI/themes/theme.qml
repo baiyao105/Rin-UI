@@ -6,6 +6,17 @@ Item {
     id: themeManager
 
     property var currentTheme: null
+    readonly property var mode: ({
+        Light: "Light",
+        Dark: "Dark",
+        Auto: "Auto"
+    })
+    readonly property var effect: ({
+        Mica: "mica",
+        Acrylic: "acrylic",
+        Tabbed: "tabbed",
+        None: "none"
+    })
 
     // 初始化时设置默认主题
     Component.onCompleted: {
@@ -17,12 +28,12 @@ Item {
         }
     }
 
-    function isThemeMgrInitialized() {
+    function _isThemeMgrInitialized() {
         return typeof ThemeManager!== "undefined"
     }
 
     function setBackdropEffect(effect) {
-        if (!isThemeMgrInitialized()) {
+        if (!_isThemeMgrInitialized()) {
             console.error("ThemeManager is not defined.")
             return -1
         }
@@ -30,7 +41,7 @@ Item {
     }
 
     function sendDragWindowEvent(window) {
-        if (!isThemeMgrInitialized()) {
+        if (!_isThemeMgrInitialized()) {
             console.error("ThemeManager is not defined.")
             return -1
         }
@@ -38,15 +49,28 @@ Item {
     }
 
     function getBackdropEffect() {
-        if (!isThemeMgrInitialized()) {
+        if (!_isThemeMgrInitialized()) {
             console.error("ThemeManager is not defined.")
             return -1
         }
         return ThemeManager.get_backdrop_effect()
     }
 
+    function setThemeColor(color) {
+        if (!_isThemeMgrInitialized()) {
+            console.error("ThemeManager is not defined.")
+            return -1
+        }
+        if (typeof color !== "string") {
+            console.error("Invalid color format. Expected a string.")
+            return -1
+        }
+        Utils.primaryColor = color
+        ThemeManager.set_theme_color(color)
+    }
+
     function getThemeColor() {
-        if (!isThemeMgrInitialized()) {
+        if (!_isThemeMgrInitialized()) {
             console.error("ThemeManager is not defined.")
             return -1
         }
@@ -54,7 +78,7 @@ Item {
     }
 
     function getTheme() {
-        if (!isThemeMgrInitialized()) {
+        if (!_isThemeMgrInitialized()) {
             console.error("ThemeManager is not defined.")
             return -1
         }
@@ -64,33 +88,33 @@ Item {
     // 本来打算写多主题支持的（）
 
     function toggleMode() {
-        if (!isThemeMgrInitialized()) {
+        if (!_isThemeMgrInitialized()) {
             console.error("ThemeManager is not defined.")
             return -1
         }
-        var mode = ThemeManager.get_theme()
+        let theme_mode;
         if (!currentTheme.isDark) {
-            mode = "Dark"
+            theme_mode = mode.Dark
         } else {
-            mode = "Light"
+            theme_mode = mode.Light
         }
-        setTheme(mode)
+        setTheme(theme_mode)
     }
 
     // 切换主题
-    function setTheme(mode) {
-        if (!isThemeMgrInitialized()) {
+    function setTheme(theme_mode: mode) {
+        if (!_isThemeMgrInitialized()) {
             console.error("ThemeManager is not defined.")
             currentTheme = Qt.createQmlObject("import '../themes'; Light {}", themeManager)
             return
         }
 
         // Call Python backend to toggle theme
-        ThemeManager.toggle_theme(mode)
+        ThemeManager.toggle_theme(theme_mode)
 
         // Get the actual theme name
         var themeName = ThemeManager.get_theme_name()
-        if (themeName === "Auto") {
+        if (themeName === mode.Auto) {
             // Get the actual theme applied (Light or Dark)
             themeName = ThemeManager.get_theme()
         }

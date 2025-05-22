@@ -21,7 +21,7 @@ FluentPage {
             icon: "ic_fluent_paint_brush_20_regular"
 
             ComboBox {
-                property var data: ["Light", "Dark", "Auto"]
+                property var data: [Theme.mode.Light, Theme.mode.Dark, Theme.mode.Auto]
                 model: ListModel {
                     ListElement { text: qsTr("Light") }
                     ListElement { text: qsTr("Dark") }

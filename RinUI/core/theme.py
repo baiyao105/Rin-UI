@@ -300,16 +300,16 @@ class ThemeManager(QObject):
         """获取当前背景效果"""
         return RinConfig["backdrop_effect"]
 
-    @Slot(result=str)
-    def get_theme_color(self):
-        """获取当前主题颜色"""
-        return RinConfig["theme_color"]
-
-    @Slot(result=str)
+    @Slot(str)
     def set_theme_color(self, color):
         """设置当前主题颜色"""
         RinConfig["theme_color"] = color
         RinConfig.save_config()
+
+    @Slot(result=str)
+    def get_theme_color(self):
+        """获取当前主题颜色"""
+        return RinConfig["theme_color"]
 
     @Slot(QObject, result=int)
     def getWindowId(self, window):
