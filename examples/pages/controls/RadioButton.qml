@@ -40,7 +40,7 @@ ControlPage {
             showcase: [
                 CheckBox {
                     id: radioSwitch
-                    text: qsTr("Disable Hyperlink")
+                    text: qsTr("Disable RadioButtons")
                 }
             ]
         }

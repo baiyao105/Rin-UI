@@ -32,7 +32,7 @@ ControlPage {
             showcase: [
                 CheckBox {
                     id: sliderSwitch
-                    text: qsTr("Disable Hyperlink")
+                    text: qsTr("Disable Slider")
                 }
             ]
         }

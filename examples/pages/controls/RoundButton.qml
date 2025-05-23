@@ -34,7 +34,7 @@ ControlPage {
             showcase: [
                 CheckBox {
                     id: buttonSwitch
-                    text: qsTr("Disable ToggleButton")
+                    text: qsTr("Disable Button")
                 }
             ]
         }
