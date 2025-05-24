@@ -6,6 +6,7 @@ import "../../components"
 
 ControlPage {
     title: qsTr("Button")
+    docsUrl: "https://ui.rinlit.cn/BasicInput/Button.html"
 
     // intro
     Text {

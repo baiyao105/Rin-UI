@@ -29,13 +29,13 @@ QtObject {
 
     property var allControls: [
         {
-            icon: Qt.resolvedUrl("controls/PersonPic.png"),
-            title: qsTr("SelectorBar"),
-            type: "navigation",
+            icon: Qt.resolvedUrl("controls/PersonPicture.png"),
+            title: qsTr("Avatar"),
+            type: "media",
             desc: qsTr(
-                "Presents information from a small set of  different sources. The user can pick one of them."
+                "Display a picture of a person/contact."
             ),
-            page: Qt.resolvedUrl("../pages/controls/SelectorBar.qml"),
+            page: Qt.resolvedUrl("../pages/controls/Avatar.qml"),
             added: true,
         },
         {

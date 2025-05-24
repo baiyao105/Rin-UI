@@ -68,6 +68,9 @@ MenuSeparator 1.0 components/MenusAndToolbars/MenuSeparator.qml
 ToolSeparator 1.0 components/MenusAndToolbars/ToolSeparator.qml
 MenuBar 1.0 components/MenusAndToolbars/MenuBar.qml
 
+# Media
+Avatar 1.0 components/Media/Avatar.qml
+
 # Navigation
 NavigationView 1.0 components/Navigation/NavigationView.qml
 NavigationBar 1.0 components/Navigation/NavigationBar.qml
