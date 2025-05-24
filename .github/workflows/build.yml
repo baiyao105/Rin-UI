@@ -3,8 +3,8 @@ name: Build Gallery by PyInstaller
 on:
   pull_request:
     branches: [master]
-  push:
-    branches: [master]
+  release:
+    types: [published]
   workflow_dispatch:
 
 jobs:
