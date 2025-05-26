@@ -18,6 +18,8 @@ Popup {
 
     // 坐标
 
+    width: implicitWidth > maximumWidth ? maximumWidth : implicitWidth
+
     contentItem: ColumnLayout {
         spacing: 0
 
@@ -49,7 +51,7 @@ Popup {
                 }
             }
         }
-        }
+    }
 
         Item {
             height: 16
@@ -75,30 +77,6 @@ Popup {
             spacing: 8
         }
     }
-
-    // background: Rectangle {
-    //     id: background
-    //     anchors.fill: parent
-    //     anchors.horizontalCenter: parent.horizontalCenter
-    //     y: -6
-    //
-    //     radius: Theme.currentTheme.appearance.windowRadius
-    //     color: Theme.currentTheme.colors.backgroundAcrylicColor
-    //     border.color: Theme.currentTheme.colors.flyoutBorderColor
-    //
-    //     Behavior on color {
-    //         ColorAnimation {
-    //             duration: Utils.appearanceSpeed
-    //             easing.type: Easing.OutQuart
-    //         }
-    //     }
-    //
-    //     layer.enabled: true
-    //     layer.effect: Shadow {
-    //         style: "flyout"
-    //         source: background
-    //     }
-    // }
 
     // 动画 / Animation //
     enter: Transition {
