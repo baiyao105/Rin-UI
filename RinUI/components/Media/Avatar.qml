@@ -44,7 +44,7 @@ Item {
                 let text_list = root.text.split(" ")
                 let result = ""
                 for (let i = 0; i < text_list.length; i++) {
-                    if (text_list[i] !== "") {
+                    if (text_list[i] !== "" && (i === 0 || i === text_list.length - 1)) {
                         result += text_list[i][0]
                     }
                 }

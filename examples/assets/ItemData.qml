@@ -132,7 +132,6 @@ QtObject {
             type: "collections",
             desc: qsTr("A control that presents a collection of items in a vertical list."),
             page: Qt.resolvedUrl("../pages/controls/ListView.qml"),
-            added: true,
         },
         {
             icon: Qt.resolvedUrl("controls/MenuFlyout.png"),
@@ -194,7 +193,6 @@ QtObject {
             type: "layout",
             desc: qsTr("A container with a header that can be expanded to show a body with more content."),
             page: Qt.resolvedUrl("../pages/controls/SettingExpander.qml"),
-            added: true,
         },
         {
             icon: Qt.resolvedUrl("controls/Slider.png"),
@@ -217,6 +215,14 @@ QtObject {
             type: "basicInput",
             desc: qsTr("A button that can toggled between 2 states like a ToggleButton."),
             page: Qt.resolvedUrl("../pages/controls/PillButton.qml"),
+            added: true,
+        },
+        {
+            icon: Qt.resolvedUrl("controls/Pivot.png"),
+            title: qsTr("Segmented"),
+            type: "navigation",
+            desc: qsTr("A common UI control to configure a view or setting."),
+            page: Qt.resolvedUrl("../pages/controls/Segmented.qml"),
             added: true,
         },
         {
