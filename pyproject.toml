@@ -9,7 +9,7 @@ authors = [
     { name = "RinLit", email = "lintu233_qwq@icloud.com" }
 ]
 description = "A Fluent Design-like UI library for Qt Quick (QML) based on PySide6"
-readme = "README.md"
+readme = "README.MD"
 requires-python = ">=3.8"
 dependencies = [
     "PySide6>=6.6.3.1",
