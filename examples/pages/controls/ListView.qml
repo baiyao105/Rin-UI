@@ -8,6 +8,8 @@ import "../../components"
 ControlPage {
     id: page
     title: "ListView"
+    badgeText: qsTr("Experimental")
+    badgeSeverity: Severity.Warning
 
     Text {
         Layout.fillWidth: true

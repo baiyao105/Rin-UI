@@ -16,6 +16,15 @@ QtObject {
         property color controlStrongColor: Qt.alpha("#000000", 0.4458)
         property color controlInputActiveColor: "#ffffff"
 
+        property color controlAltSecondaryColor: Qt.alpha("#000000", 0.0241)
+        property color controlAltTertiaryColor: Qt.alpha("#000000", 0.0578)
+        property color controlAltQuaternaryColor: Qt.alpha("#000000", 0.0924)
+
+        property color controlFillColor: Qt.alpha("#ffffff", 0.7)
+        property color controlFillSecondaryColor: Qt.alpha("#F9F9F9", 0.5)
+        property color controlFillTertiaryColor: Qt.alpha("#F9F9F9", 0.3)
+        property color controlFillQuaternaryColor: Qt.alpha("#F3F3F3", 0.76)
+
         property color controlBorderColor: Qt.alpha("#000000", 0.06)
         property color controlBottomBorderColor: Qt.alpha("#000000", 0.16)
         property color controlAccentBottomBorderColor: Qt.alpha("#000000", 0.4)
@@ -43,7 +52,7 @@ QtObject {
         property color backgroundAcrylicColor: "#F9F9F9"
         property color backgroundSmokeColor: Qt.alpha("#000000", 0.3)
 
-        property color subtleColor: "transparent"
+        property color subtleColor: Qt.alpha("#ffffff", 0)
         property color subtleSecondaryColor: Qt.alpha("#000000", 0.0373)
         property color subtleTertiaryColor: Qt.alpha("#000000", 0.0241)
         property color captionCloseColor: "#c42b1c"

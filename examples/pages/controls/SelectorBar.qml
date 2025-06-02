@@ -12,8 +12,7 @@ ControlPage {
     // intro
     Text {
         Layout.fillWidth: true
-        text: qsTr("A ToggleButton looks like a Button, but works like a CheckBox. It typically has two states,  " +
-                 "checked (on) or unchecked (off).")
+        text: qsTr("SelectorBar is used to modify the content shown by allowing users to select and switch between a small, finite set of data.")
     }
 
     Column {
@@ -27,11 +26,23 @@ ControlPage {
         Frame {
             width: parent.width
             SelectorBar {
-                model: [
-                    { text: "Recent", icon: "ic_fluent_clock_20_regular"},
-                    { text: "Shared", icon: "ic_fluent_share_20_regular"},
-                    { text: "Favorites", icon: "ic_fluent_star_20_regular"},
-                ]
+                SelectorBarItem {
+                    text: qsTr("Recent")
+                    icon.name: "ic_fluent_clock_20_regular"
+                }
+                SelectorBarItem {
+                    text: qsTr("Shared")
+                    icon.name: "ic_fluent_share_20_regular"
+                }
+                SelectorBarItem {
+                    text: qsTr("Favorites")
+                    icon.name: "ic_fluent_star_20_regular"
+                }
+                // model: [
+                //     { text: "Recent", icon: "ic_fluent_clock_20_regular"},
+                //     { text: "Shared", icon: "ic_fluent_share_20_regular"},
+                //     { text: "Favorites", icon: "ic_fluent_star_20_regular"},
+                // ]
             }
         }
     }
@@ -52,16 +63,23 @@ ControlPage {
                 SelectorBar {
                     id: selectorBar
                     currentIndex: 0
-                    model: [
-                        { text: "Page1", page: page1 },
-                        { text: "Page2", page: page2 },
-                        { text: "Page3", page: page3 },
-                    ]
+
+                    Repeater {
+                        id: rep
+                        model: [
+                            { text: "Page1", page: page1 },
+                            { text: "Page2", page: page2 },
+                            { text: "Page3", page: page3 },
+                        ]
+                        SelectorBarItem {
+                            text: modelData.text
+                        }
+                    }
                 }
                 Loader {
                     width: parent.width
                     height: 400
-                    sourceComponent: selectorBar.model[selectorBar.currentIndex].page
+                    sourceComponent: rep.model[selectorBar.currentIndex].page
                 }
             }
         }

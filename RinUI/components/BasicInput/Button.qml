@@ -82,10 +82,9 @@ Button {
             anchors.centerIn: parent
             IconWidget {
                 id: iconWidget
-                size: icon || source ? text.font.pixelSize * 1.25 : 0  // 图标大小 / Icon Size
+                size: icon || source ? text.font.pixelSize * 1.3 : 0  // 图标大小 / Icon Size
                 icon: root.icon.name
                 source: root.icon.source
-                height: parent.height
                 y: 0.25
                 color: icon.color ? icon.color : highlighted ? flat ?
                     enabled ? Theme.currentTheme.colors.textAccentColor : Theme.currentTheme.colors.textColor :

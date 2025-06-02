@@ -16,6 +16,15 @@ QtObject {
         property color controlStrongColor: Qt.alpha("#ffffff", 0.5442)
         property color controlInputActiveColor: Qt.alpha("#1E1E1E", 0.7)
 
+        property color controlAltSecondaryColor: Qt.alpha("#000000", 0.1)
+        property color controlAltTertiaryColor: Qt.alpha("#ffffff", 0.0419)
+        property color controlAltQuaternaryColor: Qt.alpha("#ffffff", 0.0698)
+
+        property color controlFillColor: Qt.alpha("#ffffff", 0.0605)
+        property color controlFillSecondaryColor: Qt.alpha("#ffffff", 0.0837)
+        property color controlFillTertiaryColor: Qt.alpha("#ffffff", 0.0326)
+        property color controlFillQuaternaryColor: Qt.alpha("#ffffff", 0.0605)
+
         property color controlBorderColor: Qt.alpha("#ffffff", 0.09)
         property color controlBottomBorderColor: Qt.alpha("#000000", 0.03)
         property color controlAccentBottomBorderColor: Qt.alpha("#000000", 0.14)
