@@ -95,6 +95,7 @@ QtObject {
             type: "dialogs&flyouts",
             desc: qsTr("Shows contextual information and enables user interaction."),
             page: Qt.resolvedUrl("../pages/controls/Flyout.qml"),
+            updated: true,
         },
         {
             icon: Qt.resolvedUrl("controls/HyperlinkButton.png"),

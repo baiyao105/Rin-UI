@@ -39,7 +39,9 @@ ControlPage {
 
                 Flyout {
                     id: flyout
-                    text: qsTr("All items will be removed. Do you want to continue?")
+                    Text {
+                        text: qsTr("All items will be removed. Do you want to continue?")
+                    }
                     buttonBox: [
                         Button {
                             text: qsTr("Yes, empty my cart")
@@ -72,8 +74,18 @@ ControlPage {
 
                     Flyout {
                         id: flyoutTop
-                        image: Qt.resolvedUrl("../../assets/banner.png")
-                        text: qsTr("The flyout is on the Top")
+
+                        Image {
+                            source: Qt.resolvedUrl("../../assets/banner.png")
+                            fillMode: Image.PreserveAspectCrop
+                            Layout.bottomMargin: 0
+
+                            Layout.preferredWidth: 200
+                            Layout.preferredHeight: 150
+                        }
+                        Text {
+                            text: qsTr("The flyout is on the Top")
+                        }
                     }
                 }
                 Button {
@@ -110,10 +122,16 @@ ControlPage {
                     Flyout {
                         id: flyoutLeft
                         position: Position.Left
-                        maximumWidth: 200
                         text: qsTr("The flyout is on the Left")
 
-                        image: Qt.resolvedUrl("../../assets/BA_Pic_Shiroko-chibi.png")
+                        Image {
+                            source: Qt.resolvedUrl("../../assets/BA_Pic_Shiroko-chibi.png")
+                            fillMode: Image.PreserveAspectCrop
+                            Layout.bottomMargin: 0
+
+                            Layout.preferredWidth: 200
+                            Layout.preferredHeight: 200
+                        }
                     }
                 }
                 Button {

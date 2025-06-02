@@ -7,63 +7,28 @@ import "../../components"
 
 Popup {
     id: flyout
-    property string text: "Flyout"
+    property alias text: flyoutText.text  // 弹出文本内容
     property alias buttonBox: buttonLayout.data  // 按钮列表
-    property string image: ""  // 图片
-    property real maximumWidth: 350  // 最大宽度
+    default property alias content: customContent.data  // 弹出内容
 
     position: Position.Top
 
     padding: 16
 
-    // 坐标
-
-    width: implicitWidth > maximumWidth ? maximumWidth : implicitWidth
-
     contentItem: ColumnLayout {
         spacing: 0
 
-        Image {
-            id: flyoutImg
+        ColumnLayout {
+            id: customContent
+            spacing: 8
             Layout.fillWidth: true
-            Layout.maximumWidth: maximumWidth
-            Layout.margins: -flyout.padding + 2
-            Layout.bottomMargin: 0
-            Layout.preferredHeight: width * (sourceSize.height / sourceSize.width)
-            fillMode: Image.PreserveAspectCrop
-            source: flyout.image
-            visible: flyout.image !== ""
 
-            layer.enabled: true
-            layer.smooth: true
-            layer.effect: OpacityMask {
-            maskSource: Rectangle {
-                width: flyoutImg.width
-                height: flyoutImg.height
-                radius: background.radius
-                color: "black"
-
-                Rectangle {
-                    anchors.bottom: parent.bottom
-                    width: parent.width
-                    height: background.radius
-                    color: "black"
-                }
+            Text {
+                id: flyoutText
+                Layout.fillWidth: true
+                typography: Typography.Body
+                visible: text.length > 0
             }
-        }
-    }
-
-        Item {
-            height: 16
-            visible: flyoutImg.visible
-        }
-
-        Text {
-            id: flyoutText
-            Layout.fillWidth: true
-            Layout.maximumWidth: maximumWidth
-            typography: Typography.Body
-            text: flyout.text
         }
 
         Item {
