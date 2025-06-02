@@ -1,4 +1,5 @@
 <div align="center">
+<img src="docs/img/logo.png" alt="RinUI Logo" width="18%">
 <h1>RinUI</h1>
 <p>A Fluent Design-like UI library for Qt Quick (QML)</p>
 
@@ -36,6 +37,8 @@ With simple configuration, you can quickly develop elegant UI interfaces in the 
 ![img_2.png](/docs/img/img_2.png)
 ![img_3.png](/docs/img/img_3.png)
 </details>
+
+> The image in the banner comes from Pixiv, PID: [125975786](https://www.pixiv.net/artworks/125975786)
 
 ## 🪄 Usage
 

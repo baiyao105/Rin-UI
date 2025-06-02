@@ -5,9 +5,10 @@ from RinUI import RinUIWindow, BackdropEffect, Theme
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    # window2 = RinUIWindow("test2.qml")
-    window = RinUIWindow("test1.qml")
-    window.setBackdropEffect(BackdropEffect.Mica)
+    window2 = RinUIWindow("test2.qml")
+    window2.setTheme(Theme.Light)
+    # window = RinUIWindow("test1.qml")
+    # window.setBackdropEffect(BackdropEffect.Mica)
 
     # print(window, window2)
 

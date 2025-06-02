@@ -13,7 +13,7 @@ from config import cfg
 class Gallery(RinUIWindow):
     def __init__(self):
         super().__init__("gallery.qml")
-        self.setIcon("assets/BA_Pic_Shiroko-chibi.png")
+        self.setIcon("assets/gallery.png")
         self.backend = Backend()
         self.backend.setBackendParent(self)
         self.setProperty("title", f"RinUI Gallery {datetime.now().year}")  # 前后端交互示例

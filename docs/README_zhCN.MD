@@ -1,4 +1,5 @@
 <div align="center">
+<img src="../docs/img/logo.png" alt="RinUI Logo" width="18%">
 <h1>RinUI</h1>
 <p>一个类 Fluent Design 的 Qt Quick (QML) UI 库</p>
 
