@@ -17,8 +17,10 @@ Button {
     property int startYear: 1925
     property int endYear: 2125
 
-    readonly property var monthModel: (new Array(12)).fill(0).map((_, i) => i + 1).map(getMonthName)
-    readonly property int maxDays: new Date(pickerView.value3 || new Date().getFullYear(), pickerView.index1 + 1, 0).getDate()
+    readonly property var monthModel: (new Array(12)).fill(0).map((_, i) => Qt.locale().monthName(i))
+    function calculateMaxDays(year, monthIndex) {
+        return new Date(year, monthIndex + 1, 0).getDate()
+    }
 
     implicitWidth: 250
     padding: 0
@@ -127,7 +129,7 @@ Button {
             )
             : undefined
         model1: monthModel
-        model2: Array.from({ length: maxDays }, (_, i) => i + 1) // 天
+        model2: Array.apply(null, {length: calculateMaxDays(model3[index3], monthIndex)}).map((_, i) => i + 1)
 
         // 初始值
         value3: yearVisible ? (new Date().getFullYear()) : undefined
