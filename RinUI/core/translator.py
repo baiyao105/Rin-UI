@@ -21,5 +21,6 @@ class RinUITranslator(QTranslator):
         print(f"🌏 Current locale: {locale.name()}")
         path = os.path.join(RINUI_PATH, "RinUI", "languages", f"{locale.name()}.qm")
         if not os.path.exists(path):
-            raise FileNotFoundError(f"Cannot find translation file: {path}")
+            print(f"Language file \"{path}\" not found. Fallback to default (en_US)")
+            path = os.path.join(RINUI_PATH, "RinUI", "languages", "en_US.qm")
         return super().load(path)
