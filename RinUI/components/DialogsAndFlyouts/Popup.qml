@@ -37,6 +37,10 @@ Popup {
         }
     }
 
+    Overlay.modal: Rectangle {
+        color: Theme.currentTheme.colors.backgroundSmokeColor
+    }
+
     background: Rectangle {
         id: background
         anchors.fill: parent

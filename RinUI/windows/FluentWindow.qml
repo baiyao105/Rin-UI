@@ -16,6 +16,7 @@ FluentWindowBase {
     titleBarHeight: Theme.currentTheme.appearance.windowTitleBarHeight
 
     property alias navigationItems: navigationView.navigationItems  // 导航栏item
+    property alias currentPage: navigationView.currentPage  // 当前索引项
     property alias defaultPage: navigationView.defaultPage  // 默认索引项
     property alias appLayerEnabled: navigationView.appLayerEnabled  // 应用层背景
     default property alias content: freeContainter.data

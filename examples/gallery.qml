@@ -21,6 +21,31 @@ FluentWindow {
         }));
     }
 
+    Component {
+        id: tips
+        InfoBar {
+            position: Position.BottomRight
+
+            timeout: 5000
+            severity: Severity.Warning
+            closable: false
+            title: qsTr("Tips")
+            text: qsTr("This page is <b>not a bug</b>, but a demo of an error in the RinUI loading interface.")
+            customContent: [
+                Button {
+                    text: "I got it."
+                    onClicked: close()
+                }
+            ]
+        }
+    }
+
+    onCurrentPageChanged: {
+        if (currentPage == Qt.resolvedUrl("unexist/page")) {
+            floatLayer.createCustom(tips)
+        }
+    }
+
     navigationItems: [
         {
             title: qsTr("Home"),

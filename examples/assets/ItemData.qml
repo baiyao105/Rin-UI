@@ -157,11 +157,27 @@ QtObject {
             updated: true,
         },
         {
+            icon: Qt.resolvedUrl("controls/Popup.png"),
+            title: qsTr("Popup"),
+            type: "dialogs&flyouts",
+            desc: qsTr("A UI element displaying temporary content over exiting interface."),
+            page: Qt.resolvedUrl("../pages/controls/Popup.qml"),
+            added: true,
+        },
+        {
             icon: Qt.resolvedUrl("controls/ProgressBar.png"),
             title: qsTr("ProgressBar"),
             type: "status&info",
             desc: qsTr("Shows the apps progress on a task, or that the app is performing ongoing work that doesn't block user interaction."),
             page: Qt.resolvedUrl("../pages/controls/ProgressBar.qml"),
+        },
+        {
+            icon: Qt.resolvedUrl("controls/ProgressRing.png"),
+            title: qsTr("ProgressRing"),
+            type: "status&info",
+            desc: qsTr("Shows the apps progress on a task, or that the app is performing ongoing work that doesn't block user interaction."),
+            page: Qt.resolvedUrl("../pages/controls/ProgressRing.qml"),
+            added: true,
         },
         {
             icon: Qt.resolvedUrl("controls/RadioButton.png"),
@@ -273,7 +289,6 @@ QtObject {
             type: "date&time",
             desc: qsTr("A configurable control that lets a user pick a time value."),
             page: Qt.resolvedUrl("../pages/controls/TimePicker.qml"),
-            added: true,
         },
         {
             icon: Qt.resolvedUrl("controls/TitleBar.png"),

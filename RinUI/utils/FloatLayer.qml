@@ -90,14 +90,23 @@ Item {
         }
     }
 
-    function createCustom( component ){
-        try{
-            var infoContainer = component.createObject(determinePosition(component.position));
+    function createCustom(component) {
+    try {
+        // 用 floatLayer 作为临时父对象
+        var infoContainer = component.createObject(floatLayer);
+        if (!infoContainer) throw "Failed to create component instance.";
+
+        var pos = infoContainer.position;
+
+        var realParent = determinePosition(pos);
+        if (realParent && realParent !== floatLayer) {
+            infoContainer.parent = realParent;
         }
-        catch(err){
-            console.error("Error: error creating component: ", component.objectName || err)
-        }
+    } catch(err) {
+        console.error("Error: error creating component: ", component.objectName || err);
     }
+}
+
 
     function determinePosition(position){
         switch(position){

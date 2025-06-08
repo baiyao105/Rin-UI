@@ -32,7 +32,7 @@ Frame {
     readonly property real endPosX: x
 
 
-    function calculateStartPosY() {
+    function _calculateStartPosY() {
         switch (position) {
             case Position.Top:
                 return -height / 2 ;
@@ -41,6 +41,10 @@ Frame {
             default:
                 return 0;
         }
+    }
+
+    function close() {
+        exitAnimation.start()
     }
 
     color: {
@@ -121,7 +125,8 @@ Frame {
                 id: bodyText
                 property bool wrap: (
                     (
-                        infoBar.width - iconWidget.width - rights.width - main.spacing * 2 - infoBar.padding * 2
+                        infoBar.width - iconWidget.width - titleText.width - rights.width - custom.width
+                        - main.spacing * 5 - infoBar.padding * 2
                     )
                     < implicitWidth
                 )
@@ -179,7 +184,7 @@ Frame {
 
     // Animations
     Component.onCompleted: {
-        startPosY = calculateStartPosY();
+        startPosY = _calculateStartPosY();
         enterAnimation.start()
     }
 

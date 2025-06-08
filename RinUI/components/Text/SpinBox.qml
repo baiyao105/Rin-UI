@@ -104,6 +104,23 @@ SpinBox {
 
     Behavior on opacity { NumberAnimation { duration: Utils.animationSpeed; easing.type: Easing.OutQuint } }
 
+    // 恢复滚轮调整数值
+    WheelHandler {
+        id: wheelHandler
+        target: spin
+        onWheel: (event) => {
+            if (!root.focus) {
+                return; // 如果没有焦点，则不处理滚轮事件
+            }
+            if (event.angleDelta.y > 0) {
+                root.value += root.stepSize;
+            } else if (event.angleDelta.y < 0) {
+                root.value -= root.stepSize;
+            }
+            event.accepted = true; // 阻止事件继续冒泡
+        }
+    }
+
     // 状态变化
     states: [
         State {
