@@ -18,8 +18,8 @@
         implicitWidth: size
         implicitHeight: size
 
-        property int strokeWidth: 6
-        property int size: 56
+        property int strokeWidth: 6  // 圆环宽度
+        property int size: 56  // 尺寸
         property real radius: (Math.min(width, height) - strokeWidth) / 2
 
         property color backgroundColor: "transparent"

@@ -11,6 +11,19 @@ Window {
     visible: true
     title: qsTr("Example")
 
+    Row {
+        Rectangle {
+            width: 50
+            height: 50
+            color: Colors.get("captionCloseColor")
+        }
+        Rectangle {
+            width: 50
+            height: 50
+            color: Theme.currentTheme.colors.captionCloseColor
+        }
+    }
+
     // 题1
     // RowLayout {
     //     anchors.centerIn: parent

@@ -32,6 +32,10 @@ Item {
         return typeof ThemeManager!== "undefined"
     }
 
+    function isDark() {
+        return currentTheme.isDark
+    }
+
     function setBackdropEffect(effect) {
         if (!_isThemeMgrInitialized()) {
             console.error("ThemeManager is not defined.")
@@ -84,8 +88,6 @@ Item {
         }
         return ThemeManager.get_theme_name()
     }
-
-    // 本来打算写多主题支持的（）
 
     function toggleMode() {
         if (!_isThemeMgrInitialized()) {

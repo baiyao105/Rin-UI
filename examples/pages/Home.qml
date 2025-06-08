@@ -61,15 +61,56 @@ FluentPage {
         }
     }
 
+    // link card
+    Flickable {
+        width: parent.width
+        implicitWidth: parent.width
+        height: linkRow.height
+        contentWidth: linkRow.width
+
+        clip: true
+
+        // horz scrollbar
+
+        Row {
+            id: linkRow
+            spacing: 12
+
+            Repeater {
+                model: [
+                    {
+                        title: qsTr("Getting Started"),
+                        desc: qsTr("Get started with RinUI and explore detailed documentation."),
+                        icon: Qt.resolvedUrl("../assets/gallery.png"),
+                        url: qsTr("https://ui.rinlit.cn/guide/getting-started.html")
+                    },
+                    {
+                        title: qsTr("Documentation"),
+                        desc: qsTr("Explore the comprehensive documentation for RinUI components."),
+                        icon: Qt.resolvedUrl("../assets/controls/RichTextBlock.png"),
+                        url: qsTr("https://ui.rinlit.cn/")
+                    },
+                    {
+                        title: qsTr("RinUI on GitHub"),
+                        desc: qsTr("Explore the RinUI source code and repository."),
+                        icon: Theme.isDark() ? Qt.resolvedUrl("../assets/github_light.svg")
+                                            : Qt.resolvedUrl("../assets/github.svg"),
+                        url: "https://github.com/RinLit-233-shiroko/Rin-UI"
+                    },
+                ]
+                delegate: LinkClip { }
+            }
+        }
+    }
+
     // Special Warning
     InfoBar {
         Layout.fillWidth: true
-        severity: Severity.Info
+        severity: Severity.Success
         closable: false
-        title: qsTr("Notice")
+        title: qsTr("🎉 Congratulations!")
         text: qsTr(
-            "Rin UI Gallery is <b>refactoring</b> its pages to make the gallery more compatible with WinUI Gallery. " +
-            "Some pages are still unfinished, the new gallery will available soon."
+            "Congratulations! The refactoring of RinUI Gallery is now <b>complete</b>."
         )
     }
 
