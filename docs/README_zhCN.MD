@@ -3,7 +3,7 @@
 <h1>RinUI</h1>
 <p>一个类 Fluent Design 的 Qt Quick (QML) UI 库</p>
 
-**中文** | [English](../README.MD)
+**中文** | [English](../README)
 
 </div>
 
