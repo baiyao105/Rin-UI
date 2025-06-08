@@ -1,3 +1,4 @@
+import os
 import sys
 
 from PySide6.QtCore import Slot, QObject, QLocale, QTranslator
@@ -40,13 +41,19 @@ class Backend(QObject):
         return QLocale.system().name()
 
     @Slot(str)
-    def setLanguage(self, lang: str):
+    def setLanguage(self, lang: str):  # sample: zh_CN; en_US
         global ui_translator, translator
+        lang_path = f"languages/{lang}.qm"
+
+        if not os.path.exists(lang_path):
+            print(f"Language file {lang_path} not found. Fallback to default (en_US)")
+            lang = "en_US"
+
         cfg["language"] = lang
         cfg.save_config()
         ui_translator = RinUITranslator(QLocale(lang))
         translator = QTranslator()
-        translator.load(f"languages/{lang}.qm")
+        translator.load(lang_path)
         QApplication.instance().removeTranslator(ui_translator)
         QApplication.instance().removeTranslator(translator)
         QApplication.instance().installTranslator(ui_translator)
