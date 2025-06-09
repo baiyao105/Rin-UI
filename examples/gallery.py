@@ -75,7 +75,7 @@ if __name__ == '__main__':
 
     gallery = Gallery()
 
-    app.aboutToQuit.connect(cfg.save_config())
+    app.aboutToQuit.connect(cfg.save_config)
     app.exec()
     # app = QGuiApplication([])
 

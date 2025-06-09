@@ -5,7 +5,8 @@ import "../themes"
 import "../utils"
 
 QtObject {
-    property string fontFamily: Qt.application.font.family  // 默认字体
+    property string fontFamily: Qt.platform.os === "windows"
+        ? "Microsoft YaHei" : Qt.application.font.family   // 默认字体
     property string iconFontFamily: FontIconLoader.name
     property string fontIconSource: Qt.resolvedUrl("../assets/fonts/FluentSystemIcons-Resizable.ttf")  // 字体图标路径
     property string fontIconIndexSource: Qt.resolvedUrl("../assets/fonts/FluentSystemIcons-Index.js")  // 字体图标索引路径

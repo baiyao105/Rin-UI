@@ -1,5 +1,6 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
+import QtQuick.Layouts 2.15
 import "../../themes"
 import "../../components"
 
@@ -34,15 +35,11 @@ Menu {
             case Position.Right:
                 return (parent.height - root.height) / 2
             default:
-                // return -root.height + 5  // 默认顶部
                 return root.y
         }
     }
 
-    implicitWidth: Math.max(contentItem.implicitWidth, 80)
-    implicitHeight: contentItem.implicitHeight
-    // x: (parent.width - root.width) / 2
-    // y: parent.height + 5
+    width: Math.max(contentItem.implicitWidth, 80)
 
     enter: Transition {
         ParallelAnimation {
@@ -101,13 +98,11 @@ Menu {
         }
     }
 
-    spacing: 5
     topPadding: 5
     bottomPadding: 5
 
     background: Rectangle {
-        implicitWidth: 80
-        implicitHeight: 36
+        anchors.fill: parent
         radius: Theme.currentTheme.appearance.windowRadius
         color: Theme.currentTheme.colors.backgroundAcrylicColor
         border.color: Theme.currentTheme.colors.flyoutBorderColor
@@ -125,20 +120,16 @@ Menu {
     contentItem: Flickable {
         id: flickable
         clip: true
-        anchors.fill: parent
-        // contentWidth: width
-        // contentHeight: column.implicitHeight
+        anchors.centerIn: parent
         implicitWidth: column.implicitWidth
         implicitHeight: column.implicitHeight
-        // interactive: column.implicitHeight > height
 
-        Column {
+        ColumnLayout {
             id: column
-            topPadding: 5
-            bottomPadding: 5
+            x: -5
+            spacing: 0
             Repeater {
-                model: root.contentModel  // 默认的 Menu 内容
-                delegate: root.delegate
+                model: root.contentModel
             }
         }
 

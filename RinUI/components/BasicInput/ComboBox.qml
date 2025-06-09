@@ -85,17 +85,6 @@ ComboBox {
         onClicked: menu.open()
     }
 
-    // Text //
-    // contentItem: Text {
-    //     id: text
-    //     typography: Typography.Body
-    //     anchors.left: parent.left
-    //     anchors.leftMargin: 11  // 左边距为 11
-    //     verticalAlignment: Text.AlignVCenter
-    //     height: parent.height
-    //     text: root.displayText ? root.displayText : root.placeholderText
-    //     color: root.displayText ? Theme.currentTheme.colors.textColor : Theme.currentTheme.colors.textSecondaryColor
-    // }
 
     contentItem: TextField {
         id: text

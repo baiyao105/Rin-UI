@@ -74,6 +74,7 @@ TextField {
 
     // 字体 / Font //
     font.pixelSize: Theme.currentTheme.typography.bodySize
+    font.family: Utils.fontFamily
 
     selectionColor: Theme.currentTheme.colors.primaryColor
     color: Theme.currentTheme.colors.textColor

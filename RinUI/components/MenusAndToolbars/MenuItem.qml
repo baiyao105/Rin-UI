@@ -7,6 +7,9 @@ import "../../components"
 
 MenuItem {
     id: root
+
+    Layout.fillWidth: true
+
     implicitWidth: {
         const leftMargin = 16;
         const arrowWidth = arrow.visible ? arrow.width + 16 : root.checked ? indicator.width + 16 : 0;
@@ -94,7 +97,7 @@ MenuItem {
         }
         Text {
             id: shortcutText
-            Layout.alignment: Qt.AlignRight | Qt.AlignVCenter
+            Layout.alignment: Qt.AlignVCenter | Qt.AlignRight
             typography: Typography.Caption
             text: root.action ? root.action.shortcut : ""
             color: Theme.currentTheme.colors.textSecondaryColor
