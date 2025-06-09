@@ -1,20 +1,23 @@
 import os
 import sys
+from typing import Union
 
 from PySide6.QtCore import QCoreApplication, QUrl, QObject
 from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import QApplication
 from PySide6.QtQml import QQmlApplicationEngine
+from pathlib import Path
 
 from .theme import ThemeManager
 from .config import BackdropEffect, is_windows, Theme, RINUI_PATH, RinConfig
 
 
 class RinUIWindow:
-    def __init__(self, qml_path: str):
+    def __init__(self, qml_path: Union[str, Path] = None):
         """
         Create an application window with RinUI.
-        :param qml_path: str, QML file path (eg = "path/to/main.qml")
+        If qml_path is provided, it will automatically load the specified QML file.
+        :param qml_path: str or Path, QML file path (eg = "path/to/main.qml")
         """
         super().__init__()
         if hasattr(self, "_initialized") and self._initialized:
@@ -33,13 +36,21 @@ class RinUIWindow:
         self.autoSetWindowsEffect = True
 
         app_instance.aboutToQuit.connect(self.theme_manager.clean_up)
-        self._setup_application()
-        self.print_startup_info()
 
-    def _setup_application(self) -> None:
-        """Setup"""
+        if qml_path is not None:
+            self.load(qml_path)
+
+    def load(self, qml_path: Union[str, Path] = None) -> None:
+        """
+        Load the QML file and set up the application window.
+        :param qml_path:
+        :return:
+        """
         # RInUI 模块
         print(f"UI Module Path: {RINUI_PATH}")
+
+        if qml_path is not None:
+            self.qml_path = qml_path
 
         if os.path.exists(RINUI_PATH):
             self.engine.addImportPath(RINUI_PATH)
@@ -61,6 +72,8 @@ class RinUIWindow:
 
         self.theme_manager.set_window(self.root_window)
         self._apply_windows_effects() if self.autoSetWindowsEffect else None
+
+        self._print_startup_info()
 
     def setIcon(self, path: str) -> None:
         """
@@ -109,9 +122,9 @@ class RinUIWindow:
             root = object.__getattribute__(self, "root_window")
             return getattr(root, name)
         except AttributeError:
-            raise AttributeError(f"\"RinUIWindow\" object has no attribute '{name}'")
+            raise AttributeError(f"\"RinUIWindow\" object has no attribute '{name}', you need to load() qml at first.")
 
-    def print_startup_info(self) -> None:
+    def _print_startup_info(self) -> None:
         border = "=" * 40
         print(f"\n{border}")
         print("✨ RinUIWindow Loaded Successfully!")
