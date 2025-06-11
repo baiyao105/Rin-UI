@@ -27,9 +27,9 @@ QtObject {
                 return root.themeColors && prop in root.themeColors
             }
         })
-    })
+    })()
 
-    // Sample: Appearance.get("windowRadius") 或 Appearance.proxy.windowRadius
+    // Sample: Colors.get("controlColor") 或 Colors.proxy.controlColor
     function get(name) {
         return root.proxy[name]
     }
