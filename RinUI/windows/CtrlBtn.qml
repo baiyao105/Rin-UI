@@ -22,11 +22,7 @@ Base {
     //关闭 最大化 最小化按钮
     function toggleControl(mode) {
         if (mode === 0) {
-            if (window.visibility === Window.Maximized) {
-                window.showNormal();
-            } else {
-                window.showMaximized();
-            }
+            WindowManager.maximizeWindow(window);
         } else if (mode===1) {
             window.showMinimized();
         } else if (mode===2) {

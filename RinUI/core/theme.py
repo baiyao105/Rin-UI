@@ -292,10 +292,6 @@ class ThemeManager(QObject):
         """获取当前主题名称"""
         return self.current_theme
 
-    @Slot(str)
-    def receive(self, message):
-        print(message)
-
     @Slot(result=str)
     def get_backdrop_effect(self):
         """获取当前背景效果"""
@@ -311,30 +307,3 @@ class ThemeManager(QObject):
     def get_theme_color(self):
         """获取当前主题颜色"""
         return RinConfig["theme_color"]
-
-    @Slot(QObject, result=int)
-    def getWindowId(self, window):
-        """获取窗口的句柄"""
-        print(f"GetWindowId: {window.winId()}")
-        return int(window.winId())
-
-    @Slot(int)
-    def dragWindowEvent(self, hwnd):
-        """ 在Windows 用原生方法拖动"""
-        if not is_windows() or hwnd not in self.windows:
-            print(
-                f"Use Qt method to drag window on: {platform.system()}"
-                if not is_windows() else f"Invalid window handle: {hwnd}"
-            )
-            return
-
-        import win32con
-        from win32gui import ReleaseCapture
-        from win32api import SendMessage
-
-        ReleaseCapture()
-        SendMessage(
-            hwnd,
-            win32con.WM_SYSCOMMAND,
-            win32con.SC_MOVE | win32con.HTCAPTION, 0
-        )

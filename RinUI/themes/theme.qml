@@ -1,6 +1,5 @@
 pragma Singleton
 import QtQuick 2.15
-// import "../themes"
 
 Item {
     id: themeManager
@@ -42,14 +41,6 @@ Item {
             return -1
         }
         ThemeManager.apply_backdrop_effect(effect)
-    }
-
-    function sendDragWindowEvent(window) {
-        if (!_isThemeMgrInitialized()) {
-            console.error("ThemeManager is not defined.")
-            return -1
-        }
-        ThemeManager.dragWindowEvent(ThemeManager.getWindowId(window))
     }
 
     function getBackdropEffect() {

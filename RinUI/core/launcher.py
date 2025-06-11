@@ -9,6 +9,7 @@ from PySide6.QtQml import QQmlApplicationEngine
 from pathlib import Path
 
 from .theme import ThemeManager
+from .window import WinEventFilter, WinEventManager
 from .config import BackdropEffect, is_windows, Theme, RINUI_PATH, RinConfig
 
 
@@ -22,18 +23,21 @@ class RinUIWindow:
         super().__init__()
         if hasattr(self, "_initialized") and self._initialized:
             return
+
+        self.root_window = None
+        self.engine = QQmlApplicationEngine()
+        self.theme_manager = ThemeManager()
+        self.win_event_filter = None
+        self.win_event_manager = WinEventManager()
+        self.qml_path = qml_path
         self._initialized = True
+
         print("✨ RinUIWindow Initializing")
 
         # 退出清理
         app_instance = QCoreApplication.instance()
         if not app_instance:
             raise RuntimeError("QApplication must be created before RinUIWindow.")
-
-        self.engine = QQmlApplicationEngine()
-        self.theme_manager = ThemeManager()
-        self.qml_path = qml_path
-        self.autoSetWindowsEffect = True
 
         app_instance.aboutToQuit.connect(self.theme_manager.clean_up)
 
@@ -49,8 +53,9 @@ class RinUIWindow:
         # RInUI 模块
         print(f"UI Module Path: {RINUI_PATH}")
 
-        if qml_path is not None:
-            self.qml_path = qml_path
+        if qml_path is None:
+            raise ValueError("QML path must be provided to load the window.")
+        self.qml_path = qml_path
 
         if os.path.exists(RINUI_PATH):
             self.engine.addImportPath(RINUI_PATH)
@@ -71,7 +76,14 @@ class RinUIWindow:
         self.root_window = self.engine.rootObjects()[0]
 
         self.theme_manager.set_window(self.root_window)
-        self._apply_windows_effects() if self.autoSetWindowsEffect else None
+
+        # 窗口句柄管理
+        self.win_event_filter = WinEventFilter(self.root_window)
+
+        app_instance = QApplication.instance()
+        app_instance.installNativeEventFilter(self.win_event_filter)
+        self.engine.rootContext().setContextProperty("WinEventManager", self.win_event_manager)
+        self._apply_windows_effects()
 
         self._print_startup_info()
 

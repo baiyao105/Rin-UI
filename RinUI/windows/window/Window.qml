@@ -7,12 +7,10 @@ import "../../utils"
 
 Window {
     id: baseWindow
-    flags: frameless ? Qt.FramelessWindowHint | Qt.Window | Qt.WindowMinimizeButtonHint | Qt.WindowMaximizeButtonHint | Qt.WindowCloseButtonHint
-        : Qt.Window
+    flags: Qt.FramelessWindowHint | Qt.Window | Qt.WindowMinimizeButtonHint | Qt.WindowMaximizeButtonHint | Qt.WindowCloseButtonHint
 
-    color: frameless ? "transparent" : Theme.currentTheme.colors.backgroundColor
-    property bool frameless: false
-    default property alias content: baseWindow.data
+    color: "transparent"
+    default property alias content: contentArea.data
     property int titleBarHeight: Theme.currentTheme.appearance.dialogTitleBarHeight
 
     // 布局
@@ -27,7 +25,6 @@ Window {
         Item {
             Layout.preferredHeight: titleBar.height
             Layout.fillWidth: true
-            visible: frameless
         }
 
         // 主体内容区域
@@ -52,7 +49,6 @@ Window {
         title: baseWindow.title
         Layout.fillWidth: true
         height: baseWindow.titleBarHeight
-        visible: frameless
     }
 
     Rectangle {
@@ -62,9 +58,6 @@ Window {
         border.color: Theme.currentTheme.colors.windowBorderColor
         z: -1
         clip: true
-        visible: frameless
-
-        // Shadow {}
 
         Behavior on color {
             ColorAnimation {
@@ -85,9 +78,6 @@ Window {
         hoverEnabled: baseWindow.visibility !== Window.Maximized
         z: -1
         cursorShape: {
-            if (!frameless) {
-                return
-            }
             const p = Qt.point(mouseX, mouseY)
             const b = Utils.windowDragArea
             if (p.x < b && p.y < b) return Qt.SizeFDiagCursor

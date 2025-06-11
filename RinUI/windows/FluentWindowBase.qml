@@ -14,15 +14,13 @@ ApplicationWindow {
     minimumHeight: 300
     property int hwnd: 0
 
-    flags: frameless ? Qt.FramelessWindowHint | Qt.Window | Qt.WindowMinimizeButtonHint | Qt.WindowMaximizeButtonHint | Qt.WindowCloseButtonHint :
-        Qt.Window
-    color: frameless ? "transparent" : Theme.currentTheme.colors.backgroundColor
+    flags: Qt.FramelessWindowHint | Qt.Window | Qt.WindowMinimizeButtonHint | Qt.WindowMaximizeButtonHint | Qt.WindowCloseButtonHint
+    color: "transparent"
 
     // 自定义属性
     property var icon: "../assets/img/default_app_icon.png"  // 图标
     property alias titleEnabled: titleBar.titleEnabled
     property int titleBarHeight: Theme.currentTheme.appearance.dialogTitleBarHeight
-    property bool frameless: true  // 是否无边框
 
 
     // 直接添加子项
@@ -34,7 +32,7 @@ ApplicationWindow {
     onVisibilityChanged: {
         if (baseWindow.visibility === Window.Maximized) {
             background.radius = 0
-            background.border.width = 0
+            background.border.width = 1
         } else {
             background.radius = Theme.currentTheme.appearance.windowRadius
             background.border.width = 1
@@ -52,7 +50,7 @@ ApplicationWindow {
 
         // 顶部边距
         Item {
-            Layout.preferredHeight: frameless ? titleBar.height : 0
+            Layout.preferredHeight: titleBar.height
             Layout.fillWidth: true
         }
 
@@ -78,7 +76,6 @@ ApplicationWindow {
         title: baseWindow.title
         Layout.fillWidth: true
         height: baseWindow.titleBarHeight
-        visible: frameless
     }
 
 
@@ -93,7 +90,6 @@ ApplicationWindow {
         radius: Theme.currentTheme.appearance.windowRadius
         z: -1
         clip: true
-        visible: frameless
 
         // Shadow {}
 
@@ -123,9 +119,6 @@ ApplicationWindow {
         hoverEnabled: baseWindow.visibility !== Window.Maximized
         z: -1
         cursorShape: {
-            if (!baseWindow.frameless) {
-                return
-            }
             const p = Qt.point(mouseX, mouseY)
             const b = Utils.windowDragArea
             if (p.x < b && p.y < b) return Qt.SizeFDiagCursor

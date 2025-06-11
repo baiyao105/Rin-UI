@@ -35,11 +35,7 @@ Item {
 
     property var window: null
     function toggleMaximized() {
-        if (window.visibility === Window.Maximized) {
-            window.showNormal();
-        } else {
-            window.showMaximized();
-        }
+        WindowManager.maximizeWindow(window)
     }
 
     Rectangle{
@@ -61,7 +57,7 @@ Item {
                 if (!(Qt.platform.os !== "windows" || Qt.platform.os !== "winrt") && !Theme._isThemeMgrInitialized()) {
                     return  // 在win环境使用原生方法拖拽
                 }
-                Theme.sendDragWindowEvent(window)
+                WindowManager.sendDragWindowEvent(window)
             }
             onDoubleClicked: toggleMaximized()
             onPositionChanged: (mouse) => {
