@@ -12,6 +12,7 @@ RowLayout {
     property alias navExpandWidth: navigationBar.expandWidth  // 导航栏宽度
     property alias navMinimumExpandWidth: navigationBar.minimumExpandWidth  // 导航栏保持展开时窗口的最小宽度
 
+    property alias navigationBar: navigationBar  // 导航栏
     property alias navigationItems: navigationBar.navigationItems  // 导航栏item
     property alias currentPage: navigationBar.currentPage  // 当前页面索引
     property string defaultPage: ""  // 默认索引项

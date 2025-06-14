@@ -14,6 +14,7 @@ FluentWindow {
     minimumHeight: 400
 
     // 从 ItemData 获取控件数据
+    // navigationView.navigationBar.collapsed: true
     function generateSubItems(type) {
         return ItemData.getItemsByType(type).map(item => ({
             title: item.title,

@@ -12,6 +12,11 @@ Window {
     title: qsTr("Example")
 
     Row {
+        Component.onCompleted: {
+            console.log(Colors.light.controlBorderStrongColor)
+            console.log(Colors.dark.controlBorderStrongColor)
+            console.log(Colors.proxy.controlBorderStrongColor)
+        }
         Rectangle {
             width: 50
             height: 50

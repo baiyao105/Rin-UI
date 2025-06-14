@@ -10,6 +10,9 @@ Item {
         Dark: "Dark",
         Auto: "Auto"
     })
+    readonly property var light: Qt.createQmlObject("import '../themes'; Light {}", themeManager)
+    readonly property var dark: Qt.createQmlObject("import '../themes'; Dark {}", themeManager)
+
     readonly property var effect: ({
         Mica: "mica",
         Acrylic: "acrylic",

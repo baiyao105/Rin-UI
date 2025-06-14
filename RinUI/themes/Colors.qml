@@ -6,8 +6,12 @@ QtObject {
     id: root
 
     readonly property var themeColors: Theme.currentTheme !== null && Theme.currentTheme !== undefined
-    ? Theme.currentTheme.colors
-    : undefined
+        ? Theme.currentTheme.colors
+        : undefined
+
+    // 明亮和暗色主题颜色，直接访问
+    readonly property var light: Qt.createQmlObject("import '../themes'; Light {}", root).colors
+    readonly property var dark: Qt.createQmlObject("import '../themes'; Dark {}", root).colors
 
     // JS Proxy 模拟动态属性访问
     readonly property var proxy: (function() {
