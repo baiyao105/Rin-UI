@@ -125,7 +125,7 @@ Frame {
                 id: bodyText
                 property bool wrap: (
                     (
-                        infoBar.width - iconWidget.width - titleText.width - rights.width - custom.width
+                        infoBar.width - iconWidget.width - rights.width - custom.width
                         - main.spacing * 5 - infoBar.padding * 2
                     )
                     < implicitWidth
