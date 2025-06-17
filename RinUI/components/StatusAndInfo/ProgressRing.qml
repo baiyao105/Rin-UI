@@ -31,7 +31,7 @@
             ? Theme.currentTheme.colors.systemCautionColor
             : state === ProgressRing.Error
             ? Theme.currentTheme.colors.systemCriticalColor
-            : Theme.currentTheme.colors.primaryColor
+            : primaryColor
         property real _progress: (to - from) === 0
             ? 0
             : Math.max(0, Math.min(1, (value - from) / (to - from)))

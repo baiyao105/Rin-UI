@@ -44,9 +44,9 @@ ControlPage {
             ComboBox {
                 id: stateComboBox
                 model: ListModel {
-                    ListElement { text: "Running"; state: ProgressBar.Running }
-                    ListElement { text: "Paused"; state: ProgressBar.Paused }
-                    ListElement { text: "Error"; state: ProgressBar.Error }
+                    ListElement { text: "Running"; state: ProgressRing.Running }
+                    ListElement { text: "Paused"; state: ProgressRing.Paused }
+                    ListElement { text: "Error"; state: ProgressRing.Error }
                 }
                 textRole: "text"
                 currentIndex: 0
