@@ -54,7 +54,7 @@ ProgressBar {
         radius: root.radius
         color: root.state === 1 ? Theme.currentTheme.colors.systemCautionColor :
             root.state === 2 ? Theme.currentTheme.colors.systemCriticalColor :
-            Theme.currentTheme.colors.primaryColor
+            primaryColor
 
         width: indeterminate ? state === 0 ? root.width / 3 : parent.width : root.visualPosition * parent.width
         x: indeterminate ? -indicator.width : 0
