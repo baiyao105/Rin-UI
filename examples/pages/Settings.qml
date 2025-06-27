@@ -136,7 +136,7 @@ FluentPage {
 
                 Hyperlink {
                     text: qsTr("Create an issue on GitHub")
-                    openUrl: "https://github.com/microsoft/WinUI-Gallery/issues/new/choose"
+                    openUrl: "https://github.com/RinLit-233-shiroko/Rin-UI/issues/new/choose"
                 }
             }
             SettingItem {
