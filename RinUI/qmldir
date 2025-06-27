@@ -29,6 +29,7 @@ PickerView 1.0 components/DateAndTime/PickerView.qml
 
 # Dialogs & Flyouts
 Dialog 1.0 components/DialogsAndFlyouts/Dialog.qml
+DialogButtonBox 1.0 components/DialogsAndFlyouts/DialogButtonBox.qml
 Flyout 1.0 components/DialogsAndFlyouts/Flyout.qml
 Popup 1.0 components/DialogsAndFlyouts/Popup.qml
 TeachingTip 1.0 components/DialogsAndFlyouts/TeachingTip.qml
@@ -53,6 +54,7 @@ InfoBar 1.0 components/StatusAndInfo/InfoBar.qml
 ProgressBar 1.0 components/StatusAndInfo/ProgressBar.qml
 ProgressRing 1.0 components/StatusAndInfo/ProgressRing.qml
 ToolTip 1.0 components/StatusAndInfo/ToolTip.qml
+BusyIndicator 1.0 components/StatusAndInfo/BusyIndicator.qml
 
 # ListAndCollections
 Clip 1.0 components/ListAndCollections/Clip.qml
