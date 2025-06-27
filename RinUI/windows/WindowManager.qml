@@ -8,7 +8,7 @@ Item {
 
     function sendDragWindowEvent(window) {
         if (!_isWinMgrInitialized()) {
-            console.error("ThemeManager is not defined.")
+            console.error("WindowManager is not defined.")
             return -1
         }
         WinEventManager.dragWindowEvent(WinEventManager.getWindowId(window))
@@ -16,14 +16,23 @@ Item {
 
     function maximizeWindow(window) {
         if (!_isWinMgrInitialized()) {
-            console.error("ThemeManager is not defined.")
-            return -1
+            console.warn("WindowManager is not defined.")
         }
-        if ((Qt.platform.os !== "windows" || Qt.platform.os !== "winrt") && _isWinMgrInitialized()) {
+        if (Qt.platform.os === "windows") {
             WinEventManager.maximizeWindow(WinEventManager.getWindowId(window))
             return  // 在win环境使用原生方法拖拽
         }
 
-        window.showMaximized()
+        toggleMaximizeWindow(window)
+    }
+
+    function toggleMaximizeWindow(window) {
+        if (!window) return;
+
+        if (window.visibility === Window.Maximized || window.isMaximized) {
+            window.showNormal();
+        } else {
+            window.showMaximized();
+        }
     }
 }

@@ -54,8 +54,8 @@ Item {
             onPressed: {
                 clickPos = Qt.point(mouseX, mouseY)
 
-                if (!(Qt.platform.os !== "windows" || Qt.platform.os !== "winrt") && !Theme._isThemeMgrInitialized()) {
-                    return  // 在win环境使用原生方法拖拽
+                if (Qt.platform.os !== "windows" || !WindowManager._isWinMgrInitialized()) {
+                    return
                 }
                 WindowManager.sendDragWindowEvent(window)
             }
@@ -65,7 +65,8 @@ Item {
                     return
                 }
 
-                if ((Qt.platform.os !== "windows" || Qt.platform.os !== "winrt") && Theme._isThemeMgrInitialized()) {
+                if (Qt.platform.os !== "windows" && WindowManager._isWinMgrInitialized()) {
+                    log("Windows only")
                     return  // 在win环境使用原生方法拖拽
                 }
 
