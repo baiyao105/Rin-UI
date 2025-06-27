@@ -41,6 +41,7 @@ Expander 1.0 Layout/Expander.qml
 # Status & Info
 InfoBar 1.0 StatusAndInfo/InfoBar.qml
 ProgressBar 1.0 StatusAndInfo/ProgressBar.qml
+ProgressRing 1.0 StatusAndInfo/ProgressRing.qml
 ToolTip 1.0 StatusAndInfo/ToolTip.qml
 
 # Text
