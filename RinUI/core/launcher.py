@@ -9,8 +9,7 @@ from PySide6.QtQml import QQmlApplicationEngine
 from pathlib import Path
 
 from .theme import ThemeManager
-from .window import WinEventFilter, WinEventManager
-from .config import BackdropEffect, is_windows, Theme, RINUI_PATH, RinConfig
+from .config import BackdropEffect, is_windows, Theme, RINUI_PATH
 
 
 class RinUIWindow:
@@ -28,7 +27,7 @@ class RinUIWindow:
         self.engine = QQmlApplicationEngine()
         self.theme_manager = ThemeManager()
         self.win_event_filter = None
-        self.win_event_manager = WinEventManager()
+        self.win_event_manager = None
         self.qml_path = qml_path
         self._initialized = True
 
@@ -78,14 +77,27 @@ class RinUIWindow:
         self.theme_manager.set_window(self.root_window)
 
         # 窗口句柄管理
+        self._window_handle_setup()
+
+        self._print_startup_info()
+
+    def _window_handle_setup(self) -> None:
+        """
+        set up the window handle. (Only available on Windows platform)
+        :return:
+        """
+        if not is_windows():
+            return
+
+        from .window import WinEventFilter, WinEventManager
+
         self.win_event_filter = WinEventFilter(self.root_window)
+        self.win_event_manager = WinEventManager()
 
         app_instance = QApplication.instance()
         app_instance.installNativeEventFilter(self.win_event_filter)
         self.engine.rootContext().setContextProperty("WinEventManager", self.win_event_manager)
         self._apply_windows_effects()
-
-        self._print_startup_info()
 
     def setIcon(self, path: str) -> None:
         """
@@ -105,7 +117,7 @@ class RinUIWindow:
         Apply Windows effects to the window.
         :return:
         """
-        if sys.platform == "win32":
+        if is_windows():
             self.theme_manager.apply_backdrop_effect(self.theme_manager.get_backdrop_effect())
             self.theme_manager.apply_window_effects()
 
