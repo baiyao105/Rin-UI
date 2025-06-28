@@ -99,10 +99,10 @@ class RinUIWindow:
         self.engine.rootContext().setContextProperty("WinEventManager", self.win_event_manager)
         self._apply_windows_effects()
 
-    def setIcon(self, path: str) -> None:
+    def setIcon(self, path: Union[str, Path] = None) -> None:
         """
         Sets the icon for the application.
-        :param path: str, icon file path (eg = "path/to/icon.png")
+        :param path: str or Path, icon file path (eg = "path/to/icon.png")
         :return:
         """
         app_instance = QApplication.instance()

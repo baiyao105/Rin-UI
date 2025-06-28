@@ -1,9 +1,8 @@
-import os
 import json
 import platform
 import sys
-from PySide6.QtCore import QLocale
 from enum import Enum
+from pathlib import Path
 
 
 def is_win11():
@@ -27,15 +26,16 @@ def is_windows():
 def resource_path(relative_path):
     """兼容 PyInstaller 打包和开发环境的路径"""
     if hasattr(sys, '_MEIPASS'):
-        return os.path.join(sys._MEIPASS, relative_path)
-    return os.path.abspath(relative_path)
+        return Path(sys._MEIPASS) / relative_path
+    return Path(relative_path).resolve()
 
 
-rinui_core_path = os.path.abspath(os.path.dirname(__file__))  # RinUI/core 目录
+rinui_core_path = Path(__file__).resolve().parent  # RinUI/core 目录
 
-BASE_DIR = os.path.abspath(os.getcwd())
-PATH = os.path.join(BASE_DIR, "RinUI/config")
-RINUI_PATH = resource_path(os.path.join(rinui_core_path, "../../"))  # 使用 resource_path 处理路径
+BASE_DIR = Path.cwd().resolve()
+PATH = BASE_DIR / "RinUI" / "config"
+RINUI_PATH = resource_path(rinui_core_path.parent.parent)  # 使用 resource_path 处理路径，等同 ../../
+
 DEFAULT_CONFIG = {
     "theme": {
         "current_theme": "Auto",
@@ -63,24 +63,24 @@ class BackdropEffect(Enum):
 
 
 class ConfigManager:
-    def __init__(self, path, filename):
+    def __init__(self, path: Path, filename: str):
         """
         Json Config Manager
-        :param path: json config file path
+        :param path: json config file path (Path)
         :param filename: json config file name (eg: rin_ui.json)
         """
         self.path = path
         self.filename = filename
         self.config = {}
-        self.full_path = os.path.join(self.path, self.filename)
+        self.full_path = self.path / self.filename
 
     def load_config(self, default_config):
         if default_config is None:
             print('Warning: "default_config" is None, use empty config instead.')
             default_config = {}
         # 如果文件存在，加载配置
-        if os.path.exists(self.full_path):
-            with open(self.full_path, 'r', encoding='utf-8') as f:
+        if self.full_path.exists():
+            with self.full_path.open('r', encoding='utf-8') as f:
                 self.config = json.load(f)
         else:
             self.config = default_config  # 如果文件不存在，使用默认配置
@@ -88,16 +88,16 @@ class ConfigManager:
 
     def update_config(self):  # 更新配置
         try:
-            with open(self.full_path, 'r', encoding='utf-8') as f:
+            with self.full_path.open('r', encoding='utf-8') as f:
                 self.config = json.load(f)
         except Exception as e:
             print(f'Error: {e}')
             self.config = {}
 
-    def upload_config(self, key=str or list, value=None):
-        if type(key) is str:
+    def upload_config(self, key: str | list, value=None):
+        if isinstance(key, str):
             self.config[key] = value
-        elif type(key) is list:
+        elif isinstance(key, list):
             for k in key:
                 self.config[k] = value
         else:
@@ -107,9 +107,8 @@ class ConfigManager:
     def save_config(self):
         try:
             # 确保配置文件目录存在
-            if not os.path.exists(self.path):
-                os.makedirs(self.path)
-            with open(self.full_path, 'w', encoding='utf-8') as f:
+            self.path.mkdir(parents=True, exist_ok=True)
+            with self.full_path.open('w', encoding='utf-8') as f:
                 json.dump(self.config, f, ensure_ascii=False, indent=4)
         except Exception as e:
             print(f'Error: {e}')
