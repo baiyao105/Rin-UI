@@ -3,6 +3,7 @@ import platform
 import sys
 from enum import Enum
 from pathlib import Path
+import os
 
 
 def is_win11():
@@ -63,24 +64,24 @@ class BackdropEffect(Enum):
 
 
 class ConfigManager:
-    def __init__(self, path: Path, filename: str):
+    def __init__(self, path, filename):
         """
         Json Config Manager
-        :param path: json config file path (Path)
+        :param path: json config file path
         :param filename: json config file name (eg: rin_ui.json)
         """
         self.path = path
         self.filename = filename
         self.config = {}
-        self.full_path = self.path / self.filename
+        self.full_path = os.path.join(self.path, self.filename)
 
     def load_config(self, default_config):
         if default_config is None:
             print('Warning: "default_config" is None, use empty config instead.')
             default_config = {}
         # 如果文件存在，加载配置
-        if self.full_path.exists():
-            with self.full_path.open('r', encoding='utf-8') as f:
+        if os.path.exists(self.full_path):
+            with open(self.full_path, 'r', encoding='utf-8') as f:
                 self.config = json.load(f)
         else:
             self.config = default_config  # 如果文件不存在，使用默认配置
@@ -88,16 +89,16 @@ class ConfigManager:
 
     def update_config(self):  # 更新配置
         try:
-            with self.full_path.open('r', encoding='utf-8') as f:
+            with open(self.full_path, 'r', encoding='utf-8') as f:
                 self.config = json.load(f)
         except Exception as e:
             print(f'Error: {e}')
             self.config = {}
 
-    def upload_config(self, key: str | list, value=None):
-        if isinstance(key, str):
+    def upload_config(self, key=str or list, value=None):
+        if type(key) is str:
             self.config[key] = value
-        elif isinstance(key, list):
+        elif type(key) is list:
             for k in key:
                 self.config[k] = value
         else:
@@ -107,8 +108,9 @@ class ConfigManager:
     def save_config(self):
         try:
             # 确保配置文件目录存在
-            self.path.mkdir(parents=True, exist_ok=True)
-            with self.full_path.open('w', encoding='utf-8') as f:
+            if not os.path.exists(self.path):
+                os.makedirs(self.path)
+            with open(self.full_path, 'w', encoding='utf-8') as f:
                 json.dump(self.config, f, ensure_ascii=False, indent=4)
         except Exception as e:
             print(f'Error: {e}')
