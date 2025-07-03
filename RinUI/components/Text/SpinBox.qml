@@ -107,7 +107,7 @@ SpinBox {
     // 恢复滚轮调整数值
     WheelHandler {
         id: wheelHandler
-        target: spin
+        target: root
         onWheel: (event) => {
             if (!root.focus) {
                 return; // 如果没有焦点，则不处理滚轮事件
