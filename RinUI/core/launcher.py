@@ -1,4 +1,3 @@
-import os
 import sys
 from typing import Union
 
@@ -54,9 +53,9 @@ class RinUIWindow:
 
         if qml_path is None:
             raise ValueError("QML path must be provided to load the window.")
-        self.qml_path = qml_path
+        self.qml_path = Path(qml_path)
 
-        if os.path.exists(RINUI_PATH):
+        if self.qml_path.exists():
             self.engine.addImportPath(RINUI_PATH)
         else:
             raise FileNotFoundError(f"Cannot find RinUI module: {RINUI_PATH}")
@@ -106,6 +105,7 @@ class RinUIWindow:
         :return:
         """
         app_instance = QApplication.instance()
+        path = Path(path).as_posix()
         if app_instance:
             app_instance.setWindowIcon(QIcon(path))  # 设置应用程序图标
             self.root_window.setProperty('icon', QUrl.fromLocalFile(path))
