@@ -1,22 +1,24 @@
-name: Build Gallery by PyInstaller
+name: Build & Release RinUI Gallery
 
 on:
-  pull_request:
-    branches: [master]
-  release:
-    types: [published]
+  push:
+    tags:
+      - '*'
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
-  build:
+  build-windows:
     runs-on: windows-latest
 
     steps:
       - name: ⬇️ Checkout code
-        uses: actions/checkout@v4.2.2
+        uses: actions/checkout@v4
 
       - name: 🐍 Set up Python
-        uses: actions/setup-python@v5.3.0
+        uses: actions/setup-python@v5
         with:
           python-version: '3.8'
 
@@ -26,7 +28,7 @@ jobs:
           .venv\Scripts\pip install -r requirements.txt
           .venv\Scripts\pip install pyinstaller
 
-      - name: 🔨 Build with PyInstaller
+      - name: 🔨 Build Gallery (Windows)
         run: |
           .venv\Scripts\pyinstaller.exe --noconsole --icon=examples/assets/gallery.ico `
             --add-data="RinUI;RinUI" `
@@ -37,10 +39,93 @@ jobs:
             --add-data="examples/gallery.qml;." `
             --paths=. `
             --contents-directory='.' `
+            --name=RinUIGallery `
             examples/gallery.py
 
-      - name: 📤 Upload artifact
-        uses: actions/upload-artifact@v4.4.2
+      - name: 📦 Zip build
+        run: |
+          powershell Compress-Archive -Path dist/RinUIGallery/* -DestinationPath dist/RinUIGallery-Windows.zip
+
+      - name: ☁️ Upload artifact
+        uses: actions/upload-artifact@v4
         with:
-          name: gallery-win-build
-          path: dist/gallery
+          name: RinUIGallery-Windows
+          path: dist/RinUIGallery-Windows.zip
+
+  build-macos:
+    runs-on: macos-latest
+
+    steps:
+      - name: ⬇️ Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🐍 Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.8'
+
+      - name: 📦 Install dependencies
+        run: |
+          python3 -m venv .venv
+          . .venv/bin/activate
+          pip install -r requirements.txt
+          pip install pyinstaller
+
+      - name: 🔨 Build Gallery (macOS)
+        run: |
+          .venv/bin/pyinstaller --noconsole --icon=examples/assets/gallery.icns \
+            --add-data="RinUI:RinUI" \
+            --add-data="examples/assets:assets" \
+            --add-data="examples/components:components" \
+            --add-data="examples/languages:languages" \
+            --add-data="examples/pages:pages" \
+            --add-data="examples/gallery.qml:." \
+            --paths=. \
+            --contents-directory='.' \
+            --name=RinUIGallery \
+            examples/gallery.py
+
+      - name: 📦 Zip build
+        run: |
+          cd dist
+          ditto -c -k --sequesterRsrc --keepParent RinUIGallery.app RinUIGallery-macOS.zip
+
+      - name: ☁️ Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: RinUIGallery-macOS
+          path: dist/RinUIGallery-macOS.zip
+
+  release:
+    needs: [build-windows, build-macos]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: ⬇️ Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: ⬇️ Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: dist/
+
+      - name: 🧱 Set up git-cliff
+        uses: kenji-miyake/setup-git-cliff@v1
+
+      - name: 📜 Generate CHANGELOG.md
+        run: |
+          git cliff --tag "${{ github.ref_name }}" --config git-cliff.rinui.toml > CHANGELOG.md
+
+      - name: 🚀 Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: RinUI Gallery ${{ github.ref_name }}
+          tag_name: ${{ github.ref_name }}
+          body_path: CHANGELOG.md
+          files: |
+            dist/RinUIGallery-Windows.zip
+            dist/RinUIGallery-macOS.zip
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
