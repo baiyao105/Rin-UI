@@ -61,7 +61,6 @@ class BackdropEffect(Enum):
     Acrylic = "acrylic"
     Mica = "mica"
     Tabbed = "tabbed"
-    Tabbed = "tabbed"
 
 
 class ConfigManager:

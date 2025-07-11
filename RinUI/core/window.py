@@ -1,10 +1,12 @@
 import platform
+from typing import Optional
 
 from PySide6.QtCore import QAbstractNativeEventFilter, QByteArray, QObject, Slot
 import ctypes
 from ctypes import wintypes
 
 import win32con
+from PySide6.QtQuick import QQuickWindow
 from win32gui import ReleaseCapture, GetWindowPlacement, ShowWindow
 from win32con import SW_MAXIMIZE, SW_RESTORE
 from win32api import SendMessage
@@ -111,13 +113,26 @@ class WinEventManager(QObject):
 
 
 class WinEventFilter(QAbstractNativeEventFilter):
-    def __init__(self, window):
+    def __init__(self, window: QQuickWindow):
         super().__init__()
         self.window = window
-        self.hwnd = int(window.winId())
-        self.resize_border = 8  # resize 边框宽度
+        self.hwnd: Optional[int] = None
+        self.resize_border = 8
 
+        # ✅ 动态监听 visible 属性
+        if not self.window.isVisible():
+            self.window.visibleChanged.connect(self._on_visible_changed)
+        else:
+            self._init_window_handle()
+
+    def _on_visible_changed(self, visible: bool):
+        if visible and self.hwnd is None:
+            self._init_window_handle()
+
+    def _init_window_handle(self):
+        self.hwnd = int(self.window.winId())
         self.set_window_styles()
+        print(f"🏷️ Window handle set: hwnd={self.hwnd}")
 
     def set_window_styles(self):
         """设置必要的窗口样式以启用原生窗口行为"""
