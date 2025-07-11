@@ -1,7 +1,7 @@
 [changelog]
 header = """
 # RinUI Gallery
-Release `{{ version }}` version
+Release `{{ range.current }}` version
 
 > [!TIP]
 > See also [PyPi](https://pypi.org/project/rinui/)
@@ -44,4 +44,3 @@ commit_parsers = [
 ]
 
 unclassified_group = "Other Changes"
-topo_order = false
