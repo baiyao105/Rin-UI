@@ -124,7 +124,7 @@ jobs:
 
       - name: 📜 Generate CHANGELOG.md
         run: |
-          git cliff
+          git cliff --tag "${{ github.ref_name }}" > CHANGELOG.md
 
       - name: 🚀 Create GitHub Release
         uses: softprops/action-gh-release@v2
