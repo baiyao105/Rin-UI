@@ -111,6 +111,14 @@ jobs:
         with:
           path: dist/
 
+      - name: 📁 Show downloaded structure (debug)
+        run: ls -R dist/
+
+      - name: 🗃 Move release files to root dist/
+        run: |
+          mv dist/RinUIGallery-Windows/*.zip dist/
+          mv dist/RinUIGallery-macOS/*.zip dist/
+
       - name: 🧱 Set up git-cliff
         uses: kenji-miyake/setup-git-cliff@v1
 
