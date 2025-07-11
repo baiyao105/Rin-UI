@@ -1,13 +1,7 @@
 [changelog]
 header = """
 # RinUI Gallery
-{% if version is matching("^alpha-") %}
-Alpha `{{ version }}` version
-{% elif version is matching("^beta-") %}
-Beta `{{ version }}` version
-{% else %}
 Release `{{ version }}` version
-{% endif %}
 
 > [!TIP]
 > See also [PyPi](https://pypi.org/project/rinui/)
