@@ -1,9 +1,9 @@
 [changelog]
 header = """
 # RinUI Gallery
-{% if tag | startswith("alpha-") %}
+{% if tag | starts_with("alpha-") %}
 Alpha `{{ version }}` version
-{% elif tag | startswith("beta-") %}
+{% elif tag | starts_with("beta-") %}
 Beta `{{ version }}` version
 {% else %}
 Release `{{ version }}` version
