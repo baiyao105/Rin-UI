@@ -6,13 +6,14 @@ Alpha `{{ version }}` version
 {% elif tag | startswith("beta-") %}
 Beta `{{ version }}` version
 {% else %}
-{{ "" }}
+Release `{{ version }}` version
 {% endif %}
 
 > [!TIP]
 > See also [PyPi](https://pypi.org/project/rinui/)
 
 ## What's Changed
+> Still **refactoring** the gallery pages
 """
 
 body = """
@@ -37,13 +38,17 @@ trim = true
 [git]
 conventional_commits = true
 filter_unconventional = true
-tag_pattern = '^(alpha|beta|v)?-?\d+\.\d+\.\d+$'
+
+tag_pattern = '^(alpha|beta|v)?-?\d+\\.\\d+\\.\\d+$'
 
 commit_parsers = [
-  { message = "^feat", group = "New Features" },
+  { message = "^feat\\(core\\):", group = "RinUI Core" },
+  { message = "^feat\\(controls\\):", group = "New Controls" },
+  { message = "^update\\(controls\\):", group = "Updated Controls" },
   { message = "^fix", group = "Bug Fixes" },
   { message = "^(chore|ci|refactor|style|docs|test)", group = "Chore" },
 ]
 
-# fallback
 unclassified_group = "Other Changes"
+topo_order = false
+sort_commits = "topo"
