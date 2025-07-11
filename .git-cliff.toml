@@ -51,4 +51,3 @@ commit_parsers = [
 
 unclassified_group = "Other Changes"
 topo_order = false
-sort_commits = "topo"
