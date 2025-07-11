@@ -119,7 +119,6 @@ class WinEventFilter(QAbstractNativeEventFilter):
         self.hwnd: Optional[int] = None
         self.resize_border = 8
 
-        # ✅ 动态监听 visible 属性
         if not self.window.isVisible():
             self.window.visibleChanged.connect(self._on_visible_changed)
         else:
@@ -132,7 +131,7 @@ class WinEventFilter(QAbstractNativeEventFilter):
     def _init_window_handle(self):
         self.hwnd = int(self.window.winId())
         self.set_window_styles()
-        print(f"🏷️ Window handle set: hwnd={self.hwnd}")
+        print(f"Window handle set: {self.hwnd}")
 
     def set_window_styles(self):
         """设置必要的窗口样式以启用原生窗口行为"""
