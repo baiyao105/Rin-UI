@@ -1,7 +1,7 @@
 [changelog]
 header = """
 # RinUI Gallery
-Release `{{ range.current }}` version
+Release `{{ version }}` version
 
 > [!TIP]
 > See also [PyPi](https://pypi.org/project/rinui/)
