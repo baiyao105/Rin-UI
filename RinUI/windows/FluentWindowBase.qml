@@ -18,7 +18,7 @@ ApplicationWindow {
     color: "transparent"
 
     // 自定义属性
-    property var icon: "../assets/img/default_app_icon.png"  // 图标
+    property var icon: undefined  // 图标
     property alias titleEnabled: titleBar.titleEnabled
     property int titleBarHeight: Theme.currentTheme.appearance.dialogTitleBarHeight
 
