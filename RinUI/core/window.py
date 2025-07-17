@@ -113,35 +113,38 @@ class WinEventManager(QObject):
 
 
 class WinEventFilter(QAbstractNativeEventFilter):
-    def __init__(self, window: QQuickWindow):
+    def __init__(self, windows: list):
         super().__init__()
-        self.window = window
-        self.hwnd: Optional[int] = None
+        self.windows = windows  # 接受多个窗口
+        self.hwnds = {}  # 用于存储每个窗口的 hwnd
         self.resize_border = 8
 
-        if not self.window.isVisible():
-            self.window.visibleChanged.connect(self._on_visible_changed)
-        else:
-            self._init_window_handle()
+        for window in self.windows:
+            window.visibleChanged.connect(self._on_visible_changed)
+            if window.isVisible():
+                self._init_window_handle(window)
 
     def _on_visible_changed(self, visible: bool):
-        if visible and self.hwnd is None:
-            self._init_window_handle()
+        for window in self.windows:
+            if visible and self.hwnds.get(window) is None:
+                self._init_window_handle(window)
 
-    def _init_window_handle(self):
-        self.hwnd = int(self.window.winId())
-        self.set_window_styles()
-        print(f"Window handle set: {self.hwnd}")
+    def _init_window_handle(self, window: QQuickWindow):
+        hwnd = int(window.winId())
+        self.hwnds[window] = hwnd
+        self.set_window_styles(window)
 
-    def set_window_styles(self):
-        """设置必要的窗口样式以启用原生窗口行为"""
-        style = user32.GetWindowLongPtrW(self.hwnd, -16)  # GWL_STYLE
+    def set_window_styles(self, window: QQuickWindow):
+        hwnd = self.hwnds.get(window)
+        if hwnd is None:
+            return
 
+        style = user32.GetWindowLongPtrW(hwnd, -16)  # GWL_STYLE
         style |= WS_CAPTION | WS_THICKFRAME
-        user32.SetWindowLongPtrW(self.hwnd, -16, style)  # GWL_STYLE
+        user32.SetWindowLongPtrW(hwnd, -16, style)  # GWL_STYLE
 
         # 重绘
-        user32.SetWindowPos(self.hwnd, 0, 0, 0, 0, 0,
+        user32.SetWindowPos(hwnd, 0, 0, 0, 0, 0,
                             0x0002 | 0x0001 | 0x0040)  # SWP_NOMOVE | SWP_NOSIZE | SWP_FRAMECHANGED
 
     def nativeEventFilter(self, eventType: QByteArray, message):
@@ -160,69 +163,73 @@ class WinEventFilter(QAbstractNativeEventFilter):
         wParam = wintypes.WPARAM.from_address(message_addr + 2 * ctypes.sizeof(ctypes.c_void_p)).value
         lParam = wintypes.LPARAM.from_address(message_addr + 3 * ctypes.sizeof(ctypes.c_void_p)).value
 
-        if message_id == WM_NCHITTEST:
-            x = ctypes.c_short(lParam & 0xFFFF).value
-            y = ctypes.c_short((lParam >> 16) & 0xFFFF).value
+        # 遍历每个窗口，检查哪个窗口收到了消息
+        for window in self.windows:
+            hwnd_window = self.hwnds.get(window)
+            if hwnd_window == hwnd:
+                if message_id == WM_NCHITTEST:
+                    x = ctypes.c_short(lParam & 0xFFFF).value
+                    y = ctypes.c_short((lParam >> 16) & 0xFFFF).value
 
-            rect = wintypes.RECT()
-            user32.GetWindowRect(self.hwnd, ctypes.byref(rect))
-            left, top, right, bottom = rect.left, rect.top, rect.right, rect.bottom
-            border = self.resize_border
+                    rect = wintypes.RECT()
+                    user32.GetWindowRect(hwnd_window, ctypes.byref(rect))
+                    left, top, right, bottom = rect.left, rect.top, rect.right, rect.bottom
+                    border = self.resize_border
 
-            if left <= x < left + border:
-                if top <= y < top + border:
-                    return True, 13  # HTTOPLEFT
-                elif bottom - border <= y < bottom:
-                    return True, 16  # HTBOTTOMLEFT
-                else:
-                    return True, 10  # HTLEFT
-            elif right - border <= x < right:
-                if top <= y < top + border:
-                    return True, 14  # HTTOPRIGHT
-                elif bottom - border <= y < bottom:
-                    return True, 17  # HTBOTTOMRIGHT
-                else:
-                    return True, 11  # HTRIGHT
-            elif top <= y < top + border:
-                return True, 12  # HTTOP
-            elif bottom - border <= y < bottom:
-                return True, 15  # HTBOTTOM
+                    if left <= x < left + border:
+                        if top <= y < top + border:
+                            return True, 13  # HTTOPLEFT
+                        elif bottom - border <= y < bottom:
+                            return True, 16  # HTBOTTOMLEFT
+                        else:
+                            return True, 10  # HTLEFT
+                    elif right - border <= x < right:
+                        if top <= y < top + border:
+                            return True, 14  # HTTOPRIGHT
+                        elif bottom - border <= y < bottom:
+                            return True, 17  # HTBOTTOMRIGHT
+                        else:
+                            return True, 11  # HTRIGHT
+                    elif top <= y < top + border:
+                        return True, 12  # HTTOP
+                    elif bottom - border <= y < bottom:
+                        return True, 15  # HTBOTTOM
 
-            # 其他区域不处理
-            return False, 0
+                    # 其他区域不处理
+                    return False, 0
 
-        # 移除标题栏
-        elif message_id == WM_NCCALCSIZE and wParam:
-            return True, 0
+                # 移除标题栏
+                elif message_id == WM_NCCALCSIZE and wParam:
+                    return True, 0
 
-        # 支持动画
-        elif message_id == WM_SYSCOMMAND:
-            return False, 0
+                # 支持动画
+                elif message_id == WM_SYSCOMMAND:
+                    return False, 0
 
-        # 处理 WM_GETMINMAXINFO 消息以支持 Snap 功能
-        elif message_id == WM_GETMINMAXINFO:
-            # 获取屏幕工作区大小
-            monitor = user32.MonitorFromWindow(self.hwnd, 2)  # MONITOR_DEFAULTTONEAREST
+                # 处理 WM_GETMINMAXINFO 消息以支持 Snap 功能
+                elif message_id == WM_GETMINMAXINFO:
+                    # 获取屏幕工作区大小
+                    monitor = user32.MonitorFromWindow(hwnd_window, 2)  # MONITOR_DEFAULTTONEAREST
 
-            # 使用自定义的 MONITORINFO 结构
-            monitor_info = MONITORINFO()
-            monitor_info.cbSize = ctypes.sizeof(MONITORINFO)
-            monitor_info.dwFlags = 0
-            user32.GetMonitorInfoW(monitor, ctypes.byref(monitor_info))
+                    # 使用自定义的 MONITORINFO 结构
+                    monitor_info = MONITORINFO()
+                    monitor_info.cbSize = ctypes.sizeof(MONITORINFO)
+                    monitor_info.dwFlags = 0
+                    user32.GetMonitorInfoW(monitor, ctypes.byref(monitor_info))
 
-            # 获取 MINMAXINFO 结构
-            minmax_info = MINMAXINFO.from_address(lParam)
+                    # 获取 MINMAXINFO 结构
+                    minmax_info = MINMAXINFO.from_address(lParam)
 
-            # 设置最大化位置和大小
-            minmax_info.ptMaxPosition.x = monitor_info.rcWork.left - monitor_info.rcMonitor.left
-            minmax_info.ptMaxPosition.y = monitor_info.rcWork.top - monitor_info.rcMonitor.top
-            minmax_info.ptMaxSize.x = monitor_info.rcWork.right - monitor_info.rcWork.left
-            minmax_info.ptMaxSize.y = monitor_info.rcWork.bottom - monitor_info.rcWork.top
+                    # 设置最大化位置和大小
+                    minmax_info.ptMaxPosition.x = monitor_info.rcWork.left - monitor_info.rcMonitor.left
+                    minmax_info.ptMaxPosition.y = monitor_info.rcWork.top - monitor_info.rcMonitor.top
+                    minmax_info.ptMaxSize.x = monitor_info.rcWork.right - monitor_info.rcWork.left
+                    minmax_info.ptMaxSize.y = monitor_info.rcWork.bottom - monitor_info.rcWork.top
 
-            # 设置最小跟踪大小
-            minmax_info.ptMinTrackSize.x = 200  # 最小宽度
-            minmax_info.ptMinTrackSize.y = 150  # 最小高度
+                    # 设置最小跟踪大小
+                    minmax_info.ptMinTrackSize.x = 200  # 最小宽度
+                    minmax_info.ptMinTrackSize.y = 150  # 最小高度
 
-            return True, 0
+                    return True, 0
 
         return False, 0

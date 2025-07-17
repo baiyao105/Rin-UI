@@ -3,6 +3,7 @@ from typing import Union
 
 from PySide6.QtCore import QCoreApplication, QUrl, QObject
 from PySide6.QtGui import QIcon
+from PySide6.QtQuick import QQuickWindow
 from PySide6.QtWidgets import QApplication
 from PySide6.QtQml import QQmlApplicationEngine
 from pathlib import Path
@@ -19,6 +20,7 @@ class RinUIWindow:
         :param qml_path: str or Path, QML file path (eg = "path/to/main.qml")
         """
         super().__init__()
+        self.windows = None
         if hasattr(self, "_initialized") and self._initialized:
             return
 
@@ -72,8 +74,10 @@ class RinUIWindow:
 
         # 窗口设置
         self.root_window = self.engine.rootObjects()[0]
+        self.windows = [self.root_window] + self.root_window.findChildren(QQuickWindow)
 
-        self.theme_manager.set_window(self.root_window)
+        for window in self.windows:
+            self.theme_manager.set_window(window)
 
         # 窗口句柄管理
         self._window_handle_setup()
@@ -90,7 +94,7 @@ class RinUIWindow:
 
         from .window import WinEventFilter, WinEventManager
 
-        self.win_event_filter = WinEventFilter(self.root_window)
+        self.win_event_filter = WinEventFilter(self.windows)
         self.win_event_manager = WinEventManager()
 
         app_instance = QApplication.instance()

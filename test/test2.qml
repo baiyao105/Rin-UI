@@ -5,7 +5,7 @@ import QtQuick.Window
 import RinUI
 
 
-Window {
+ApplicationWindow {
     width: 640
     height: 480
     visible: true
