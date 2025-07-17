@@ -135,8 +135,6 @@ class ThemeManager(QObject):
         except Exception as e:
             print(f"Failed to load config because of {e}, using default config")
 
-        # self.hwnd = None  # 窗口句柄
-
         self.start_listener()
 
     def start_listener(self):
