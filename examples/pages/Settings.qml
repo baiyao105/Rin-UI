@@ -110,7 +110,7 @@ FluentPage {
 
             content: Text {
                 color: Theme.currentTheme.colors.textSecondaryColor
-                text: "0.1.5.2"
+                text: "0.1.5.3"
             }
 
             SettingItem {
