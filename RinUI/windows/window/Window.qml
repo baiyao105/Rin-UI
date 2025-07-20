@@ -12,6 +12,14 @@ Window {
     color: "transparent"
     default property alias content: contentArea.data
     property int titleBarHeight: Theme.currentTheme.appearance.dialogTitleBarHeight
+    property alias titleEnabled: titleBar.titleEnabled
+    property alias minimizeEnabled: titleBar.minimizeEnabled
+    property alias maximizeEnabled: titleBar.maximizeEnabled
+    property alias closeEnabled: titleBar.closeEnabled
+
+    property alias minimizeVisible: titleBar.minimizeVisible
+    property alias maximizeVisible: titleBar.maximizeVisible
+    property alias closeVisible: titleBar.closeVisible
 
     // 布局
     ColumnLayout {

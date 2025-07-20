@@ -20,6 +20,14 @@ ApplicationWindow {
     // 自定义属性
     property var icon: undefined  // 图标
     property alias titleEnabled: titleBar.titleEnabled
+    property alias minimizeEnabled: titleBar.minimizeEnabled
+    property alias maximizeEnabled: titleBar.maximizeEnabled
+    property alias closeEnabled: titleBar.closeEnabled
+
+    property alias minimizeVisible: titleBar.minimizeVisible
+    property alias maximizeVisible: titleBar.maximizeVisible
+    property alias closeVisible: titleBar.closeVisible
+
     property int titleBarHeight: Theme.currentTheme.appearance.dialogTitleBarHeight
 
 

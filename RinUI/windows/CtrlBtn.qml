@@ -7,7 +7,7 @@ import "../components"
 
 Base {
     id: root
-    interactive: true  // 是否可以交互
+    interactive: true
     property int mode: 0  //0:max 1:min 2:close
     property alias icon: icon.icon
 
@@ -70,7 +70,7 @@ Base {
     MouseArea {
         id: mouseArea
         anchors.fill: parent
-        enabled: enabled
+        enabled: root.enabled
         hoverEnabled: true
         onClicked: {
             toggleControl(mode)
