@@ -22,7 +22,7 @@ Item {
 
     property alias header: headerCustom.data
     property string text: "Expander"
-    default property alias contentData: contentLayout.data
+    default property alias contentData: contentLayout.data  //折叠内容
 
     implicitWidth: Math.max(
         headerLayout.implicitWidth + 5 * 2,

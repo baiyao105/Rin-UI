@@ -6,8 +6,7 @@ import RinUI
 
 Frame {
     id: frame
-    default property alias content: rightContent.data
-    // property alias showcase: showcaseContainer.data
+    default property alias action: rightContent.data
     property string title
     property string description
 

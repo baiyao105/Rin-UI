@@ -9,8 +9,8 @@ import "../../components"
 // expander
 Expander {
     id: root
-    property alias content: rightContent.data
-    // property alias showcase: showcaseContainer.data
+    property alias content: rightContent.data  // 用于放置控件
+    property alias action: rightContent.data  // 用于放置控件
     property string title: "Title"
     property alias icon: icon.icon
     property alias source: icon.source
