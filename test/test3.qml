@@ -17,6 +17,13 @@ Window {
         }
     }
 
+    SettingExpander {
+        anchors.centerIn: parent
+        width: 400
+
+        title: "Settings"
+    }
+
 
     Window {
         id: subWindow

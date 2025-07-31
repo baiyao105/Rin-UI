@@ -11,11 +11,11 @@ Expander {
     id: root
     property alias content: rightContent.data  // 用于放置控件
     property alias action: rightContent.data  // 用于放置控件
-    property string title: "Title"
+    property string title
     property alias icon: icon.icon
     property alias source: icon.source
     property alias iconSize: icon.size
-    property string description: "A description of the setting"
+    property string description
 
     contentPadding: 0
     contentSpacing: 0
@@ -53,6 +53,7 @@ Expander {
                     wrapMode: Text.Wrap  // 启用换行
                     maximumLineCount: 3
                     elide: Text.ElideRight
+                    visible: description.length > 0
                 }
             }
         }

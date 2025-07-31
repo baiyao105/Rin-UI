@@ -21,7 +21,7 @@ Item {
     property real radius: Theme.currentTheme.appearance.windowRadius
 
     property alias header: headerCustom.data
-    property string text: "Expander"
+    property string text
     default property alias contentData: contentLayout.data  //折叠内容
 
     implicitWidth: Math.max(
