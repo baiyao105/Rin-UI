@@ -66,7 +66,7 @@ ControlPage {
 
             DatePicker {
                 id: datePicker
-                yearVisible: false
+                // yearVisible: false
             }
 
             showcase: [
