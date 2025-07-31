@@ -38,7 +38,7 @@ ControlPage {
                 expandDirection: expandDirectionCombobox.currentIndex === 0
                     ? Expander.Up : Expander.Down
 
-                icon: "ic_fluent_box_20_regular"
+                icon.name: "ic_fluent_box_20_regular"
                 title: qsTr("SettingExpander")
                 description: qsTr(
                     "The SettingExpander has the same properties as SettingCard, " +
