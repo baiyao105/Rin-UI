@@ -18,6 +18,8 @@ Button {
 
     readonly property color hoverColor: !highlighted && !flat
         ? Theme.currentTheme.colors.controlSecondaryColor : backgroundColor
+    icon.width: text.font.pixelSize * 1.3
+    icon.height: text.font.pixelSize * 1.3
 
     // accessibility
     FocusIndicator {
@@ -82,7 +84,10 @@ Button {
             anchors.centerIn: parent
             IconWidget {
                 id: iconWidget
-                size: icon || source ? text.font.pixelSize * 1.3 : 0  // 图标大小 / Icon Size
+                property bool isSetedIcon: icon || source.toString()
+                // size: icon || source > 0 ? text.font.pixelSize * 1.3 : 0  // 图标大小 / Icon Size
+                width: isSetedIcon ? root.icon.width : 0  // 图标大小 / Icon Size
+                height: isSetedIcon ? root.icon.height : 0  // 图标大小 / Icon Size
                 icon: root.icon.name
                 source: root.icon.source
                 y: 0.25

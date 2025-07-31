@@ -18,7 +18,7 @@ FluentPage {
             width: parent.width
             title: qsTr("App Theme")
             description: qsTr("Select which app theme to display")
-            icon: "ic_fluent_paint_brush_20_regular"
+            icon.name: "ic_fluent_paint_brush_20_regular"
 
             ComboBox {
                 property var data: [Theme.mode.Light, Theme.mode.Dark, Theme.mode.Auto]
@@ -38,7 +38,7 @@ FluentPage {
             width: parent.width
             title: qsTr("Window Backdrop Effect")
             description: qsTr("Adjust the appearance of the window background (Only available on Windows platform, some styles may only support on Windows 11)")
-            icon: "ic_fluent_square_hint_sparkles_20_regular"
+            icon.name: "ic_fluent_square_hint_sparkles_20_regular"
 
             ComboBox {
                 property var data: ["mica", "acrylic", "tabbed", "none"]
@@ -68,7 +68,7 @@ FluentPage {
             width: parent.width
             title: qsTr("Display Language")
             description: qsTr("Set your preferred language for the gallery")
-            icon: "ic_fluent_translate_20_regular"
+            icon.name: "ic_fluent_translate_20_regular"
 
             ComboBox {
                 property var data: [Backend.getSystemLanguage(), "en_US", "zh_CN"]
@@ -105,8 +105,8 @@ FluentPage {
             width: parent.width
             title: qsTr("RinUI Gallery")
             description: qsTr("© 2025 RinLit. All rights reserved.")
-            source: Qt.resolvedUrl("../assets/BA_Pic_Shiroko-chibi.png")
-            iconSize: 28
+            icon.source: Qt.resolvedUrl("../assets/BA_Pic_Shiroko-chibi.png")
+            icon.size: 28
 
             content: Text {
                 color: Theme.currentTheme.colors.textSecondaryColor

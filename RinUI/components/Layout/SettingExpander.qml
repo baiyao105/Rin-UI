@@ -4,6 +4,7 @@ import QtQuick.Layouts 2.15
 import Qt5Compat.GraphicalEffects
 import "../../themes"
 import "../../components"
+import "../../utils"
 
 
 // expander
@@ -12,9 +13,7 @@ Expander {
     property alias content: rightContent.data  // 用于放置控件
     property alias action: rightContent.data  // 用于放置控件
     property string title
-    property alias icon: icon.icon
-    property alias source: icon.source
-    property alias iconSize: icon.size
+    property alias icon: icon
     property string description
 
     contentPadding: 0

@@ -94,7 +94,8 @@ Window 1.0 windows/window/Window.qml
 ScrollViewer 1.0 components/ScrollViewer.qml
 ScrollBar 1.0 components/ScrollBar.qml
 
-IconWidget 1.0 components/IconWidget.qml
+IconWidget 1.0 components/Icon.qml
+Icon 1.0 components/Icon.qml
 
 
 ContextMenu 1.0 components/ContextMenu.qml

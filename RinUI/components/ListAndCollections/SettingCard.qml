@@ -10,9 +10,7 @@ Frame {
     default property alias content: rightContent.data
     // property alias showcase: showcaseContainer.data
     property string title
-    property alias icon: icon.icon
-    property alias source: icon.source
-    property alias iconSize: icon.size
+    property alias icon: icon
     property string description
 
     leftPadding: 15

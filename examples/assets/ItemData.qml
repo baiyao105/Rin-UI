@@ -109,7 +109,7 @@ QtObject {
             title: qsTr("IconWidget"),
             type: "styles",
             desc: qsTr("Represents icon controls that use different image types as its content."),
-            page: Qt.resolvedUrl("../pages/controls/IconWidget.qml"),
+            page: Qt.resolvedUrl("../pages/controls/Icon.qml"),
         },
         {
             icon: Qt.resolvedUrl("controls/InfoBadge.png"),
