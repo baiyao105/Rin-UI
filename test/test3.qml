@@ -12,21 +12,46 @@ Window {
 
     Button {
         text: "Open Window"
-        onClicked: {
-            subWindow.show()
+        Menu {
+            id: menu
+            MenuItem {
+                text: "Sub Window"
+                onClicked: {
+                    subWindow.show()
+                }
+            }
+            MenuItem {
+                text: "Sub Window 2"
+                onClicked: {
+                    subWindow2.show()
+                }
+            }
+            MenuItem {
+                text: "Sub Window 3"
+                onClicked: {
+                    subWindow3.show()
+                }
+            }
         }
-    }
-
-    SettingExpander {
-        anchors.centerIn: parent
-        width: 400
-
-        title: "Settings"
+        onClicked: {
+            menu.open()
+        }
     }
 
 
     Window {
         id: subWindow
+        width: 400
+        height: 400
+    }
+
+    Window {
+        id: subWindow2
+        width: 400
+        height: 400
+    }
+    Window {
+        id: subWindow3
         width: 400
         height: 400
     }

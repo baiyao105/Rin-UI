@@ -120,14 +120,15 @@ class WinEventFilter(QAbstractNativeEventFilter):
         self.resize_border = 8
 
         for window in self.windows:
-            window.visibleChanged.connect(self._on_visible_changed)
+            # 使用lambda创建闭包来捕获特定的窗口对象
+            window.visibleChanged.connect(lambda visible, w=window: self._on_visible_changed(visible, w))
             if window.isVisible():
                 self._init_window_handle(window)
 
-    def _on_visible_changed(self, visible: bool):
-        for window in self.windows:
-            if visible and self.hwnds.get(window) is None:
-                self._init_window_handle(window)
+    def _on_visible_changed(self, visible: bool, window: QQuickWindow):
+        # 直接使用传入的窗口对象
+        if visible and self.hwnds.get(window) is None:
+            self._init_window_handle(window)
 
     def _init_window_handle(self, window: QQuickWindow):
         hwnd = int(window.winId())
