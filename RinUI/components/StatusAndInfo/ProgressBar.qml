@@ -13,16 +13,15 @@ ProgressBar {
     property color primaryColor: Theme.currentTheme.colors.primaryColor
     property int radius: 99
     property int state: ProgressBar.Running
+
     enum State {
         Running,
         Paused,
         Error
     }
 
-    // 尺寸规范
     implicitWidth: 200
     implicitHeight: 3
-    value: 0
 
     // 背景轨道
     background: Rectangle {
@@ -31,12 +30,9 @@ ProgressBar {
         height: 1
         radius: root.radius
         color: backgroundColor
-        Text {
-            text: root.state
-        }
     }
 
-    // 遮罩
+    // 遮罩（让指示条圆角可控）
     layer.enabled: true
     layer.smooth: true
     layer.effect: OpacityMask {
@@ -47,73 +43,87 @@ ProgressBar {
         }
     }
 
-    // 进度指示
-    contentItem: Rectangle {
-        id: indicator
-        height: parent.height
-        radius: root.radius
-        color: root.state === 1 ? Theme.currentTheme.colors.systemCautionColor :
-            root.state === 2 ? Theme.currentTheme.colors.systemCriticalColor :
-            primaryColor
+    // 进度内容
+    contentItem: Item {
+        id: content
+        implicitWidth: 200
+        implicitHeight: 3
+        clip: true
 
-        width: indeterminate ? state === 0 ? root.width / 3 : parent.width : root.visualPosition * parent.width
-        x: indeterminate ? -indicator.width : 0
+        // 指示条 Rectangle
+        Rectangle {
+            id: indicator
+            height: parent.height
+            radius: root.radius
+            color: root.state === 1 ? Theme.currentTheme.colors.systemCautionColor :
+                   root.state === 2 ? Theme.currentTheme.colors.systemCriticalColor :
+                   root.primaryColor
 
-        NumberAnimation {
-            target: indicator
+            width: root.indeterminate
+                ? root.state === 0 ? root.width / 3 : parent.width
+                : root.visualPosition * parent.width
 
-            property: "x"
-            from: -indicator.width
-            to: root.width
-            duration: Utils.progressBarAnimationSpeed
-            loops: Animation.Infinite
-            easing.type: Easing.InOutQuart
+            x: root.indeterminate
+                ? (root.state === 0 ? -indicator.width : 0)
+                : 0
 
-            running: indeterminate && state === 0
+            Behavior on width {
+                enabled: !root.indeterminate
+                NumberAnimation {
+                    duration: Utils.animationSpeed
+                    easing.type: Easing.OutCubic
+                }
+            }
+
+            Behavior on color {
+                ColorAnimation {
+                    duration: Utils.animationSpeed
+                    easing.type: Easing.OutCubic
+                }
+            }
+
+            // 非确定态动画（Running）
+            NumberAnimation on x {
+                from: -indicator.width
+                to: root.width
+                duration: Utils.progressBarAnimationSpeed
+                loops: Animation.Infinite
+                easing.type: Easing.InOutQuart
+                running: root.indeterminate && root.state === 0
+            }
         }
 
-        // 进度动画
-        Behavior on width {
-            enabled: !indeterminate
+        // 非确定态动画（Paused / Error）→ 归位动画
+        SequentialAnimation {
+            id: returnAnimation
+            running: root.indeterminate && root.state !== 0
             NumberAnimation {
-                duration: Utils.animationSpeed  // 175
-                easing.type: Easing.OutCubic
+                target: indicator
+                property: "width"
+                from: indicator.width
+                to: root.width / 10
+                duration: Utils.animationSpeedFaster
+                easing.type: Easing.InQuart
             }
-        }
-        Behavior on color {
-            ColorAnimation {
-                duration: Utils.animationSpeed
-                easing.type: Easing.OutCubic
+            NumberAnimation {
+                target: indicator
+                property: "width"
+                from: 0
+                to: root.width
+                duration: Utils.animationSpeedMiddle
+                easing.type: Easing.OutQuint
             }
         }
     }
 
-    // 归位动画
-    SequentialAnimation {
-        running: indeterminate && state !== 0
-        NumberAnimation {
-            target: indicator
-            property: "width"
-            from: indicator.width
-            to: root.width / 10
-            duration: Utils.animationSpeedFaster
-            easing.type: Easing.InQuart
-        }
-        NumberAnimation {
-            target: indicator
-            property: "width"
-            from: 0
-            to: root.width
-            duration: Utils.animationSpeedMiddle
-            easing.type: Easing.OutQuint
-        }
-    }
-
+    // 状态切换立即更新 indicator 状态
     onStateChanged: {
-        if (state !== 0 && indeterminate) {
-            indicator.x = 0
-        } else if (state === 0 && indeterminate) {
-            indicator.width = root.width / 3
+        if (indeterminate) {
+            if (state !== 0) {
+                indicator.x = 0
+            } else {
+                indicator.width = root.width / 3
+            }
         }
     }
 
@@ -121,7 +131,7 @@ ProgressBar {
         if (!indeterminate) {
             indicator.width = root.visualPosition * root.width
         } else {
-            indicator.width = state === 0 ? root.width / 3 : parent.width
+            indicator.width = state === 0 ? root.width / 3 : root.width
         }
     }
 }

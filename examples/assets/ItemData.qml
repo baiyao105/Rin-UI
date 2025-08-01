@@ -170,6 +170,7 @@ QtObject {
             type: "status&info",
             desc: qsTr("Shows the apps progress on a task, or that the app is performing ongoing work that doesn't block user interaction."),
             page: Qt.resolvedUrl("../pages/controls/ProgressBar.qml"),
+            updated: true,
         },
         {
             icon: Qt.resolvedUrl("controls/ProgressRing.png"),
