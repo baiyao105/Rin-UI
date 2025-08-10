@@ -20,6 +20,7 @@ Window {
     property alias minimizeVisible: titleBar.minimizeVisible
     property alias maximizeVisible: titleBar.maximizeVisible
     property alias closeVisible: titleBar.closeVisible
+    property bool isRinUIWindow: true
 
     // 布局
     ColumnLayout {

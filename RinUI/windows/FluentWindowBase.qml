@@ -13,6 +13,7 @@ ApplicationWindow {
     minimumWidth: 400
     minimumHeight: 300
     property int hwnd: 0
+    property bool isRinUIWindow: true
 
     flags: Qt.FramelessWindowHint | Qt.Window | Qt.WindowMinimizeButtonHint | Qt.WindowMaximizeButtonHint | Qt.WindowCloseButtonHint
     color: "transparent"

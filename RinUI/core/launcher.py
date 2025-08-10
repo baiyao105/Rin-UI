@@ -74,7 +74,8 @@ class RinUIWindow:
 
         # 窗口设置
         self.root_window = self.engine.rootObjects()[0]
-        self.windows = [self.root_window] + self.root_window.findChildren(QQuickWindow)
+        all_windows = [self.root_window] + self.root_window.findChildren(QQuickWindow)
+        self.windows = [w for w in all_windows if w.property("isRinUIWindow")]
 
         for window in self.windows:
             self.theme_manager.set_window(window)

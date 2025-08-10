@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Controls
+import QtQuick.Window as QQW
 import QtQuick.Layouts
 import QtQuick.Window
 import RinUI
@@ -39,20 +40,22 @@ Window {
     }
 
 
-    Window {
-        id: subWindow
-        width: 400
-        height: 400
-    }
+    Item {
+        QQW.Window {
+            id: subWindow
+            width: 400
+            height: 400
+        }
 
-    Window {
-        id: subWindow2
-        width: 400
-        height: 400
-    }
-    Window {
-        id: subWindow3
-        width: 400
-        height: 400
+        Window {
+            id: subWindow2
+            width: 400
+            height: 400
+        }
+        Window {
+            id: subWindow3
+            width: 400
+            height: 400
+        }
     }
 }
