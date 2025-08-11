@@ -5,7 +5,7 @@ import "../../utils"
 
 Text {
     id: label
-    property int typography: Typography.Body
+    property int typography: -1
 
     color: targetColor
     property color targetColor: Theme.currentTheme.colors.textColor  // 目标颜色，用于切换动画
@@ -44,7 +44,8 @@ Text {
             case Typography.BodyLarge:
             case Typography.BodyStrong:
                 return Font.DemiBold;
-            default:
+            case Typography.Body:
+            case Typography.Caption:
                 return Font.Normal;
         }
     }
