@@ -35,10 +35,17 @@ Text {
 
     font.family: Utils.fontFamily
 
-    font.bold: typography === Typography.Display ||
-               typography === Typography.TitleLarge ||
-               typography === Typography.Title ||
-               typography === Typography.Subtitle ||
-               typography === Typography.BodyLarge ||
-               typography === Typography.BodyStrong
+    font.weight: {
+        switch (typography) {
+            case Typography.Display:
+            case Typography.TitleLarge:
+            case Typography.Title:
+            case Typography.Subtitle:
+            case Typography.BodyLarge:
+            case Typography.BodyStrong:
+                return Font.DemiBold;
+            default:
+                return Font.Normal;
+        }
+    }
 }
