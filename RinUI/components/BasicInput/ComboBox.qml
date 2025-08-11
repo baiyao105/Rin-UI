@@ -106,7 +106,7 @@ ComboBox {
             root.currentIndex = index
             return true
         }
-        onItemSelected: handleItemSelected(index)
+        onItemSelected: (index) => handleItemSelected(index)
     }
 
     // 动画

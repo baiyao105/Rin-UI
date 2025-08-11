@@ -47,6 +47,8 @@ Text {
             case Typography.Body:
             case Typography.Caption:
                 return Font.Normal;
+            default:
+                return font.weight;
         }
     }
 }

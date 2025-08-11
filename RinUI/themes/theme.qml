@@ -98,24 +98,24 @@ Item {
     }
 
     // 切换主题
-    function setTheme(theme_mode: mode) {
+    function setTheme(theme_mode) {
         if (!_isThemeMgrInitialized()) {
             console.error("ThemeManager is not defined.")
             currentTheme = Qt.createQmlObject("import '../themes'; Light {}", themeManager)
             return
         }
-
-        // Call Python backend to toggle theme
+        if (theme_mode !== mode.Dark && theme_mode !== mode.Light && theme_mode !== mode.Auto) {
+            console.error("Invalid theme mode.")
+            return
+        }
         ThemeManager.toggle_theme(theme_mode)
 
-        // Get the actual theme name
+        // 获取实际的主题名称
         var themeName = ThemeManager.get_theme_name()
         if (themeName === mode.Auto) {
-            // Get the actual theme applied (Light or Dark)
             themeName = ThemeManager.get_theme()
         }
         load_qml(themeName)
-        return 0;
     }
 
     function load_qml(themeName) {

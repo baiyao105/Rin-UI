@@ -19,7 +19,7 @@ ApplicationWindow {
     color: "transparent"
 
     // 自定义属性
-    property var icon: undefined  // 图标
+    property var icon: ""  // 图标
     property alias titleEnabled: titleBar.titleEnabled
     property alias minimizeEnabled: titleBar.minimizeEnabled
     property alias maximizeEnabled: titleBar.maximizeEnabled

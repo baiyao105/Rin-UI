@@ -6,7 +6,7 @@ import "../../components"
 Item {
     id: navigationItems
     property var itemData
-    readonly property bool subItem: itemData.subItems && itemData.subItems.length > 0
+    readonly property bool subItem: itemData.subItems ? true : false  // clean console warning
     property var currentPage
     property bool highlighted: String(navigationBar.currentPage) === String(itemData.page) || (collapsed && subItemHighlighted)
 
