@@ -44,8 +44,7 @@ Text {
             case Typography.BodyLarge:
             case Typography.BodyStrong:
                 return Font.DemiBold;
-            case Typography.Body:
-            case Typography.Caption:
+            default:
                 return Font.Normal;
         }
     }
