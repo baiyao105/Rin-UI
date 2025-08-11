@@ -11,6 +11,11 @@ Window {
     height: 600
     visible: true
 
+    Text{
+        text: "Hello World"
+        anchors.centerIn: parent
+    }
+
     Button {
         text: "Open Window"
         Menu {
