@@ -6,7 +6,7 @@ import RinUI
 
 // 自定义控件演示 / Custom control demonstration //
 Frame {
-    id: frame
+    id: settingCard
     default property alias content: rightContent.data
     // property alias showcase: showcaseContainer.data
     property string title
@@ -29,9 +29,10 @@ Frame {
             Layout.fillHeight: true
             spacing: 16
 
-            IconWidget {
+            Icon {
                 id: icon
                 size: 20
+                visible: name !== "" || source !== ""
             }
             ColumnLayout {
                 Layout.fillWidth: true
@@ -43,7 +44,7 @@ Frame {
                     text: title
                     maximumLineCount: 2  // 限制最多两行
                     elide: Text.ElideRight  // 超过限制时用省略号
-                    visible: title.length > 0
+                    visible: typeof settingCard.title !== "undefined"
                 }
 
                 Text {
@@ -55,14 +56,12 @@ Frame {
                     wrapMode: Text.Wrap  // 启用换行
                     maximumLineCount: 3
                     elide: Text.ElideRight
-                    visible: description.length > 0
+                    visible: typeof settingCard.discription !== "undefined"
                 }
             }
-            visible: !(!titleLabel.visible && !discriptionLabel.visible)
         }
         RowLayout {
             id: rightContent
-            Layout.fillWidth: true
             Layout.fillHeight: true
             Layout.alignment: Qt.AlignRight
             spacing: 16

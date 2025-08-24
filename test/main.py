@@ -6,6 +6,6 @@ if __name__ == '__main__':
     app = QApplication(sys.argv)
 
     window2 = RinUIWindow("test3.qml")
-    window2.setTheme(Theme.Light)
+    window2.setTheme(Theme.Auto)
 
     sys.exit(app.exec())

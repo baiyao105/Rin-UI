@@ -9,7 +9,7 @@ Item {
     id: root
     property string icon: ""  // 字体图标（如 "\uf103"）
     property alias name: root.icon  // 兼容
-    property url source: ""  // 图片路径（如 "icons/image.png"）
+    property string source: ""  // 图片路径（如 "icons/image.png"）
     property alias color: text.color
     // property string fontSource: Qt.resolvedUrl("../assets/fonts/" + Theme.currentTheme.typography.fontIcon)
     // property string fontSource: Qt.resolvedUrl("../assets/fonts/FluentSystemIcons-Resizable.ttf")  // 字体图标路径
