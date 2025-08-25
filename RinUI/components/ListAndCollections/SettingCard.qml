@@ -44,7 +44,7 @@ Frame {
                     text: title
                     maximumLineCount: 2  // 限制最多两行
                     elide: Text.ElideRight  // 超过限制时用省略号
-                    visible: typeof settingCard.title !== "undefined"
+                    visible: settingCard.title.length
                 }
 
                 Text {
@@ -56,7 +56,7 @@ Frame {
                     wrapMode: Text.Wrap  // 启用换行
                     maximumLineCount: 3
                     elide: Text.ElideRight
-                    visible: typeof settingCard.discription !== "undefined"
+                    visible: settingCard.description.length
                 }
             }
         }

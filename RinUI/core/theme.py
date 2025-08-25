@@ -187,10 +187,10 @@ class ThemeManager(QObject):
                 self._apply_win10_effect(effect_type, hwnd)
 
         RinConfig["backdrop_effect"] = effect_type
-        print(
-            f"Applied \"{effect_type.strip().capitalize()}\" effect with "
-            f"{platform.system() + '11' if is_win11() else '10'}"
-        )
+        # print(
+        #     f"Applied \"{effect_type.strip().capitalize()}\" effect with "
+        #     f"{platform.system() + '11' if is_win11() else '10'}"
+        # )
         return 0  # 成功
 
     def _apply_win10_effect(self, effect_type, hwnd):
@@ -239,7 +239,7 @@ class ThemeManager(QObject):
                 ctypes.byref(corner_preference),
                 ctypes.sizeof(corner_preference)
             )
-        print("Enabled Rounded and Shadows")
+        # print("Enabled Rounded and Shadows")
 
     def _update_window_theme(self):  # 更新窗口的颜色模式
         if sys.platform != "win32" or not self.windows:
@@ -258,7 +258,7 @@ class ThemeManager(QObject):
             else:
                 print(f"Cannot apply backdrop on {platform.system()}")
 
-        print(f"Window theme updated to {actual_theme}")
+        # print(f"Window theme updated to {actual_theme}")
 
     def is_dark_theme(self):
         """是否为暗黑主题"""

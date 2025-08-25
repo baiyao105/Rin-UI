@@ -44,4 +44,3 @@ filter_commits = true
 topo_order = false
 sort_commits = "oldest"
 link_parsers = []
-limit_commits = 42

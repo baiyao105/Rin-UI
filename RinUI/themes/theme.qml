@@ -124,7 +124,7 @@ Item {
             let mode = ThemeManager.get_theme()
             if (themeObject) {
                 currentTheme = themeObject
-                console.log("Switched to", mode, "mode")
+                // console.log("Switched to", mode, "mode")
             } else {
                 console.error("Failed to create theme object for mode:", mode)
             }

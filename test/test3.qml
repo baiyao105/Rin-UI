@@ -21,6 +21,7 @@ Window {
         width: 400
         icon.name: "ic_fluent_settings_20_regular"
         title: "Name"
+        description: "Enter your name"
 
         // TextField {
         //
@@ -80,6 +81,7 @@ Window {
             id: subWindow2
             width: 400
             height: 400
+            title: "Sub Window 2"
 
             SettingCard {
         Layout.fillWidth: true

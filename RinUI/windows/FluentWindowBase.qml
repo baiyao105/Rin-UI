@@ -81,8 +81,8 @@ ApplicationWindow {
     TitleBar {
         id: titleBar
         window: baseWindow
-        icon: baseWindow.icon
-        title: baseWindow.title
+        icon: baseWindow.icon || ""
+        title: baseWindow.title || ""
         Layout.fillWidth: true
         height: baseWindow.titleBarHeight
     }
