@@ -183,6 +183,14 @@ RowLayout {
         }
     }
 
+    function pop() {
+        safePop()
+    }
+
+    function push(page, reload) {
+        safePush(page, reload)
+    }
+
     function safePush(page, reload) {
         // 无效检测
         if (!(typeof page === "object" || typeof page === "string" || page instanceof Component)) {
