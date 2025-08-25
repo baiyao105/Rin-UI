@@ -221,15 +221,31 @@ class WinEventFilter(QAbstractNativeEventFilter):
                     # 获取 MINMAXINFO 结构
                     minmax_info = MINMAXINFO.from_address(lParam)
 
-                    # 设置最大化位置和大小
+                    # 最大化位置和大小
                     minmax_info.ptMaxPosition.x = monitor_info.rcWork.left - monitor_info.rcMonitor.left
                     minmax_info.ptMaxPosition.y = monitor_info.rcWork.top - monitor_info.rcMonitor.top
-                    minmax_info.ptMaxSize.x = monitor_info.rcWork.right - monitor_info.rcWork.left
-                    minmax_info.ptMaxSize.y = monitor_info.rcWork.bottom - monitor_info.rcWork.top
+                    minmax_info.ptMaxSize.x = monitor_info.rcWork.right - monitor_info.rcMonitor.left
+                    minmax_info.ptMaxSize.y = monitor_info.rcWork.bottom - monitor_info.rcMonitor.top
 
-                    # 设置最小跟踪大小
-                    minmax_info.ptMinTrackSize.x = 200  # 最小宽度
-                    minmax_info.ptMinTrackSize.y = 150  # 最小高度
+
+                    def get_window_int_property(window, name, default):
+                        val = getattr(window, name, default)
+                        if callable(val):
+                            val = val()  # 如果是方法就调用
+                        if val is None:
+                            val = default
+                        return int(val)
+
+                    min_w = get_window_int_property(window, "minimumWidth", 200)
+                    min_h = get_window_int_property(window, "minimumHeight", 150)
+                    max_w = get_window_int_property(window, "maximumWidth",
+                                                    monitor_info.rcWork.right - monitor_info.rcWork.left)
+                    max_h = get_window_int_property(window, "maximumHeight",
+                                                    monitor_info.rcWork.bottom - monitor_info.rcWork.top)
+                    minmax_info.ptMinTrackSize.x = int(min_w)
+                    minmax_info.ptMinTrackSize.y = int(min_h)
+                    minmax_info.ptMaxTrackSize.x = int(max_w)
+                    minmax_info.ptMaxTrackSize.y = int(max_h)
 
                     return True, 0
 
