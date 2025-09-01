@@ -98,7 +98,7 @@ Button {
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter
 
-            text: pickerView.gotData ? pickerView.value3 : amText
+            text: pickerView.gotData ? (pickerView.value3 !== undefined ? pickerView.value3 : "") : amText
             visible: !use24Hour
         }
     }
