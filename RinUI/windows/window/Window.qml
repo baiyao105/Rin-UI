@@ -99,6 +99,9 @@ Window {
             if (p.x < b || p.x >= width - b) return Qt.SizeHorCursor
             if (p.y < b || p.y >= height - b) return Qt.SizeVerCursor
         }
+        Component.onCompleted: {
+            cursorShape = Qt.ArrowCursor
+        }
         acceptedButtons: Qt.NoButton
     }
 
