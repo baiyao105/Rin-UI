@@ -278,14 +278,16 @@ class WinEventFilter(QAbstractNativeEventFilter):
 
                 # 移除标题栏
                 elif message_id == WM_NCCALCSIZE and wParam:
-                    client_rect = ctypes.cast(lParam, ctypes.POINTER(NCCALCSIZE_PARAMS)).contents.rgrc[0]
+                    ncc_ptr = ctypes.cast(lParam, ctypes.POINTER(NCCALCSIZE_PARAMS))
+                    rgrc = ncc_ptr.contents.rgrc
+
                     if is_maximized(hwnd):
-                        ty = get_resize_border_thickness(hwnd, False)
-                        client_rect.top += ty
-                        client_rect.bottom -= ty
-                        tx = get_resize_border_thickness(hwnd, True)
-                        client_rect.left += tx
-                        client_rect.right -= tx
+                        ty = get_resize_border_thickness(hwnd, horizontal=False)
+                        tx = get_resize_border_thickness(hwnd, horizontal=True)
+                        rgrc[0].top += ty
+                        rgrc[0].bottom -= ty
+                        rgrc[0].left += tx
+                        rgrc[0].right -= tx
                         abd = APPBARDATA()
                         ctypes.memset(ctypes.byref(abd), 0, ctypes.sizeof(abd))
                         abd.cbSize = ctypes.sizeof(APPBARDATA)
@@ -298,25 +300,26 @@ class WinEventFilter(QAbstractNativeEventFilter):
                             abd2.hWnd = FindWindow("Shell_TrayWnd", None)
                             if abd2.hWnd:
                                 window_monitor = MonitorFromWindow(hwnd, MONITOR_DEFAULTTONEAREST)
-                                if window_monitor:
-                                    taskbar_monitor = MonitorFromWindow(abd2.hWnd, MONITOR_DEFAULTTOPRIMARY)
-                                    if taskbar_monitor and taskbar_monitor == window_monitor:
-                                        ctypes.windll.shell32.SHAppBarMessage(ABM_GETTASKBARPOS, ctypes.byref(abd2))
+                                taskbar_monitor = MonitorFromWindow(abd2.hWnd, MONITOR_DEFAULTTONEAREST)
+                                if window_monitor and taskbar_monitor and window_monitor == taskbar_monitor:
+                                    res = ctypes.windll.shell32.SHAppBarMessage(ABM_GETTASKBARPOS, ctypes.byref(abd2))
+                                    if res:
                                         edge = abd2.uEdge
-                            top = (edge == 1)
-                            bottom = (edge == 3)
-                            left = (edge == 0)
-                            right = (edge == 2)
-                            if top:
-                                client_rect.top += 1
-                            elif bottom:
-                                client_rect.bottom -= 1
-                            elif left:
-                                client_rect.left += 1
-                            elif right:
-                                client_rect.right -= 1
+                            is_top_edge = (edge == 1)
+                            is_bottom_edge = (edge == 3)
+                            is_left_edge = (edge == 0)
+                            is_right_edge = (edge == 2)
+                            if is_top_edge:
+                                rgrc[0].top += 1
+                            elif is_bottom_edge:
+                                rgrc[0].bottom -= 1
+                            elif is_left_edge:
+                                rgrc[0].left += 1
+                            elif is_right_edge:
+                                rgrc[0].right -= 1
                             else:
-                                client_rect.bottom -= 1
+                                # 未识别, 默认把底部收1
+                                rgrc[0].bottom -= 1
                     return True, 0
 
                 # 支持动画
@@ -340,8 +343,8 @@ class WinEventFilter(QAbstractNativeEventFilter):
                     # 最大化位置和大小
                     minmax_info.ptMaxPosition.x = monitor_info.rcWork.left - monitor_info.rcMonitor.left
                     minmax_info.ptMaxPosition.y = monitor_info.rcWork.top - monitor_info.rcMonitor.top
-                    minmax_info.ptMaxSize.x = monitor_info.rcWork.right - monitor_info.rcMonitor.left
-                    minmax_info.ptMaxSize.y = monitor_info.rcWork.bottom - monitor_info.rcMonitor.top
+                    minmax_info.ptMaxSize.x = monitor_info.rcWork.right - monitor_info.rcWork.left
+                    minmax_info.ptMaxSize.y = monitor_info.rcWork.bottom - monitor_info.rcWork.top
 
 
                     def get_window_int_property(window, name, default):
