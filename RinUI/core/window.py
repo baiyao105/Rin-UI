@@ -252,7 +252,7 @@ class WinEventFilter(QAbstractNativeEventFilter):
                 left, top, right, bottom = rect.left, rect.top, rect.right, rect.bottom
                 border = self.resize_border
 
-                max_left, max_top, max_right, max_bottom = self._get_maximize_button_rect(hwnd_window)
+                max_left, max_top, max_right, max_bottom = self._get_button_rect(hwnd_window)["maximize"]
                 if max_left <= x <= max_right and max_top <= y <= max_bottom:
                     return True, HTMAXBUTTON  # 返回 HTMAXBUTTON 以支持 Snap Layout
 
@@ -372,19 +372,20 @@ class WinEventFilter(QAbstractNativeEventFilter):
 
         return False, 0
 
-    def _get_maximize_button_rect(self, hwnd_window):
-        """获取最大化按钮的矩形区域"""
+    def _get_button_rect(self, hwnd_window):
+        """获取按钮矩形区域"""
         rect = wintypes.RECT()
         user32.GetWindowRect(hwnd_window, ctypes.byref(rect))
-        button_width = GetSystemMetrics(30)  # SM_CXSIZE - 标题栏按钮宽度
-        button_height = GetSystemMetrics(31)  # SM_CYSIZE - 标题栏按钮高度
-        if button_width <= 0:
-            button_width = 46
-        if button_height <= 0:
-            button_height = 32
-        max_button_right = rect.right - button_width  # 关闭按钮
-        max_button_left = max_button_right - button_width
-        max_button_top = rect.top
-        max_button_bottom = rect.top + button_height
+        button_width = user32.GetSystemMetrics(30) or 46
+        button_height = user32.GetSystemMetrics(31) or 32
+        right = rect.right
+        top = rect.top
+        close_rect = (right - button_width, top, right, top + button_height)
+        max_rect = (right - button_width * 2, top, right - button_width, top + button_height)
+        min_rect = (right - button_width * 3, top, right - button_width * 2, top + button_height)
+        return {
+            "minimize": min_rect,
+            "maximize": max_rect,
+            "close": close_rect
+        }
 
-        return max_button_left, max_button_top, max_button_right, max_button_bottom
