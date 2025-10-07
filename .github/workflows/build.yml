@@ -3,128 +3,121 @@ name: Build & Release RinUI Gallery
 on:
   push:
     tags:
-      - '*'
+      - "*"
   workflow_dispatch:
 
 permissions:
   contents: write
 
 jobs:
-  build-windows:
-    runs-on: windows-latest
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [windows-latest, macos-latest]
 
     steps:
       - name: ⬇️ Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
-      - name: 🐍 Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
+      - name: 📦 Set up Python & Install uv
+        uses: astral-sh/setup-uv@v6
 
       - name: 📦 Install dependencies
         run: |
-          python -m venv .venv
-          .venv\Scripts\pip install -r requirements.txt
-          .venv\Scripts\pip install pyinstaller
+          uv sync
+          uv pip install pyinstaller
 
       - name: 🔨 Build Gallery (Windows)
+        if: runner.os == 'Windows'
+        shell: bash
         run: |
-          .venv\Scripts\pyinstaller.exe --noconsole --icon=examples/assets/gallery.ico `
-            --add-data="RinUI;RinUI" `
-            --add-data="examples/assets;assets" `
-            --add-data="examples/components;components" `
-            --add-data="examples/languages;languages" `
-            --add-data="examples/pages;pages" `
-            --add-data="examples/gallery.qml;." `
-            --paths=. `
-            --contents-directory='.' `
-            --name=RinUIGallery `
+          uv run pyinstaller --noconsole \
+            --icon "examples/assets/gallery.ico" \
+            --add-data "RinUI:RinUI" \
+            --add-data "examples/assets:assets" \
+            --add-data "examples/components:components" \
+            --add-data "examples/languages:languages" \
+            --add-data "examples/pages:pages" \
+            --add-data "examples/gallery.qml:." \
+            --paths=. \
+            --contents-directory . \
+            --name=RinUIGallery \
             examples/gallery.py
 
-      - name: 📦 Zip build
+      - name: 🔨 Build Gallery (macOS)
+        if: runner.os == 'macOS'
+        shell: bash
         run: |
-          powershell Compress-Archive -Path dist/RinUIGallery/* -DestinationPath dist/RinUIGallery-Windows.zip
+          uv run pyinstaller --noconsole \
+            --icon "examples/assets/gallery.icns" \
+            --add-data "RinUI:RinUI" \
+            --add-data "examples/assets:assets" \
+            --add-data "examples/components:components" \
+            --add-data "examples/languages:languages" \
+            --add-data "examples/pages:pages" \
+            --add-data "examples/gallery.qml:." \
+            --paths=. \
+            --contents-directory . \
+            --name=RinUIGallery \
+            examples/gallery.py
 
-      - name: ☁️ Upload artifact
+      - name: 📦 Zip build (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          Compress-Archive -Path dist/RinUIGallery/* -DestinationPath dist/RinUIGallery-Windows.zip
+
+      - name: 📦 Zip build (macOS)
+        if: runner.os == 'macOS'
+        shell: bash
+        run: |
+          cd dist
+          ditto -c -k --sequesterRsrc --keepParent RinUIGallery.app RinUIGallery-macOS.zip
+
+      - name: ☁️ Upload artifact (Windows)
+        if: runner.os == 'Windows'
         uses: actions/upload-artifact@v4
         with:
           name: RinUIGallery-Windows
           path: dist/RinUIGallery-Windows.zip
 
-  build-macos:
-    runs-on: macos-latest
-
-    steps:
-      - name: ⬇️ Checkout code
-        uses: actions/checkout@v4
-
-      - name: 🐍 Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-
-      - name: 📦 Install dependencies
-        run: |
-          python3 -m venv .venv
-          . .venv/bin/activate
-          pip install -r requirements.txt
-          pip install pyinstaller
-
-      - name: 🔨 Build Gallery (macOS)
-        run: |
-          .venv/bin/pyinstaller --noconsole --icon=examples/assets/gallery.icns \
-            --add-data="RinUI:RinUI" \
-            --add-data="examples/assets:assets" \
-            --add-data="examples/components:components" \
-            --add-data="examples/languages:languages" \
-            --add-data="examples/pages:pages" \
-            --add-data="examples/gallery.qml:." \
-            --paths=. \
-            --contents-directory='.' \
-            --name=RinUIGallery \
-            examples/gallery.py
-
-      - name: 📦 Zip build
-        run: |
-          cd dist
-          ditto -c -k --sequesterRsrc --keepParent RinUIGallery.app RinUIGallery-macOS.zip
-
-      - name: ☁️ Upload artifact
+      - name: ☁️ Upload artifact (macOS)
+        if: runner.os == 'macOS'
         uses: actions/upload-artifact@v4
         with:
           name: RinUIGallery-macOS
           path: dist/RinUIGallery-macOS.zip
 
   release:
-    needs: [build-windows, build-macos]
+    needs: [build]
     runs-on: ubuntu-latest
 
     steps:
       - name: ⬇️ Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
       - name: ⬇️ Download artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           path: dist/
 
-      - name: 📁 Show downloaded structure (debug)
-        run: ls -R dist/
-
       - name: 🗃 Move release files to root dist/
         run: |
+          echo "::group::Show downloaded structure"
+          ls -R dist/
+          echo "::endgroup::"
           mv dist/RinUIGallery-Windows/*.zip dist/
           mv dist/RinUIGallery-macOS/*.zip dist/
 
       - name: 🧱 Set up git-cliff
-        uses: kenji-miyake/setup-git-cliff@v1
+        uses: kenji-miyake/setup-git-cliff@v2
 
       - name: 📜 Generate CHANGELOG.md
         run: |
-          git cliff --tag "${{ github.ref_name }}" --config .git-cliff.toml > CHANGELOG.md
+          git cliff --latest --tag "${{ github.ref_name }}" --config .git-cliff.toml > CHANGELOG.md
 
       - name: 🚀 Create GitHub Release
         uses: softprops/action-gh-release@v2
