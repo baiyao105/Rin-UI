@@ -86,7 +86,7 @@ wheels = [
 
 [[package]]
 name = "rinui"
-version = "0.1.7.3"
+version = "0.1.8"
 source = { editable = "." }
 dependencies = [
     { name = "darkdetect" },
