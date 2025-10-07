@@ -144,7 +144,7 @@ class WinEventManager(QObject):
     @Slot(QObject, result=int)
     def getWindowId(self, window):
         """获取窗口的句柄"""
-        print(f"GetWindowId: {window.winId()}")
+        # print(f"GetWindowId: {window.winId()}")
         return int(window.winId())
 
     @Slot(int)
@@ -340,13 +340,15 @@ class WinEventFilter(QAbstractNativeEventFilter):
             if message_id == WM_GETMINMAXINFO:
                 # 获取屏幕工作区大小
                 monitor = user32.MonitorFromWindow(hwnd_window, 2)  # MONITOR_DEFAULTTONEAREST
+                if not monitor:
+                    return False, 0
 
                 # 使用自定义的 MONITORINFO 结构
                 monitor_info = MONITORINFO()
                 monitor_info.cbSize = ctypes.sizeof(MONITORINFO)
                 monitor_info.dwFlags = 0
-                user32.GetMonitorInfoW(monitor, ctypes.byref(monitor_info))
-
+                if not user32.GetMonitorInfoW(monitor, ctypes.byref(monitor_info)):
+                    return False, 0
                 # 获取 MINMAXINFO 结构
                 minmax_info = MINMAXINFO.from_address(lParam)
 
@@ -356,27 +358,33 @@ class WinEventFilter(QAbstractNativeEventFilter):
                 rel_y = monitor_info.rcWork.top - monitor_info.rcMonitor.top
                 work_width = monitor_info.rcWork.right - monitor_info.rcWork.left
                 work_height = monitor_info.rcWork.bottom - monitor_info.rcWork.top
+                if work_width <= 0 or work_height <= 0:
+                    return False, 0
                 # WM_NCCALCSIZE 中 top += ty, left += tx, right -= tx, bottom -= ty
-                # 位置偏移 -tx/-ty，大小 +2*tx / +2*ty
+                # 位置偏移 -tx/-ty, 大小 +2*tx / +2*ty
                 minmax_info.ptMaxPosition.x = rel_x - tx
                 minmax_info.ptMaxPosition.y = rel_y - ty
                 minmax_info.ptMaxSize.x = work_width + 2 * tx
                 minmax_info.ptMaxSize.y = work_height + 2 * ty
 
                 def get_window_int_property(window, name, default):
-                    val = getattr(window, name, default)
-                    if callable(val):
-                        val = val()  # 如果是方法就调用
-                    if val is None:
-                        val = default
-                    return int(val)
+                    try:
+                        val = getattr(window, name, default)
+                        if callable(val):
+                            val = val()  # 如果是方法就调用
+                        if val is None:
+                            val = default
+                        return max(int(val), 0)
+                    except (AttributeError, ValueError, TypeError):
+                        return default
+
 
                 min_w = max(get_window_int_property(window, "minimumWidth", 330), 330)
-                min_h = get_window_int_property(window, "minimumHeight", 150)
-                max_w = get_window_int_property(window, "maximumWidth",
-                                                work_width + 2 * tx)
-                max_h = get_window_int_property(window, "maximumHeight",
-                                                work_height + 2 * ty)
+                min_h = max(get_window_int_property(window, "minimumHeight", 150), 150)
+                max_w = get_window_int_property(window, "maximumWidth", work_width + 2 * tx)
+                max_h = get_window_int_property(window, "maximumHeight", work_height + 2 * ty)
+                max_w = max(max_w, min_w)
+                max_h = max(max_h, min_h)
                 minmax_info.ptMinTrackSize.x = int(min_w)
                 minmax_info.ptMinTrackSize.y = int(min_h)
                 minmax_info.ptMaxTrackSize.x = int(max_w)
