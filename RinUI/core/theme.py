@@ -3,7 +3,6 @@ import platform
 import time
 
 from PySide6.QtCore import QObject, Signal, Slot, QThread
-from PySide6.QtGui import QFontDatabase, QFont
 
 from .config import DEFAULT_CONFIG, RinConfig, is_win10, is_windows, is_win11, BackdropEffect
 import sys
@@ -267,7 +266,7 @@ class ThemeManager(QObject):
     def _actual_theme(self):
         """实际应用的主题"""
         if self.current_theme == "Auto":
-            return darkdetect.theme() if self.is_darkdetect_supported else "Light"
+            return darkdetect.theme() or "Light" if self.is_darkdetect_supported else "Light"
         return self.current_theme
 
     @Slot(str)
