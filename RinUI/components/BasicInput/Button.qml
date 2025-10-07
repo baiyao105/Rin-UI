@@ -8,6 +8,8 @@ import "../../components"
 Button {
     id: root
     property color primaryColor: Theme.currentTheme.colors.primaryColor
+    property color textColor: Theme.currentTheme.colors.textColor
+    property alias color: root.backgroundColor
     property color backgroundColor: flat ? Theme.currentTheme.colors.subtleSecondaryColor :
         highlighted ? primaryColor : Theme.currentTheme.colors.controlColor
     // default property alias icon.source: icon.source
