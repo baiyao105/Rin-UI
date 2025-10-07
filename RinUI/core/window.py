@@ -371,10 +371,14 @@ class WinEventFilter(QAbstractNativeEventFilter):
         """获取最大化按钮的矩形区域"""
         rect = wintypes.RECT()
         user32.GetWindowRect(hwnd_window, ctypes.byref(rect))
-        button_width = 46  # 标准按钮宽度
-        button_height = 32  # 标准按钮高度
-        max_button_right = rect.right - button_width  # 关闭按钮右边界
-        max_button_left = max_button_right - button_width  # 最大化按钮左边界
+        button_width = GetSystemMetrics(30)  # SM_CXSIZE - 标题栏按钮宽度
+        button_height = GetSystemMetrics(31)  # SM_CYSIZE - 标题栏按钮高度
+        if button_width <= 0:
+            button_width = 46
+        if button_height <= 0:
+            button_height = 32
+        max_button_right = rect.right - button_width  # 关闭按钮
+        max_button_left = max_button_right - button_width
         max_button_top = rect.top
         max_button_bottom = rect.top + button_height
 
