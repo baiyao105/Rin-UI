@@ -1,25 +1,24 @@
-import platform
-
-from PySide6.QtCore import QAbstractNativeEventFilter, QByteArray, QObject, Slot
 import ctypes
+import platform
 from ctypes import wintypes
 
 import win32con
+from PySide6.QtCore import QAbstractNativeEventFilter, QByteArray, QObject, Slot
 from PySide6.QtGui import QGuiApplication
 from PySide6.QtQuick import QQuickWindow
+from win32api import GetSystemMetrics, MonitorFromWindow, SendMessage
 from win32com.shell.shellcon import (
     ABM_GETSTATE,
     ABM_GETTASKBARPOS,
     ABS_AUTOHIDE,
 )
-from win32gui import FindWindow, ReleaseCapture, GetWindowPlacement, ShowWindow
 from win32con import (
     MONITOR_DEFAULTTONEAREST,
     MONITOR_DEFAULTTOPRIMARY,
     SW_MAXIMIZE,
     SW_RESTORE
 )
-from win32api import GetSystemMetrics, MonitorFromWindow, SendMessage
+from win32gui import FindWindow, GetWindowPlacement, ReleaseCapture, ShowWindow
 
 from RinUI.core.config import is_windows
 
@@ -92,6 +91,8 @@ WS_THICKFRAME = 0x00040000
 SC_MINIMIZE = 0xF020
 SC_MAXIMIZE = 0xF030
 SC_RESTORE = 0xF120
+
+HTMAXBUTTON = 0x9
 
 
 class MINMAXINFO(ctypes.Structure):
@@ -249,6 +250,10 @@ class WinEventFilter(QAbstractNativeEventFilter):
                     left, top, right, bottom = rect.left, rect.top, rect.right, rect.bottom
                     border = self.resize_border
 
+                    max_left, max_top, max_right, max_bottom = self._get_maximize_button_rect(hwnd_window)
+                    if max_left <= x <= max_right and max_top <= y <= max_bottom:
+                        return True, HTMAXBUTTON  # 返回 HTMAXBUTTON 以支持 Snap Layout
+
                     if left <= x < left + border:
                         if top <= y < top + border:
                             return True, 13  # HTTOPLEFT
@@ -347,7 +352,7 @@ class WinEventFilter(QAbstractNativeEventFilter):
                             val = default
                         return int(val)
 
-                    min_w = get_window_int_property(window, "minimumWidth", 200)
+                    min_w = max(get_window_int_property(window, "minimumWidth", 330), 330)
                     min_h = get_window_int_property(window, "minimumHeight", 150)
                     max_w = get_window_int_property(window, "maximumWidth",
                                                     monitor_info.rcWork.right - monitor_info.rcWork.left)
@@ -361,3 +366,16 @@ class WinEventFilter(QAbstractNativeEventFilter):
                     return True, 0
 
         return False, 0
+
+    def _get_maximize_button_rect(self, hwnd_window):
+        """获取最大化按钮的矩形区域"""
+        rect = wintypes.RECT()
+        user32.GetWindowRect(hwnd_window, ctypes.byref(rect))
+        button_width = 46  # 标准按钮宽度
+        button_height = 32  # 标准按钮高度
+        max_button_right = rect.right - button_width  # 关闭按钮右边界
+        max_button_left = max_button_right - button_width  # 最大化按钮左边界
+        max_button_top = rect.top
+        max_button_bottom = rect.top + button_height
+
+        return max_button_left, max_button_top, max_button_right, max_button_bottom
