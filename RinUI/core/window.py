@@ -350,12 +350,18 @@ class WinEventFilter(QAbstractNativeEventFilter):
                 # 获取 MINMAXINFO 结构
                 minmax_info = MINMAXINFO.from_address(lParam)
 
-                # 最大化位置和大小
-                minmax_info.ptMaxPosition.x = monitor_info.rcWork.left - monitor_info.rcMonitor.left
-                minmax_info.ptMaxPosition.y = monitor_info.rcWork.top - monitor_info.rcMonitor.top
-                minmax_info.ptMaxSize.x = monitor_info.rcWork.right - monitor_info.rcWork.left
-                minmax_info.ptMaxSize.y = monitor_info.rcWork.bottom - monitor_info.rcWork.top
-
+                tx = get_resize_border_thickness(hwnd_window, horizontal=True)
+                ty = get_resize_border_thickness(hwnd_window, horizontal=False)
+                rel_x = monitor_info.rcWork.left - monitor_info.rcMonitor.left
+                rel_y = monitor_info.rcWork.top - monitor_info.rcMonitor.top
+                work_width = monitor_info.rcWork.right - monitor_info.rcWork.left
+                work_height = monitor_info.rcWork.bottom - monitor_info.rcWork.top
+                # WM_NCCALCSIZE 中 top += ty, left += tx, right -= tx, bottom -= ty
+                # 位置偏移 -tx/-ty，大小 +2*tx / +2*ty
+                minmax_info.ptMaxPosition.x = rel_x - tx
+                minmax_info.ptMaxPosition.y = rel_y - ty
+                minmax_info.ptMaxSize.x = work_width + 2 * tx
+                minmax_info.ptMaxSize.y = work_height + 2 * ty
 
                 def get_window_int_property(window, name, default):
                     val = getattr(window, name, default)
@@ -368,9 +374,9 @@ class WinEventFilter(QAbstractNativeEventFilter):
                 min_w = max(get_window_int_property(window, "minimumWidth", 330), 330)
                 min_h = get_window_int_property(window, "minimumHeight", 150)
                 max_w = get_window_int_property(window, "maximumWidth",
-                                                monitor_info.rcWork.right - monitor_info.rcWork.left)
+                                                work_width + 2 * tx)
                 max_h = get_window_int_property(window, "maximumHeight",
-                                                monitor_info.rcWork.bottom - monitor_info.rcWork.top)
+                                                work_height + 2 * ty)
                 minmax_info.ptMinTrackSize.x = int(min_w)
                 minmax_info.ptMinTrackSize.y = int(min_h)
                 minmax_info.ptMaxTrackSize.x = int(max_w)
