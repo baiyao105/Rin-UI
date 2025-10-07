@@ -14,7 +14,6 @@ from win32com.shell.shellcon import (
 )
 from win32con import (
     MONITOR_DEFAULTTONEAREST,
-    MONITOR_DEFAULTTOPRIMARY,
     SW_MAXIMIZE,
     SW_RESTORE
 )
@@ -190,7 +189,7 @@ class WinEventFilter(QAbstractNativeEventFilter):
         super().__init__()
         self.windows = windows  # 接受多个窗口
         self.hwnds = {}  # 用于存储每个窗口的 hwnd
-        self.resize_border = 8
+        self.resize_border = 8  # 仅兜底
 
         for window in self.windows:
             # 使用lambda创建闭包来捕获特定的窗口对象
@@ -250,29 +249,38 @@ class WinEventFilter(QAbstractNativeEventFilter):
                 rect = wintypes.RECT()
                 user32.GetWindowRect(hwnd_window, ctypes.byref(rect))
                 left, top, right, bottom = rect.left, rect.top, rect.right, rect.bottom
-                border = self.resize_border
+                border = get_resize_border_thickness(hwnd_window, horizontal=True)
+                border_v = get_resize_border_thickness(hwnd_window, horizontal=False)
+                border = max(1, int(border))
+                border_v = max(1, int(border_v))
+                btn_rects = self._get_button_rect(hwnd_window)
+                max_left, max_top, max_right, max_bottom = btn_rects["maximize"]
+                is_l_down = (user32.GetAsyncKeyState(0x01) & 0x8000) != 0  # VK_LBUTTON
+                is_r_down = (user32.GetAsyncKeyState(0x02) & 0x8000) != 0  # VK_RBUTTON
 
-                max_left, max_top, max_right, max_bottom = self._get_button_rect(hwnd_window)["maximize"]
                 if max_left <= x <= max_right and max_top <= y <= max_bottom:
-                    return True, HTMAXBUTTON  # 返回 HTMAXBUTTON 以支持 Snap Layout
+                    if not (is_l_down or is_r_down):
+                        return True, HTMAXBUTTON
+                    else:
+                        return True, 1  # HTCLIENT
 
                 if left <= x < left + border:
-                    if top <= y < top + border:
+                    if top <= y < top + border_v:
                         return True, 13  # HTTOPLEFT
-                    elif bottom - border <= y < bottom:
+                    elif bottom - border_v <= y < bottom:
                         return True, 16  # HTBOTTOMLEFT
                     else:
                         return True, 10  # HTLEFT
                 elif right - border <= x < right:
-                    if top <= y < top + border:
+                    if top <= y < top + border_v:
                         return True, 14  # HTTOPRIGHT
-                    elif bottom - border <= y < bottom:
+                    elif bottom - border_v <= y < bottom:
                         return True, 17  # HTBOTTOMRIGHT
                     else:
                         return True, 11  # HTRIGHT
-                elif top <= y < top + border:
+                elif top <= y < top + border_v:
                     return True, 12  # HTTOP
-                elif bottom - border <= y < bottom:
+                elif bottom - border_v <= y < bottom:
                     return True, 15  # HTBOTTOM
 
                 # 其他区域不处理
@@ -373,16 +381,21 @@ class WinEventFilter(QAbstractNativeEventFilter):
         return False, 0
 
     def _get_button_rect(self, hwnd_window):
-        """获取按钮矩形区域"""
+        """获取标题栏按钮的屏幕坐标矩形
+        Note: 这是对原生标题栏按钮位置的近似
+        """
         rect = wintypes.RECT()
         user32.GetWindowRect(hwnd_window, ctypes.byref(rect))
-        button_width = user32.GetSystemMetrics(30) or 46
-        button_height = user32.GetSystemMetrics(31) or 32
-        right = rect.right
-        top = rect.top
-        close_rect = (right - button_width, top, right, top + button_height)
-        max_rect = (right - button_width * 2, top, right - button_width, top + button_height)
-        min_rect = (right - button_width * 3, top, right - button_width * 2, top + button_height)
+        btn_w = user32.GetSystemMetrics(30) or 46        # SM_CXSIZE
+        btn_h = user32.GetSystemMetrics(31) or 32        # SM_CYSIZE
+        cx_frame = user32.GetSystemMetrics(32) or 8      # SM_CXFRAME
+        cy_frame = user32.GetSystemMetrics(33) or 8      # SM_CYFRAME
+        cx_pad = user32.GetSystemMetrics(92) or 0        # SM_CXPADDEDBORDER
+        top_y = rect.top + cy_frame + cx_pad
+        right_x = rect.right - cx_frame
+        close_rect = (right_x - btn_w, top_y, right_x, top_y + btn_h)
+        max_rect = (right_x - btn_w * 2, top_y, right_x - btn_w, top_y + btn_h)
+        min_rect = (right_x - btn_w * 3, top_y, right_x - btn_w * 2, top_y + btn_h)
         return {
             "minimize": min_rect,
             "maximize": max_rect,
