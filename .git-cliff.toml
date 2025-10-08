@@ -1,11 +1,9 @@
 [changelog]
-body = """
+body = """## RinUI{% if version %} ({{ version }}){% endif %}
 
 {% macro commit_line(commit) -%}
   - {% if commit.scope %}**{{ commit.scope }}**: {% endif %}{{ commit.message | split(pat="\n") | first | trim | upper_first }}{% if commit.remote.username %} by @{{ commit.remote.username }}{% endif %}{% if commit.remote.pr_number %} ([#{{ commit.remote.pr_number }}]({{ self::remote_url() }}/pull/{{ commit.remote.pr_number }})){% endif %}
 {%- endmacro %}
-
-"""## RinUI{% if version %} ({{ version }}){% endif %}
 
 {% for group, commits in commits | group_by(attribute="group") %}
 {%- if group == "<!-- 11 -->📝 Other" %}
