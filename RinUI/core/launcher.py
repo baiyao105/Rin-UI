@@ -1,15 +1,15 @@
 import sys
+from pathlib import Path
 from typing import Union
 
-from PySide6.QtCore import QCoreApplication, QUrl, QObject
+from PySide6.QtCore import QCoreApplication, QObject, QUrl
 from PySide6.QtGui import QIcon
+from PySide6.QtQml import QQmlApplicationEngine
 from PySide6.QtQuick import QQuickWindow
 from PySide6.QtWidgets import QApplication
-from PySide6.QtQml import QQmlApplicationEngine
-from pathlib import Path
 
+from .config import RINUI_PATH, BackdropEffect, Theme, is_windows
 from .theme import ThemeManager
-from .config import BackdropEffect, is_windows, Theme, RINUI_PATH
 
 
 class RinUIWindow:
@@ -100,7 +100,9 @@ class RinUIWindow:
 
         app_instance = QApplication.instance()
         app_instance.installNativeEventFilter(self.win_event_filter)
-        self.engine.rootContext().setContextProperty("WinEventManager", self.win_event_manager)
+        self.engine.rootContext().setContextProperty(
+            "WinEventManager", self.win_event_manager
+        )
         self._apply_windows_effects()
 
     def setIcon(self, path: Union[str, Path] = None) -> None:
@@ -113,7 +115,7 @@ class RinUIWindow:
         path = Path(path).as_posix()
         if app_instance:
             app_instance.setWindowIcon(QIcon(path))  # 设置应用程序图标
-            self.root_window.setProperty('icon', QUrl.fromLocalFile(path))
+            self.root_window.setProperty("icon", QUrl.fromLocalFile(path))
         else:
             raise RuntimeError("Cannot set icon before QApplication is created.")
 
@@ -123,7 +125,9 @@ class RinUIWindow:
         :return:
         """
         if is_windows():
-            self.theme_manager.apply_backdrop_effect(self.theme_manager.get_backdrop_effect())
+            self.theme_manager.apply_backdrop_effect(
+                self.theme_manager.get_backdrop_effect()
+            )
             self.theme_manager.apply_window_effects()
 
     # func名称遵循 Qt 命名规范
@@ -151,7 +155,9 @@ class RinUIWindow:
             root = object.__getattribute__(self, "root_window")
             return getattr(root, name)
         except AttributeError:
-            raise AttributeError(f"\"RinUIWindow\" object has no attribute '{name}', you need to load() qml at first.")
+            raise AttributeError(
+                f"\"RinUIWindow\" object has no attribute '{name}', you need to load() qml at first."
+            )
 
     def _print_startup_info(self) -> None:
         border = "=" * 40
