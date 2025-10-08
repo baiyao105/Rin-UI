@@ -60,7 +60,7 @@ class ThemeListener(QThread):
     监听系统颜色模式
     """
 
-    theme_changed = Signal(str)
+    themeChanged = Signal(str)
 
     def run(self):
         last_theme = darkdetect.theme()
@@ -68,7 +68,7 @@ class ThemeListener(QThread):
             current_theme = darkdetect.theme()
             if current_theme != last_theme:
                 last_theme = current_theme
-                self.theme_changed.emit(current_theme)
+                self.themeChanged.emit(current_theme)
                 print(f"Theme changed: {current_theme}")
             time.sleep(1)
 
@@ -77,8 +77,8 @@ class ThemeListener(QThread):
 
 
 class ThemeManager(QObject):
-    theme_changed = Signal(str)
-    backdrop_changed = Signal(str)
+    themeChanged = Signal(str)
+    backdropChanged = Signal(str)
     windows = []  # 窗口句柄们（
     _instance = None
 
@@ -140,7 +140,7 @@ class ThemeManager(QObject):
             print("darkdetect not supported on this platform")
             return
         self.listener = ThemeListener()
-        self.listener.theme_changed.connect(self._handle_system_theme)
+        self.listener.themeChanged.connect(self._handle_system_theme)
         self.listener.start()
 
     def set_window(self, window):  # 绑定窗口句柄
@@ -151,7 +151,7 @@ class ThemeManager(QObject):
     def _handle_system_theme(self):
         if self.current_theme == "Auto":
             self._update_window_theme()
-            self.theme_changed.emit(self._actual_theme())
+            self.themeChanged.emit(self._actual_theme())
         else:
             # 保持当前背景效果不变
             self._update_window_theme()
@@ -166,7 +166,7 @@ class ThemeManager(QObject):
         if not is_windows() or not self.windows:
             print(f'Cannot apply effect "{effect_type}" on this platform')
             return -2  # 非 windows或未绑定窗口
-        self.backdrop_changed.emit(effect_type)
+        self.backdropChanged.emit(effect_type)
 
         accent_state = ACCENT_STATES.get(effect_type, 0)
         if not ACCENT_SUPPORT.get(effect_type, False):
@@ -286,7 +286,7 @@ class ThemeManager(QObject):
             self.current_theme = theme
             RinConfig["theme"]["current_theme"] = theme
             self._update_window_theme()
-            self.theme_changed.emit(self._actual_theme())
+            self.themeChanged.emit(self._actual_theme())
 
     @Slot(result=str)
     def get_theme(self):
