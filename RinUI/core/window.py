@@ -145,7 +145,7 @@ def get_resize_border_thickness(hwnd: wintypes.HWND, horizontal=True) -> int:
 
 class WinEventManager(QObject):
     @Slot(QObject, result=int)
-    def get_window_id(self, window):
+    def getWindowId(self, window):
         """获取窗口的句柄"""
         print(f"GetWindowId: {window.winId()}")
         return int(window.winId())
@@ -167,7 +167,7 @@ class WinEventManager(QObject):
         )
 
     @Slot(int)
-    def maximize_window(self, hwnd):
+    def maximizeWindow(self, hwnd):
         """在Windows上最大化或还原窗口"""
         if not is_windows() or type(hwnd) is not int or hwnd == 0:
             print(

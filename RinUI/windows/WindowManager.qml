@@ -11,7 +11,7 @@ Item {
             console.error("WindowManager is not defined.")
             return -1
         }
-        WinEventManager.drag_window_event(WinEventManager.get_window_id(window))
+        WinEventManager.drag_window_event(WinEventManager.getWindowId(window))
     }
 
     function maximizeWindow(window) {
@@ -19,7 +19,7 @@ Item {
             console.warn("WindowManager is not defined.")
         }
         if (Qt.platform.os === "windows") {
-            WinEventManager.maximize_window(WinEventManager.get_window_id(window))
+            WinEventManager.maximizeWindow(WinEventManager.getWindowId(window))
             return  // 在win环境使用原生方法拖拽
         }
 
