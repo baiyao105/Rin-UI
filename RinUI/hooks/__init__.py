@@ -1,4 +1,4 @@
 def get_hook_dirs():
-    import os
+    from pathlib import Path
 
-    return [os.path.dirname(__file__)]
+    return [str(Path(__file__).parent)]

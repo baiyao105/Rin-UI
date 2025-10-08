@@ -1,4 +1,4 @@
-import os
+from pathlib import Path
 
 from PySide6.QtCore import QLocale, QTranslator
 
@@ -24,8 +24,8 @@ class RinUITranslator(QTranslator):
         :return: bool
         """
         print(f"🌏 Current locale: {locale.name()}")
-        path = os.path.join(RINUI_PATH, "RinUI", "languages", f"{locale.name()}.qm")
-        if not os.path.exists(path):
+        path = Path(RINUI_PATH) / "RinUI" / "languages" / f"{locale.name()}.qm"
+        if not path.exists():
             print(f'Language file "{path}" not found. Fallback to default (en_US)')
-            path = os.path.join(RINUI_PATH, "RinUI", "languages", "en_US.qm")
-        return super().load(path)
+            path = Path(RINUI_PATH) / "RinUI" / "languages" / "en_US.qm"
+        return super().load(str(path))

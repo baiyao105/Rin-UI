@@ -1,5 +1,4 @@
 import json
-import os
 import platform
 import sys
 from enum import Enum
@@ -7,11 +6,23 @@ from pathlib import Path
 
 
 def is_win11():
-    return bool(is_windows() and (platform.release() >= "10" and int(platform.version().split(".")[2]) >= 22000))
+    return bool(
+        is_windows()
+        and (
+            platform.release() >= "10"
+            and int(platform.version().split(".")[2]) >= 22000
+        )
+    )
 
 
 def is_win10():
-    return bool(is_windows() and (platform.release() >= "10" and int(platform.version().split(".")[2]) >= 10240))
+    return bool(
+        is_windows()
+        and (
+            platform.release() >= "10"
+            and int(platform.version().split(".")[2]) >= 10240
+        )
+    )
 
 
 def is_windows():
@@ -66,18 +77,18 @@ class ConfigManager:
         :param path: json config file path
         :param filename: json config file name (eg: rin_ui.json)
         """
-        self.path = path
+        self.path = Path(path)
         self.filename = filename
         self.config = {}
-        self.full_path = os.path.join(self.path, self.filename)
+        self.full_path = self.path / self.filename
 
     def load_config(self, default_config):
         if default_config is None:
             print('Warning: "default_config" is None, use empty config instead.')
             default_config = {}
         # 如果文件存在，加载配置
-        if os.path.exists(self.full_path):
-            with open(self.full_path, encoding="utf-8") as f:
+        if self.full_path.exists():
+            with self.full_path.open(encoding="utf-8") as f:
                 self.config = json.load(f)
         else:
             self.config = default_config  # 如果文件不存在，使用默认配置
@@ -85,7 +96,7 @@ class ConfigManager:
 
     def update_config(self):  # 更新配置
         try:
-            with open(self.full_path, encoding="utf-8") as f:
+            with self.full_path.open(encoding="utf-8") as f:
                 self.config = json.load(f)
         except Exception as e:
             print(f"Error: {e}")
@@ -98,15 +109,16 @@ class ConfigManager:
             for k in key:
                 self.config[k] = value
         else:
-            raise TypeError("key must be str or list")
+            msg = "Key must be str or list"
+            raise TypeError(msg) from None
         self.save_config()
 
     def save_config(self):
         try:
             # 确保配置文件目录存在
-            if not os.path.exists(self.path):
-                os.makedirs(self.path)
-            with open(self.full_path, "w", encoding="utf-8") as f:
+            if not self.path.exists():
+                self.path.mkdir(parents=True)
+            with self.full_path.open("w", encoding="utf-8") as f:
                 json.dump(self.config, f, ensure_ascii=False, indent=4)
         except Exception as e:
             print(f"Error: {e}")

@@ -145,13 +145,13 @@ def get_resize_border_thickness(hwnd: wintypes.HWND, horizontal=True) -> int:
 
 class WinEventManager(QObject):
     @Slot(QObject, result=int)
-    def getWindowId(self, window):
+    def get_window_id(self, window):
         """获取窗口的句柄"""
         print(f"GetWindowId: {window.winId()}")
         return int(window.winId())
 
     @Slot(int)
-    def dragWindowEvent(self, hwnd: int):
+    def drag_window_event(self, hwnd: int):
         """在Windows 用原生方法拖动"""
         if not is_windows() or type(hwnd) is not int or hwnd == 0:
             print(
@@ -167,7 +167,7 @@ class WinEventManager(QObject):
         )
 
     @Slot(int)
-    def maximizeWindow(self, hwnd):
+    def maximize_window(self, hwnd):
         """在Windows上最大化或还原窗口"""
         if not is_windows() or type(hwnd) is not int or hwnd == 0:
             print(
@@ -183,8 +183,9 @@ class WinEventManager(QObject):
             else:
                 ShowWindow(hwnd, SW_MAXIMIZE)
 
-        except Exception as e:
-            print(f"Error toggling window state: {e}")
+        except Exception as err:
+            msg = f"Error toggling window state: {err}"
+            print(msg)
 
 
 class WinEventFilter(QAbstractNativeEventFilter):
@@ -226,13 +227,13 @@ class WinEventFilter(QAbstractNativeEventFilter):
             hwnd, 0, 0, 0, 0, 0, 0x0002 | 0x0001 | 0x0040
         )  # SWP_NOMOVE | SWP_NOSIZE | SWP_FRAMECHANGED
 
-    def nativeEventFilter(self, eventType: QByteArray, message):
-        if eventType != b"windows_generic_MSG":
+    def nativeEventFilter(self, event_type: QByteArray, message):
+        if event_type != b"windows_generic_MSG":
             return False, 0
 
         try:
             message_addr = int(message)
-        except:
+        except Exception:
             buf = memoryview(message)
             message_addr = ctypes.addressof(ctypes.c_char.from_buffer(buf))
 
@@ -241,10 +242,10 @@ class WinEventFilter(QAbstractNativeEventFilter):
         message_id = wintypes.UINT.from_address(
             message_addr + ctypes.sizeof(ctypes.c_void_p)
         ).value
-        wParam = wintypes.WPARAM.from_address(
+        w_param = wintypes.WPARAM.from_address(
             message_addr + 2 * ctypes.sizeof(ctypes.c_void_p)
         ).value
-        lParam = wintypes.LPARAM.from_address(
+        l_param = wintypes.LPARAM.from_address(
             message_addr + 3 * ctypes.sizeof(ctypes.c_void_p)
         ).value
 
@@ -253,8 +254,8 @@ class WinEventFilter(QAbstractNativeEventFilter):
             hwnd_window = self.hwnds.get(window)
             if hwnd_window == hwnd:
                 if message_id == WM_NCHITTEST:
-                    x = ctypes.c_short(lParam & 0xFFFF).value
-                    y = ctypes.c_short((lParam >> 16) & 0xFFFF).value
+                    x = ctypes.c_short(l_param & 0xFFFF).value
+                    y = ctypes.c_short((l_param >> 16) & 0xFFFF).value
 
                     rect = wintypes.RECT()
                     user32.GetWindowRect(hwnd_window, ctypes.byref(rect))
@@ -287,9 +288,9 @@ class WinEventFilter(QAbstractNativeEventFilter):
                     return False, 0
 
                 # 移除标题栏
-                if message_id == WM_NCCALCSIZE and wParam:
+                if message_id == WM_NCCALCSIZE and w_param:
                     client_rect = ctypes.cast(
-                        lParam, ctypes.POINTER(NCCALCSIZE_PARAMS)
+                        l_param, ctypes.POINTER(NCCALCSIZE_PARAMS)
                     ).contents.rgrc[0]
                     if is_maximized(hwnd):
                         ty = get_resize_border_thickness(hwnd, False)
@@ -360,7 +361,7 @@ class WinEventFilter(QAbstractNativeEventFilter):
                     user32.GetMonitorInfoW(monitor, ctypes.byref(monitor_info))
 
                     # 获取 MINMAXINFO 结构
-                    minmax_info = MINMAXINFO.from_address(lParam)
+                    minmax_info = MINMAXINFO.from_address(l_param)
 
                     # 最大化位置和大小
                     minmax_info.ptMaxPosition.x = (

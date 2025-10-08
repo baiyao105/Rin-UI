@@ -37,7 +37,8 @@ class RinUIWindow:
         # 退出清理
         app_instance = QCoreApplication.instance()
         if not app_instance:
-            raise RuntimeError("QApplication must be created before RinUIWindow.")
+            msg = "QApplication must be created before RinUIWindow."
+            raise RuntimeError(msg)
 
         app_instance.aboutToQuit.connect(self.theme_manager.clean_up)
 
@@ -54,13 +55,15 @@ class RinUIWindow:
         print(f"UI Module Path: {RINUI_PATH}")
 
         if qml_path is None:
-            raise ValueError("QML path must be provided to load the window.")
+            msg = "QML path must be provided to load the window."
+            raise ValueError(msg)
         self.qml_path = Path(qml_path)
 
         if self.qml_path.exists():
             self.engine.addImportPath(RINUI_PATH)
         else:
-            raise FileNotFoundError(f"Cannot find RinUI module: {RINUI_PATH}")
+            msg = f"Cannot find RinUI module: {RINUI_PATH}"
+            raise FileNotFoundError(msg)
 
         # 主题管理器
         self.engine.rootContext().setContextProperty("ThemeManager", self.theme_manager)
@@ -70,7 +73,8 @@ class RinUIWindow:
             print(f"Cannot Load QML file: {e}")
 
         if not self.engine.rootObjects():
-            raise RuntimeError(f"Error loading QML file: {self.qml_path}")
+            msg = f"Error loading QML file: {self.qml_path}"
+            raise RuntimeError(msg)
 
         # 窗口设置
         self.root_window = self.engine.rootObjects()[0]
@@ -117,7 +121,8 @@ class RinUIWindow:
             app_instance.setWindowIcon(QIcon(path))  # 设置应用程序图标
             self.root_window.setProperty("icon", QUrl.fromLocalFile(path))
         else:
-            raise RuntimeError("Cannot set icon before QApplication is created.")
+            msg = "Cannot set icon before QApplication is created."
+            raise RuntimeError(msg)
 
     def _apply_windows_effects(self) -> None:
         """
@@ -138,7 +143,8 @@ class RinUIWindow:
         :return:
         """
         if not is_windows() and effect != BackdropEffect.None_:
-            raise OSError("Only can set backdrop effect on Windows platform.")
+            msg = "Only can set backdrop effect on Windows platform."
+            raise OSError(msg)
         self.theme_manager.apply_backdrop_effect(effect.value)
 
     def setTheme(self, theme: Theme) -> None:
@@ -154,10 +160,9 @@ class RinUIWindow:
         try:
             root = object.__getattribute__(self, "root_window")
             return getattr(root, name)
-        except AttributeError:
-            raise AttributeError(
-                f"\"RinUIWindow\" object has no attribute '{name}', you need to load() qml at first."
-            )
+        except AttributeError as err:
+            msg = f"\"RinUIWindow\" object has no attribute '{name}', you need to load() qml at first."
+            raise AttributeError(msg) from err
 
     def _print_startup_info(self) -> None:
         border = "=" * 40
