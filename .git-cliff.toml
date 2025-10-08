@@ -47,6 +47,7 @@ conventional_commits = true
 filter_unconventional = false
 split_commits = false
 commit_parsers = [
+    { message = "^chore\\(release\\)", skip = true},
     { message = "^feat", group = "<!-- 00 -->⛰️  Features" },
     { message = "^fix", group = "<!-- 01 -->🐛 Bug Fixes" },
     { message = "^doc", group = "<!-- 02 -->📚 Documentation" },
