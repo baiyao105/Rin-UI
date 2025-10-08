@@ -1,20 +1,19 @@
-import os
 import sys
+from pathlib import Path
 
-from PySide6.QtCore import Slot, QObject, QLocale, QTranslator
-from PySide6.QtGui import QIcon, QGuiApplication
-from PySide6.QtWidgets import QApplication
-from datetime import datetime
+from PySide6.QtCore import QLocale
 
-import RinUI
-from RinUI import RinUIWindow, RinUITranslator, ConfigManager
+PROJECT_ROOT = Path(__file__).parent.parent
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
 
+from RinUI import ConfigManager  # noqa: E402
 
-PATH = os.path.dirname(os.path.abspath(__file__))
+PATH = Path(__file__).parent.absolute()
 DFT_CONFIG = {
     "language": QLocale.system().name(),
 }
 
 
-cfg = ConfigManager(PATH, "config.json")
+cfg = ConfigManager(str(PATH), "config.json")
 cfg.load_config(DFT_CONFIG)
