@@ -34,7 +34,7 @@ Base {
         }
     }
 
-    width: 48
+    implicitWidth: 48
     height: parent.height
 
 

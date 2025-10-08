@@ -31,6 +31,7 @@ ApplicationWindow {
     property alias closeVisible: titleBar.closeVisible
 
     property int titleBarHeight: Theme.currentTheme.appearance.dialogTitleBarHeight
+    property alias titleBarArea: titleBar.children
 
 
     // 直接添加子项
