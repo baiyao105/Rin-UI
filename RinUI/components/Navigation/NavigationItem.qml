@@ -137,7 +137,7 @@ Item {
                     subMenu.open()
                 }
             }
-            if (itemData.page && currentPage && !navigationItems.highlighted) {
+            if (itemData.page && currentPage && String(navigationBar.currentPage) !== String(itemData.page)) {
                 // 记录上一次的索引
                 navigationView.safePush(itemData.page, false, true)
             }
