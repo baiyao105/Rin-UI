@@ -347,16 +347,20 @@ class WinEventFilter(QAbstractNativeEventFilter):
                             val = default
                         return int(val)
 
-                    min_w = get_window_int_property(window, "minimumWidth", 200)
-                    min_h = get_window_int_property(window, "minimumHeight", 150)
-                    max_w = get_window_int_property(window, "maximumWidth",
-                                                    monitor_info.rcWork.right - monitor_info.rcWork.left)
-                    max_h = get_window_int_property(window, "maximumHeight",
-                                                    monitor_info.rcWork.bottom - monitor_info.rcWork.top)
-                    minmax_info.ptMinTrackSize.x = int(min_w)
-                    minmax_info.ptMinTrackSize.y = int(min_h)
-                    minmax_info.ptMaxTrackSize.x = int(max_w)
-                    minmax_info.ptMaxTrackSize.y = int(max_h)
+                    screen = window.screen()
+                    dp_ratio = screen.devicePixelRatio() if screen else 1.0
+
+                    min_w = int(get_window_int_property(window, "minimumWidth", 0) * dp_ratio)
+                    min_h = int(get_window_int_property(window, "minimumHeight", 0) * dp_ratio)
+                    max_w = int(get_window_int_property(window, "maximumWidth",
+                                                        monitor_info.rcWork.right - monitor_info.rcWork.left) * dp_ratio)
+                    max_h = int(get_window_int_property(window, "maximumHeight",
+                                                        monitor_info.rcWork.bottom - monitor_info.rcWork.top) * dp_ratio)
+
+                    minmax_info.ptMinTrackSize.x = min_w
+                    minmax_info.ptMinTrackSize.y = min_h
+                    minmax_info.ptMaxTrackSize.x = max_w
+                    minmax_info.ptMaxTrackSize.y = max_h
 
                     return True, 0
 
