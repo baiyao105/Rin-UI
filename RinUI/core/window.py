@@ -14,7 +14,6 @@ from win32com.shell.shellcon import (
 )
 from win32con import (
     MONITOR_DEFAULTTONEAREST,
-    MONITOR_DEFAULTTOPRIMARY,
     SW_MAXIMIZE,
     SW_RESTORE,
 )
@@ -153,7 +152,6 @@ class WinEventManager(QObject):
         return int(window.winId())
 
     @Slot(int)
-
     def drag_window_event(self, hwnd: int):
         """在Windows 用原生方法拖动"""
         if not is_windows() or type(hwnd) is not int or hwnd == 0:
@@ -259,8 +257,8 @@ class WinEventFilter(QAbstractNativeEventFilter):
                 continue
 
             if message_id == WM_NCHITTEST:
-                x = ctypes.c_short(lParam & 0xFFFF).value
-                y = ctypes.c_short((lParam >> 16) & 0xFFFF).value
+                x = ctypes.c_short(l_param & 0xFFFF).value
+                y = ctypes.c_short((l_param >> 16) & 0xFFFF).value
 
                 rect = wintypes.RECT()
                 user32.GetWindowRect(hwnd_window, ctypes.byref(rect))
@@ -300,8 +298,8 @@ class WinEventFilter(QAbstractNativeEventFilter):
                 return False, 0
 
             # 移除标题栏
-            if message_id == WM_NCCALCSIZE and wParam:
-                ncc_ptr = ctypes.cast(lParam, ctypes.POINTER(NCCALCSIZE_PARAMS))
+            if message_id == WM_NCCALCSIZE and w_param:
+                ncc_ptr = ctypes.cast(l_param, ctypes.POINTER(NCCALCSIZE_PARAMS))
                 rgrc = ncc_ptr.contents.rgrc
 
                 if is_maximized(hwnd):
@@ -377,7 +375,7 @@ class WinEventFilter(QAbstractNativeEventFilter):
                 if not user32.GetMonitorInfoW(monitor, ctypes.byref(monitor_info)):
                     return False, 0
                 # 获取 MINMAXINFO 结构
-                minmax_info = MINMAXINFO.from_address(lParam)
+                minmax_info = MINMAXINFO.from_address(l_param)
 
                 tx = get_resize_border_thickness(hwnd_window, horizontal=True)
                 ty = get_resize_border_thickness(hwnd_window, horizontal=False)
@@ -405,38 +403,38 @@ class WinEventFilter(QAbstractNativeEventFilter):
                     except (AttributeError, ValueError, TypeError):
                         return default
 
-                    screen = window.screen()
-                    dp_ratio = screen.devicePixelRatio() if screen else 1.0
+                screen = window.screen()
+                dp_ratio = screen.devicePixelRatio() if screen else 1.0
 
-                    min_w = int(
-                        get_window_int_property(window, "minimumWidth", 0) * dp_ratio
+                min_w = int(
+                    get_window_int_property(window, "minimumWidth", 0) * dp_ratio
+                )
+                min_h = int(
+                    get_window_int_property(window, "minimumHeight", 0) * dp_ratio
+                )
+                max_w = int(
+                    get_window_int_property(
+                        window,
+                        "maximumWidth",
+                        monitor_info.rcWork.right - monitor_info.rcWork.left,
                     )
-                    min_h = int(
-                        get_window_int_property(window, "minimumHeight", 0) * dp_ratio
+                    * dp_ratio
+                )
+                max_h = int(
+                    get_window_int_property(
+                        window,
+                        "maximumHeight",
+                        monitor_info.rcWork.bottom - monitor_info.rcWork.top,
                     )
-                    max_w = int(
-                        get_window_int_property(
-                            window,
-                            "maximumWidth",
-                            monitor_info.rcWork.right - monitor_info.rcWork.left,
-                        )
-                        * dp_ratio
-                    )
-                    max_h = int(
-                        get_window_int_property(
-                            window,
-                            "maximumHeight",
-                            monitor_info.rcWork.bottom - monitor_info.rcWork.top,
-                        )
-                        * dp_ratio
-                    )
+                    * dp_ratio
+                )
 
-                    minmax_info.ptMinTrackSize.x = min_w
-                    minmax_info.ptMinTrackSize.y = min_h
-                    minmax_info.ptMaxTrackSize.x = max_w
-                    minmax_info.ptMaxTrackSize.y = max_h
+                minmax_info.ptMinTrackSize.x = min_w
+                minmax_info.ptMinTrackSize.y = min_h
+                minmax_info.ptMaxTrackSize.x = max_w
+                minmax_info.ptMaxTrackSize.y = max_h
 
-                    return True, 0
+                return True, 0
 
         return False, 0
 
