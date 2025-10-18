@@ -12,27 +12,25 @@ from win32com.shell.shellcon import (
     ABM_GETTASKBARPOS,
     ABS_AUTOHIDE,
 )
-from win32con import (
-    MONITOR_DEFAULTTONEAREST,
-    SW_MAXIMIZE,
-    SW_RESTORE
-)
+from win32con import MONITOR_DEFAULTTONEAREST, SW_MAXIMIZE, SW_RESTORE
 from win32gui import FindWindow, GetWindowPlacement, ReleaseCapture, ShowWindow
 
 from RinUI.core.config import is_windows
 
 # 定义 Windows 类型
-ULONG_PTR = ctypes.c_ulong if ctypes.sizeof(ctypes.c_void_p) == 4 else ctypes.c_ulonglong
+ULONG_PTR = (
+    ctypes.c_ulong if ctypes.sizeof(ctypes.c_void_p) == 4 else ctypes.c_ulonglong
+)
 LONG = ctypes.c_long
 
 
 # 自定义结构体 MONITORINFO
 class MONITORINFO(ctypes.Structure):
     _fields_ = [
-        ('cbSize', wintypes.DWORD),
-        ('rcMonitor', wintypes.RECT),
-        ('rcWork', wintypes.RECT),
-        ('dwFlags', wintypes.DWORD)
+        ("cbSize", wintypes.DWORD),
+        ("rcMonitor", wintypes.RECT),
+        ("rcWork", wintypes.RECT),
+        ("dwFlags", wintypes.DWORD),
     ]
 
 
@@ -47,7 +45,6 @@ class MSG(ctypes.Structure):
     ]
 
 
-
 class PWINDOWPOS(ctypes.Structure):
     _fields_ = [
         ("hWnd", wintypes.HWND),
@@ -56,14 +53,13 @@ class PWINDOWPOS(ctypes.Structure):
         ("y", ctypes.c_int),
         ("cx", ctypes.c_int),
         ("cy", ctypes.c_int),
-        ("flags", wintypes.UINT)
+        ("flags", wintypes.UINT),
     ]
 
+
 class NCCALCSIZE_PARAMS(ctypes.Structure):
-    _fields_ = [
-        ("rgrc", wintypes.RECT * 3),
-        ("lppos", ctypes.POINTER(PWINDOWPOS))
-    ]
+    _fields_ = [("rgrc", wintypes.RECT * 3), ("lppos", ctypes.POINTER(PWINDOWPOS))]
+
 
 class APPBARDATA(ctypes.Structure):
     _fields_ = [
@@ -72,7 +68,7 @@ class APPBARDATA(ctypes.Structure):
         ("uCallbackMessage", wintypes.UINT),
         ("uEdge", wintypes.UINT),
         ("rc", wintypes.RECT),
-        ("lParam", wintypes.LPARAM)
+        ("lParam", wintypes.LPARAM),
     ]
 
 
@@ -108,22 +104,26 @@ def is_maximized(hwnd: int) -> bool:
     placement = GetWindowPlacement(hwnd)
     return placement[1] == SW_MAXIMIZE
 
+
 def is_composition_enabled() -> bool:
     result = ctypes.c_int(0)
     ctypes.windll.dwmapi.DwmIsCompositionEnabled(ctypes.byref(result))
     return bool(result.value)
 
+
 def find_window(hwnd: int):
     if not hwnd:
-        return
+        return None
 
     windows = QGuiApplication.topLevelWindows()
     if not windows:
-        return
+        return None
 
     for window in windows:
         if window and int(window.winId()) == hwnd:
             return window
+    return None
+
 
 def get_resize_border_thickness(hwnd: wintypes.HWND, horizontal=True) -> int:
     window = find_window(int(hwnd))
@@ -149,19 +149,18 @@ class WinEventManager(QObject):
 
     @Slot(int)
     def dragWindowEvent(self, hwnd: int):
-        """ 在Windows 用原生方法拖动"""
+        """在Windows 用原生方法拖动"""
         if not is_windows() or type(hwnd) is not int or hwnd == 0:
             print(
                 f"Use Qt method to drag window on: {platform.system()}"
-                if not is_windows() else f"Invalid window handle: {hwnd}"
+                if not is_windows()
+                else f"Invalid window handle: {hwnd}"
             )
             return
 
         ReleaseCapture()
         SendMessage(
-            hwnd,
-            win32con.WM_SYSCOMMAND,
-            win32con.SC_MOVE | win32con.HTCAPTION, 0
+            hwnd, win32con.WM_SYSCOMMAND, win32con.SC_MOVE | win32con.HTCAPTION, 0
         )
 
     @Slot(int)
@@ -170,7 +169,8 @@ class WinEventManager(QObject):
         if not is_windows() or type(hwnd) is not int or hwnd == 0:
             print(
                 f"Use Qt method to drag window on: {platform.system()}"
-                if not is_windows() else f"Invalid window handle: {hwnd}"
+                if not is_windows()
+                else f"Invalid window handle: {hwnd}"
             )
             return
 
@@ -193,7 +193,9 @@ class WinEventFilter(QAbstractNativeEventFilter):
 
         for window in self.windows:
             # 使用lambda创建闭包来捕获特定的窗口对象
-            window.visibleChanged.connect(lambda visible, w=window: self._on_visible_changed(visible, w))
+            window.visibleChanged.connect(
+                lambda visible, w=window: self._on_visible_changed(visible, w)
+            )
             if window.isVisible():
                 self._init_window_handle(window)
 
@@ -217,8 +219,9 @@ class WinEventFilter(QAbstractNativeEventFilter):
         user32.SetWindowLongPtrW(hwnd, -16, style)  # GWL_STYLE
 
         # 重绘
-        user32.SetWindowPos(hwnd, 0, 0, 0, 0, 0,
-                            0x0002 | 0x0001 | 0x0040)  # SWP_NOMOVE | SWP_NOSIZE | SWP_FRAMECHANGED
+        user32.SetWindowPos(
+            hwnd, 0, 0, 0, 0, 0, 0x0002 | 0x0001 | 0x0040
+        )  # SWP_NOMOVE | SWP_NOSIZE | SWP_FRAMECHANGED
 
     def nativeEventFilter(self, eventType: QByteArray, message):
         if eventType != b"windows_generic_MSG":
@@ -232,9 +235,15 @@ class WinEventFilter(QAbstractNativeEventFilter):
 
         # 直接使用内存地址访问 MSG 字段
         hwnd = ctypes.c_void_p.from_address(message_addr).value
-        message_id = wintypes.UINT.from_address(message_addr + ctypes.sizeof(ctypes.c_void_p)).value
-        wParam = wintypes.WPARAM.from_address(message_addr + 2 * ctypes.sizeof(ctypes.c_void_p)).value
-        lParam = wintypes.LPARAM.from_address(message_addr + 3 * ctypes.sizeof(ctypes.c_void_p)).value
+        message_id = wintypes.UINT.from_address(
+            message_addr + ctypes.sizeof(ctypes.c_void_p)
+        ).value
+        wParam = wintypes.WPARAM.from_address(
+            message_addr + 2 * ctypes.sizeof(ctypes.c_void_p)
+        ).value
+        lParam = wintypes.LPARAM.from_address(
+            message_addr + 3 * ctypes.sizeof(ctypes.c_void_p)
+        ).value
 
         # 遍历每个窗口，检查哪个窗口收到了消息
         for window in self.windows:
@@ -261,26 +270,23 @@ class WinEventFilter(QAbstractNativeEventFilter):
                 if max_left <= x <= max_right and max_top <= y <= max_bottom:
                     if not (is_l_down or is_r_down):
                         return True, HTMAXBUTTON
-                    else:
-                        return True, 1  # HTCLIENT
+                    return True, 1  # HTCLIENT
 
                 if left <= x < left + border:
                     if top <= y < top + border_v:
                         return True, 13  # HTTOPLEFT
-                    elif bottom - border_v <= y < bottom:
+                    if bottom - border_v <= y < bottom:
                         return True, 16  # HTBOTTOMLEFT
-                    else:
-                        return True, 10  # HTLEFT
-                elif right - border <= x < right:
+                    return True, 10  # HTLEFT
+                if right - border <= x < right:
                     if top <= y < top + border_v:
                         return True, 14  # HTTOPRIGHT
-                    elif bottom - border_v <= y < bottom:
+                    if bottom - border_v <= y < bottom:
                         return True, 17  # HTBOTTOMRIGHT
-                    else:
-                        return True, 11  # HTRIGHT
-                elif top <= y < top + border_v:
+                    return True, 11  # HTRIGHT
+                if top <= y < top + border_v:
                     return True, 12  # HTTOP
-                elif bottom - border_v <= y < bottom:
+                if bottom - border_v <= y < bottom:
                     return True, 15  # HTBOTTOM
 
                 # 其他区域不处理
@@ -301,7 +307,9 @@ class WinEventFilter(QAbstractNativeEventFilter):
                     abd = APPBARDATA()
                     ctypes.memset(ctypes.byref(abd), 0, ctypes.sizeof(abd))
                     abd.cbSize = ctypes.sizeof(APPBARDATA)
-                    taskbar_state = ctypes.windll.shell32.SHAppBarMessage(ABM_GETSTATE, ctypes.byref(abd))
+                    taskbar_state = ctypes.windll.shell32.SHAppBarMessage(
+                        ABM_GETSTATE, ctypes.byref(abd)
+                    )
                     if taskbar_state & ABS_AUTOHIDE:
                         edge = -1
                         abd2 = APPBARDATA()
@@ -309,16 +317,26 @@ class WinEventFilter(QAbstractNativeEventFilter):
                         abd2.cbSize = ctypes.sizeof(APPBARDATA)
                         abd2.hWnd = FindWindow("Shell_TrayWnd", None)
                         if abd2.hWnd:
-                            window_monitor = MonitorFromWindow(hwnd, MONITOR_DEFAULTTONEAREST)
-                            taskbar_monitor = MonitorFromWindow(abd2.hWnd, MONITOR_DEFAULTTONEAREST)
-                            if window_monitor and taskbar_monitor and window_monitor == taskbar_monitor:
-                                res = ctypes.windll.shell32.SHAppBarMessage(ABM_GETTASKBARPOS, ctypes.byref(abd2))
+                            window_monitor = MonitorFromWindow(
+                                hwnd, MONITOR_DEFAULTTONEAREST
+                            )
+                            taskbar_monitor = MonitorFromWindow(
+                                abd2.hWnd, MONITOR_DEFAULTTONEAREST
+                            )
+                            if (
+                                window_monitor
+                                and taskbar_monitor
+                                and window_monitor == taskbar_monitor
+                            ):
+                                res = ctypes.windll.shell32.SHAppBarMessage(
+                                    ABM_GETTASKBARPOS, ctypes.byref(abd2)
+                                )
                                 if res:
                                     edge = abd2.uEdge
-                        is_top_edge = (edge == 1)
-                        is_bottom_edge = (edge == 3)
-                        is_left_edge = (edge == 0)
-                        is_right_edge = (edge == 2)
+                        is_top_edge = edge == 1
+                        is_bottom_edge = edge == 3
+                        is_left_edge = edge == 0
+                        is_right_edge = edge == 2
                         if is_top_edge:
                             rgrc[0].top += 1
                         elif is_bottom_edge:
@@ -339,7 +357,9 @@ class WinEventFilter(QAbstractNativeEventFilter):
             # 处理 WM_GETMINMAXINFO 消息以支持 Snap 功能
             if message_id == WM_GETMINMAXINFO:
                 # 获取屏幕工作区大小
-                monitor = user32.MonitorFromWindow(hwnd_window, 2)  # MONITOR_DEFAULTTONEAREST
+                monitor = user32.MonitorFromWindow(
+                    hwnd_window, 2
+                )  # MONITOR_DEFAULTTONEAREST
                 if not monitor:
                     return False, 0
 
@@ -378,11 +398,14 @@ class WinEventFilter(QAbstractNativeEventFilter):
                     except (AttributeError, ValueError, TypeError):
                         return default
 
-
                 min_w = max(get_window_int_property(window, "minimumWidth", 330), 330)
                 min_h = max(get_window_int_property(window, "minimumHeight", 150), 150)
-                max_w = get_window_int_property(window, "maximumWidth", work_width + 2 * tx)
-                max_h = get_window_int_property(window, "maximumHeight", work_height + 2 * ty)
+                max_w = get_window_int_property(
+                    window, "maximumWidth", work_width + 2 * tx
+                )
+                max_h = get_window_int_property(
+                    window, "maximumHeight", work_height + 2 * ty
+                )
                 max_w = max(max_w, min_w)
                 max_h = max(max_h, min_h)
                 minmax_info.ptMinTrackSize.x = int(min_w)
@@ -400,19 +423,14 @@ class WinEventFilter(QAbstractNativeEventFilter):
         """
         rect = wintypes.RECT()
         user32.GetWindowRect(hwnd_window, ctypes.byref(rect))
-        btn_w = user32.GetSystemMetrics(30) or 46        # SM_CXSIZE
-        btn_h = user32.GetSystemMetrics(31) or 32        # SM_CYSIZE
-        cx_frame = user32.GetSystemMetrics(32) or 8      # SM_CXFRAME
-        cy_frame = user32.GetSystemMetrics(33) or 8      # SM_CYFRAME
-        cx_pad = user32.GetSystemMetrics(92) or 0        # SM_CXPADDEDBORDER
+        btn_w = user32.GetSystemMetrics(30) or 46  # SM_CXSIZE
+        btn_h = user32.GetSystemMetrics(31) or 32  # SM_CYSIZE
+        cx_frame = user32.GetSystemMetrics(32) or 8  # SM_CXFRAME
+        cy_frame = user32.GetSystemMetrics(33) or 8  # SM_CYFRAME
+        cx_pad = user32.GetSystemMetrics(92) or 0  # SM_CXPADDEDBORDER
         top_y = rect.top + cy_frame + cx_pad
         right_x = rect.right - cx_frame
         close_rect = (right_x - btn_w, top_y, right_x, top_y + btn_h)
         max_rect = (right_x - btn_w * 2, top_y, right_x - btn_w, top_y + btn_h)
         min_rect = (right_x - btn_w * 3, top_y, right_x - btn_w * 2, top_y + btn_h)
-        return {
-            "minimize": min_rect,
-            "maximize": max_rect,
-            "close": close_rect
-        }
-
+        return {"minimize": min_rect, "maximize": max_rect, "close": close_rect}
