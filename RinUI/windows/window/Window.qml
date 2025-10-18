@@ -12,6 +12,7 @@ Window {
     color: "transparent"
     default property alias content: contentArea.data
     property int titleBarHeight: Theme.currentTheme.appearance.dialogTitleBarHeight
+    property alias titleBarArea: titleBar.content
     property alias titleEnabled: titleBar.titleEnabled
     property alias minimizeEnabled: titleBar.minimizeEnabled
     // property alias maximizeEnabled: titleBar.maximizeEnabled

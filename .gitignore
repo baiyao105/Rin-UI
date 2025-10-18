@@ -8,6 +8,7 @@
 /RinUI.cxxflags
 /RinUI.files
 /RinUI.includes
+/RinUI/config
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -180,4 +181,3 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
-

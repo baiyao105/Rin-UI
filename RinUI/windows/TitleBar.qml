@@ -1,5 +1,6 @@
 import QtQuick 2.12
 import QtQuick.Controls 2.3
+import QtQuick.Layouts
 import QtQuick.Window 2.3
 import "../themes"
 import "../components"
@@ -22,6 +23,9 @@ Item {
     property alias minimizeVisible: minimizeBtn.visible
     property alias maximizeVisible: maximizeBtn.visible
     property alias closeVisible: closeBtn.visible
+
+    // area
+    default property alias content: contentItem.data
 
 
     height: titleBarHeight
@@ -79,55 +83,70 @@ Item {
         }
     }
 
-    // 窗口按钮 / Window Controls
-    Row{
-        anchors.right: parent.right
-        anchors.top: parent.top
-        anchors.bottom: parent.bottom
-        spacing: 0
-        CtrlBtn {
-            id: minimizeBtn
-            mode: 1
-            enabled: root.minimizeEnabled
-        }
-        CtrlBtn {
-            id: maximizeBtn
-            mode: 0
-            enabled: root.maximizeEnabled
+    RowLayout {
+        anchors.fill: parent
+        anchors.margins: 0
+        spacing: 48
+        // 窗口标题 / Window Title
 
-        }
-        CtrlBtn {
-            id: closeBtn
-            mode: 2
-            enabled: root.closeEnabled
-        }
-    }
+        RowLayout {
+            id: titleRow
+            Layout.fillHeight: true
+            Layout.fillWidth: true
+            Layout.leftMargin: 16
+            spacing: 16
+            opacity: root.titleEnabled
 
-    // 窗口标题 / Window Title
-    Row {
-        id: titleRow
-        anchors.left: parent.left
-        anchors.top: parent.top
-        anchors.bottom: parent.bottom
-        anchors.leftMargin: 16
-        spacing: 16
-        visible: root.titleEnabled
+            //图标
+            IconWidget {
+                id: iconLabel
+                size: 16
+                Layout.alignment: Qt.AlignVCenter
+                // anchors.verticalCenter: parent.verticalCenter
+                visible: icon || source
+            }
 
-        //图标
-        IconWidget {
-            id: iconLabel
-            size: 16
-            anchors.verticalCenter: parent.verticalCenter
-            visible: icon || source
+            //标题
+            Text {
+                id: titleLabel
+                Layout.alignment: Qt.AlignVCenter
+                // anchors.verticalCenter:  parent.verticalCenter
+
+                typography: Typography.Caption
+                text: qsTr("Fluent TitleBar")
+            }
         }
 
-        //标题
-        Text {
-            id: titleLabel
-            anchors.verticalCenter:  parent.verticalCenter
+        Item {
+            // custom
+            id: contentItem
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            clip: true
+        }
 
-            typography: Typography.Caption
-            text: qsTr("Fluent TitleBar")
+        // 窗口按钮 / Window Controls
+        Row {
+            width: implicitWidth
+            Layout.fillHeight: true
+            Layout.alignment: Qt.AlignRight
+            spacing: 0
+            CtrlBtn {
+                id: minimizeBtn
+                mode: 1
+                enabled: root.minimizeEnabled
+            }
+            CtrlBtn {
+                id: maximizeBtn
+                mode: 0
+                enabled: root.maximizeEnabled
+
+            }
+            CtrlBtn {
+                id: closeBtn
+                mode: 2
+                enabled: root.closeEnabled
+            }
         }
     }
 }

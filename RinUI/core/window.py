@@ -12,7 +12,12 @@ from win32com.shell.shellcon import (
     ABM_GETTASKBARPOS,
     ABS_AUTOHIDE,
 )
-from win32con import MONITOR_DEFAULTTONEAREST, SW_MAXIMIZE, SW_RESTORE
+from win32con import (
+    MONITOR_DEFAULTTONEAREST,
+    MONITOR_DEFAULTTOPRIMARY,
+    SW_MAXIMIZE,
+    SW_RESTORE,
+)
 from win32gui import FindWindow, GetWindowPlacement, ReleaseCapture, ShowWindow
 
 from RinUI.core.config import is_windows
@@ -148,7 +153,8 @@ class WinEventManager(QObject):
         return int(window.winId())
 
     @Slot(int)
-    def dragWindowEvent(self, hwnd: int):
+
+    def drag_window_event(self, hwnd: int):
         """在Windows 用原生方法拖动"""
         if not is_windows() or type(hwnd) is not int or hwnd == 0:
             print(
@@ -180,8 +186,9 @@ class WinEventManager(QObject):
             else:
                 ShowWindow(hwnd, SW_MAXIMIZE)
 
-        except Exception as e:
-            print(f"Error toggling window state: {e}")
+        except Exception as err:
+            msg = f"Error toggling window state: {err}"
+            print(msg)
 
 
 class WinEventFilter(QAbstractNativeEventFilter):
@@ -223,13 +230,13 @@ class WinEventFilter(QAbstractNativeEventFilter):
             hwnd, 0, 0, 0, 0, 0, 0x0002 | 0x0001 | 0x0040
         )  # SWP_NOMOVE | SWP_NOSIZE | SWP_FRAMECHANGED
 
-    def nativeEventFilter(self, eventType: QByteArray, message):
-        if eventType != b"windows_generic_MSG":
+    def nativeEventFilter(self, event_type: QByteArray, message):
+        if event_type != b"windows_generic_MSG":
             return False, 0
 
         try:
             message_addr = int(message)
-        except:
+        except Exception:
             buf = memoryview(message)
             message_addr = ctypes.addressof(ctypes.c_char.from_buffer(buf))
 
@@ -238,10 +245,10 @@ class WinEventFilter(QAbstractNativeEventFilter):
         message_id = wintypes.UINT.from_address(
             message_addr + ctypes.sizeof(ctypes.c_void_p)
         ).value
-        wParam = wintypes.WPARAM.from_address(
+        w_param = wintypes.WPARAM.from_address(
             message_addr + 2 * ctypes.sizeof(ctypes.c_void_p)
         ).value
-        lParam = wintypes.LPARAM.from_address(
+        l_param = wintypes.LPARAM.from_address(
             message_addr + 3 * ctypes.sizeof(ctypes.c_void_p)
         ).value
 
@@ -398,22 +405,38 @@ class WinEventFilter(QAbstractNativeEventFilter):
                     except (AttributeError, ValueError, TypeError):
                         return default
 
-                min_w = max(get_window_int_property(window, "minimumWidth", 330), 330)
-                min_h = max(get_window_int_property(window, "minimumHeight", 150), 150)
-                max_w = get_window_int_property(
-                    window, "maximumWidth", work_width + 2 * tx
-                )
-                max_h = get_window_int_property(
-                    window, "maximumHeight", work_height + 2 * ty
-                )
-                max_w = max(max_w, min_w)
-                max_h = max(max_h, min_h)
-                minmax_info.ptMinTrackSize.x = int(min_w)
-                minmax_info.ptMinTrackSize.y = int(min_h)
-                minmax_info.ptMaxTrackSize.x = int(max_w)
-                minmax_info.ptMaxTrackSize.y = int(max_h)
+                    screen = window.screen()
+                    dp_ratio = screen.devicePixelRatio() if screen else 1.0
 
-                return True, 0
+                    min_w = int(
+                        get_window_int_property(window, "minimumWidth", 0) * dp_ratio
+                    )
+                    min_h = int(
+                        get_window_int_property(window, "minimumHeight", 0) * dp_ratio
+                    )
+                    max_w = int(
+                        get_window_int_property(
+                            window,
+                            "maximumWidth",
+                            monitor_info.rcWork.right - monitor_info.rcWork.left,
+                        )
+                        * dp_ratio
+                    )
+                    max_h = int(
+                        get_window_int_property(
+                            window,
+                            "maximumHeight",
+                            monitor_info.rcWork.bottom - monitor_info.rcWork.top,
+                        )
+                        * dp_ratio
+                    )
+
+                    minmax_info.ptMinTrackSize.x = min_w
+                    minmax_info.ptMinTrackSize.y = min_h
+                    minmax_info.ptMaxTrackSize.x = max_w
+                    minmax_info.ptMaxTrackSize.y = max_h
+
+                    return True, 0
 
         return False, 0
 

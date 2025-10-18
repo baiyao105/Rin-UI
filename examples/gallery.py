@@ -1,23 +1,33 @@
-import os
 import sys
+from datetime import datetime
+from pathlib import Path
 
-from PySide6.QtCore import Slot, QObject, QLocale, QTranslator
+from config import cfg
+from PySide6.QtCore import QLocale, QObject, QTranslator, Slot
 from PySide6.QtGui import QGuiApplication
 from PySide6.QtWidgets import QApplication
-from datetime import datetime
 
 import RinUI
-from RinUI import RinUIWindow, RinUITranslator, __version__
-from config import cfg
+from RinUI import RinUITranslator, RinUIWindow, __version__
+
+SCRIPT_DIR = Path(__file__).parent.absolute()
+PROJECT_ROOT = SCRIPT_DIR.parent
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
 
 
 class Gallery(RinUIWindow):
     def __init__(self):
-        super().__init__("gallery.qml")
-        self.setIcon("assets/gallery.png")
+        qml_file = SCRIPT_DIR / "gallery.qml"
+        super().__init__(str(qml_file))
+        icon_path = SCRIPT_DIR / "assets" / "gallery.png"
+        self.setIcon(str(icon_path))
+
         self.backend = Backend()
         self.backend.setBackendParent(self)
-        self.setProperty("title", f"RinUI Gallery {datetime.now().year}")  # 前后端交互示例
+        self.setProperty(
+            "title", f"RinUI Gallery {datetime.now().year}"
+        )  # 前后端交互示例
 
         self.engine.rootContext().setContextProperty("Backend", self.backend)  # 注入
 
@@ -47,17 +57,18 @@ class Backend(QObject):
     @Slot(str)
     def setLanguage(self, lang: str):  # sample: zh_CN; en_US
         global ui_translator, translator
-        lang_path = f"languages/{lang}.qm"
+        lang_path = SCRIPT_DIR / "languages" / f"{lang}.qm"
 
-        if not os.path.exists(lang_path):
+        if not lang_path.exists():
             print(f"Language file {lang_path} not found. Fallback to default (en_US)")
             lang = "en_US"
+            lang_path = SCRIPT_DIR / "languages" / f"{lang}.qm"
 
         cfg["language"] = lang
         cfg.save_config()
         ui_translator = RinUITranslator(QLocale(lang))
         translator = QTranslator()
-        translator.load(lang_path)
+        translator.load(str(lang_path))
         QApplication.instance().removeTranslator(ui_translator)
         QApplication.instance().removeTranslator(translator)
         QApplication.instance().installTranslator(ui_translator)
@@ -65,7 +76,7 @@ class Backend(QObject):
         self.parent.engine.retranslate()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     print(RinUI.__file__)
     app = QApplication(sys.argv)
 
@@ -74,8 +85,9 @@ if __name__ == '__main__':
     ui_translator = RinUITranslator(QLocale(lang))
     app.installTranslator(ui_translator)
     translator = QTranslator()
-    translator.load(f"languages/{lang}.qm")  # 放在同目录或者使用绝对路径
-    app.installTranslator(translator)
+    lang_file = SCRIPT_DIR / "languages" / f"{lang}.qm"
+    if lang_file.exists() and translator.load(str(lang_file)):
+        app.installTranslator(translator)
 
     gallery = Gallery()
 

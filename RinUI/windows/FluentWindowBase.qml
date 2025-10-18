@@ -31,6 +31,7 @@ ApplicationWindow {
     property alias closeVisible: titleBar.closeVisible
 
     property int titleBarHeight: Theme.currentTheme.appearance.dialogTitleBarHeight
+    property alias titleBarArea: titleBar.content
 
 
     // 直接添加子项
@@ -147,9 +148,10 @@ ApplicationWindow {
         id: resizeHandler
         grabPermissions: TapHandler.TakeOverForbidden
         target: null
+        enabled: Qt.platform.os !== "windows"
         onActiveChanged: if (active && baseWindow.visibility !== Window.Maximized) {
             const p = resizeHandler.centroid.position
-            const b = Utils.windowDragArea + 10
+            const b = Utils.windowDragArea
             let e = 0;
             if (p.x < b) e |= Qt.LeftEdge
             if (p.x >= width - b) e |= Qt.RightEdge
