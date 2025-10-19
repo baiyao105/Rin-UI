@@ -23,6 +23,7 @@ RowLayout {
     // 页面组件缓存(Component)
     property var componentCache: ({})
     property bool pushInProgress: false
+    property var loadingPages: ({})
 
     signal pageChanged()  // 页面切换信号
 
@@ -188,6 +189,7 @@ RowLayout {
     }
 
     function safePush(page, reload, fromNavigation) {
+        // 防止动画冲突
         if (pushInProgress) {
             console.log("Push already in progress, queuing...")
             Qt.callLater(function() { safePush(page, reload, fromNavigation) })
@@ -200,23 +202,30 @@ RowLayout {
             return
         }
 
+        let pageKey = (page instanceof Component) ? page.toString() : page.toString()
+        if (loadingPages[pageKey] && !reload) {
+            console.log("Page is loading, skipping:", pageKey)
+            return
+        }
         pushInProgress = true
 
         if (page instanceof Component) {
             // 对于Component类型, 直接使用
-            asyncPush(page, page.toString(), reload)
+            asyncPush(page, pageKey, reload)
         } else if (typeof page === "object" || typeof page === "string") {
-            let pageKey = page.toString()
             // 检查缓存
             if (!componentCache[pageKey] || reload) {
+                loadingPages[pageKey] = true  // 正在加载
                 let component = Qt.createComponent(page)
 
                 if (component.status === Component.Ready) {
                     componentCache[pageKey] = component
-                    console.log("Created and cached component:", pageKey)
+                    loadingPages[pageKey] = false
+                    // console.log("Created and cached component:", pageKey)
                     asyncPush(component, pageKey, reload)
                 } else if (component.status === Component.Error) {
                     console.error("Failed to load:", page, component.errorString())
+                    loadingPages[pageKey] = false
                     pushInProgress = false
                     navigationBar.lastPages.push(navigationBar.currentPage)
                     navigationBar.lastPages = navigationBar.lastPages
@@ -229,20 +238,24 @@ RowLayout {
                     return
                 } else {
                     // 组件还在加载中
-                    component.statusChanged.connect(function() {
+                    let handler = function() {
                         if (component.status === Component.Ready) {
                             componentCache[pageKey] = component
-                            console.log("Async loaded and cached component:", pageKey)
+                            loadingPages[pageKey] = false
+                            // console.log("Async loaded and cached component:", pageKey)
                             asyncPush(component, pageKey, reload)
                         } else if (component.status === Component.Error) {
                             console.error("Failed to async load:", page, component.errorString())
+                            loadingPages[pageKey] = false
                             pushInProgress = false
                         }
-                    })
+                        component.statusChanged.disconnect(handler)
+                    }
+                    component.statusChanged.connect(handler)
                     return
                 }
             } else {
-                console.log("Using cached component:", pageKey)
+                // console.log("Using cached component:", pageKey)
                 asyncPush(componentCache[pageKey], pageKey, reload)
             }
         }
@@ -253,7 +266,7 @@ RowLayout {
             // 查找并销毁栈中的旧实例
             for (let i = 0; i < stackView.depth; i++) {
                 let item = stackView.get(i)
-                if (item && item.toString().includes(pageKey)) {
+                if (item && item.objectName === pageKey) {
                     console.log("Destroying old instance for reload:", pageKey)
                     if (i === stackView.depth - 1) {
                         stackView.pop(null, StackView.Immediate)
@@ -271,23 +284,33 @@ RowLayout {
                 }
             }
         }
+        navigationBar.lastPages.push(navigationBar.currentPage)
+        navigationBar.lastPages = navigationBar.lastPages
+        navigationBar.currentPage = pageKey
+        pageChanged()
         // 创建新的页面实例
-        let pageInstance = component.createObject(null)
+        let pageInstance = component.createObject(null, { objectName: pageKey })
         if (!pageInstance) {
             console.error("Failed to create page instance for:", pageKey)
             pushInProgress = false
             return
         }
-        // 更新导航状态
-        navigationBar.lastPages.push(navigationBar.currentPage)
-        navigationBar.lastPages = navigationBar.lastPages
-        navigationBar.currentPage = pageKey
-        pageChanged()
-        // 推送
         stackView.push(pageInstance)
-        Qt.callLater(function() {
-            pushInProgress = false
-        })
+        // 监听 StackView 动画完成状态
+        let animationHandler = function() {
+            if (stackView.currentItem === pageInstance && !stackView.busy) {
+                pushInProgress = false
+                stackView.busyChanged.disconnect(animationHandler)
+                // console.log("Navigation animation completed for:", pageKey)
+            }
+        }
+        stackView.busyChanged.connect(animationHandler)
+        if (!stackView.busy && stackView.currentItem === pageInstance) {
+            Qt.callLater(function() {
+                pushInProgress = false
+                // console.log("Navigation completed immediately for:", pageKey)
+            })
+        }
     }
 
     function findPageByKey(key) {
