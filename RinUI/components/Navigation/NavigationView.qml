@@ -285,7 +285,7 @@ RowLayout {
         // 查找并销毁栈中的匹配实例
         for (let i = stackView.depth - 1; i >= 0; i--) {
             let item = stackView.get(i)
-            if (item && item.objectName === pageKey) {
+            if (item && item.__rin_pageKey === pageKey) {
                 console.log("Destroying instance for reload:", pageKey, "at index:", i)
                 foundAndCleaned = true
                 if (i === stackView.depth - 1) {
@@ -331,9 +331,12 @@ RowLayout {
         navigationBar.currentPage = pageKey
         pageChanged()
         // 创建新的页面实例
-        let pageInstance = component.createObject(null, { 
-            objectName: pageKey.includes("/") ? pageKey.split("/").pop().replace(".qml", "") : pageKey 
+        let pageInstance = component.createObject(stackView, {
+            objectName: pageKey.includes("/") ? pageKey.split("/").pop().replace(".qml", "") : pageKey
         })
+        if (pageInstance) {
+            pageInstance.__rin_pageKey = pageKey
+        }
         if (!pageInstance) {
             console.error("Failed to create page instance for:", pageKey)
             pushInProgress = false
