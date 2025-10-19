@@ -279,42 +279,52 @@ RowLayout {
         }
     }
 
-    function asyncPush(component, pageKey, reload) {
-        if (reload) {
-            // 查找并销毁栈中的旧实例
-            for (let i = 0; i < stackView.depth; i++) {
-                let item = stackView.get(i)
-                if (item && item.objectName === pageKey) {
-                    console.log("Destroying old instance for reload:", pageKey)
-                    if (i === stackView.depth - 1) {
-                        stackView.pop(null, StackView.Immediate)
-                    } else {
-                        // 非顶层特殊处理
-                        let targetItem = item
-                        let itemsToRemove = []
-                        for (let j = i; j < stackView.depth; j++) {
-                            let currentItem = stackView.get(j)
-                            if (currentItem) {
-                                itemsToRemove.push(currentItem)
-                            }
-                        }
-                        for (let k = itemsToRemove.length - 1; k >= 0; k--) {
-                            let itemToRemove = itemsToRemove[k]
-                            let poppedItem = stackView.pop(null, StackView.Immediate)
-                            if (poppedItem === itemToRemove) {
-                                if (poppedItem === targetItem) {
-                                    poppedItem.destroy()
-                                    break
-                                }
-                            } else {
-                                console.error("Stack safety error: popped item mismatch")
-                                break
-                            }
+    function cleanupPageForReload(pageKey) {
+        if (!pageKey) return false
+        let foundAndCleaned = false
+        // 查找并销毁栈中的匹配实例
+        for (let i = stackView.depth - 1; i >= 0; i--) {
+            let item = stackView.get(i)
+            if (item && item.objectName === pageKey) {
+                console.log("Destroying instance for reload:", pageKey, "at index:", i)
+                foundAndCleaned = true
+                if (i === stackView.depth - 1) {
+                    let poppedItem = stackView.pop(null, StackView.Immediate)
+                    if (poppedItem) {
+                        poppedItem.destroy()
+                    }
+                } else {
+                    // 非顶层特殊处理
+                    let targetItem = item
+                    let itemsToRemove = []
+                    for (let j = i; j < stackView.depth; j++) {
+                        let currentItem = stackView.get(j)
+                        if (currentItem) {
+                            itemsToRemove.push(currentItem)
                         }
                     }
-                    break
+                    for (let k = itemsToRemove.length - 1; k >= 0; k--) {
+                        let itemToRemove = itemsToRemove[k]
+                        let poppedItem = stackView.pop(null, StackView.Immediate)
+                        if (poppedItem === itemToRemove) {
+                            if (poppedItem === targetItem) {
+                                poppedItem.destroy()
+                                break
+                            }
+                        } else {
+                            console.error("Stack safety error: popped item mismatch")
+                            break
+                        }
+                    }
                 }
             }
+        }
+        return foundAndCleaned
+    }
+
+    function asyncPush(component, pageKey, reload) {
+        if (reload) {
+            cleanupPageForReload(pageKey)
         }
         navigationBar.lastPages.push(navigationBar.currentPage)
         navigationBar.lastPages = navigationBar.lastPages
@@ -330,6 +340,11 @@ RowLayout {
             return
         }
         stackView.push(pageInstance)
+        if (loadingPages[pageKey]) {
+            loadingPages[pageKey] = false
+            delete loadingPages[pageKey]
+        }
+
         Qt.callLater(function() {
             if (stackView.busy && stackView.currentItem === pageInstance) {
                 let animationHandler = function() {
