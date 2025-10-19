@@ -202,7 +202,14 @@ RowLayout {
             return
         }
 
-        let pageKey = (page instanceof Component) ? page.toString() : page.toString()
+        let pageKey  // 缓存键
+        if (page instanceof Component) {
+            pageKey = page.objectName || page.toString()
+        } else if (typeof page === "string") {
+            pageKey = page
+        } else {
+            pageKey = page.toString()
+        }
         if (loadingPages[pageKey] && !reload) {
             console.log("Page is loading, skipping:", pageKey)
             return
@@ -226,6 +233,7 @@ RowLayout {
                 } else if (component.status === Component.Error) {
                     console.error("Failed to load:", page, component.errorString())
                     loadingPages[pageKey] = false
+                    delete loadingPages[pageKey]
                     pushInProgress = false
                     navigationBar.lastPages.push(navigationBar.currentPage)
                     navigationBar.lastPages = navigationBar.lastPages
@@ -247,7 +255,17 @@ RowLayout {
                         } else if (component.status === Component.Error) {
                             console.error("Failed to async load:", page, component.errorString())
                             loadingPages[pageKey] = false
+                            delete loadingPages[pageKey]
                             pushInProgress = false
+                            // 失败时推送错误页面
+                            navigationBar.lastPages.push(navigationBar.currentPage)
+                            navigationBar.lastPages = navigationBar.lastPages
+                            navigationBar.currentPage = pageKey
+                            pageChanged()
+                            stackView.push("ErrorPage.qml", {
+                        errorMessage: component.errorString(),
+                        page: page,
+                    })
                         }
                         component.statusChanged.disconnect(handler)
                     }
@@ -272,10 +290,24 @@ RowLayout {
                         stackView.pop(null, StackView.Immediate)
                     } else {
                         // 非顶层特殊处理
-                        while (stackView.depth > i) {
-                            let topItem = stackView.pop(null, StackView.Immediate)
-                            if (topItem === item) {
-                                topItem.destroy()
+                        let targetItem = item
+                        let itemsToRemove = []
+                        for (let j = i; j < stackView.depth; j++) {
+                            let currentItem = stackView.get(j)
+                            if (currentItem) {
+                                itemsToRemove.push(currentItem)
+                            }
+                        }
+                        for (let k = itemsToRemove.length - 1; k >= 0; k--) {
+                            let itemToRemove = itemsToRemove[k]
+                            let poppedItem = stackView.pop(null, StackView.Immediate)
+                            if (poppedItem === itemToRemove) {
+                                if (poppedItem === targetItem) {
+                                    poppedItem.destroy()
+                                    break
+                                }
+                            } else {
+                                console.error("Stack safety error: popped item mismatch")
                                 break
                             }
                         }
@@ -289,28 +321,35 @@ RowLayout {
         navigationBar.currentPage = pageKey
         pageChanged()
         // 创建新的页面实例
-        let pageInstance = component.createObject(null, { objectName: pageKey })
+        let pageInstance = component.createObject(null, { 
+            objectName: pageKey.includes("/") ? pageKey.split("/").pop().replace(".qml", "") : pageKey 
+        })
         if (!pageInstance) {
             console.error("Failed to create page instance for:", pageKey)
             pushInProgress = false
             return
         }
         stackView.push(pageInstance)
-        // 监听 StackView 动画完成状态
-        let animationHandler = function() {
-            if (stackView.currentItem === pageInstance && !stackView.busy) {
-                pushInProgress = false
-                stackView.busyChanged.disconnect(animationHandler)
-                // console.log("Navigation animation completed for:", pageKey)
-            }
-        }
-        stackView.busyChanged.connect(animationHandler)
-        if (!stackView.busy && stackView.currentItem === pageInstance) {
-            Qt.callLater(function() {
+        Qt.callLater(function() {
+            if (stackView.busy && stackView.currentItem === pageInstance) {
+                let animationHandler = function() {
+                    if (stackView.currentItem === pageInstance && !stackView.busy) {
+                        pushInProgress = false
+                        stackView.busyChanged.disconnect(animationHandler)
+                        // console.log("Navigation animation completed for:", pageKey)
+                    }
+                }
+                if (!stackView.busy) {
+                    pushInProgress = false
+                    // console.log("Navigation completed immediately for:", pageKey)
+                } else {
+                    stackView.busyChanged.connect(animationHandler)
+                }
+            } else {
                 pushInProgress = false
                 // console.log("Navigation completed immediately for:", pageKey)
-            })
-        }
+            }
+        })
     }
 
     function findPageByKey(key) {
