@@ -180,10 +180,15 @@ RowLayout {
             } else {
                 lastPages = lastPages.slice(0, -1)  // 移除最后一个元素
             }
-            currentPage = previousPage
-            // console.log("执行pop操作 - 返回到页面:", currentPage, "剩余lastPages长度:", lastPages.length)
-            stackView.pop()
-            pageChanged()
+            if (stackView.depth > 1) {
+                currentPage = previousPage
+                // console.log("执行pop操作 - 返回到页面:", currentPage, "剩余lastPages长度:", lastPages.length)
+                stackView.pop()
+                pageChanged()
+            } else {
+                currentPage = previousPage
+                safePush(previousPage, false, true)  // 重新加载页面
+            }
         } else {
             console.log("Can't pop: no pages in history")
         }
@@ -351,7 +356,7 @@ RowLayout {
     }
 
     function asyncPush(component, pageKey, reload, fromNavigation) {
-        // console.log("asyncPush调用 - pageKey:", pageKey, "fromNavigation:", fromNavigation, "当前lastPages长度:", lastPages.length)
+        // console.log("asyncPush调用 - pageKey:", pageKey, "reload:", reload, "fromNavigation:", fromNavigation, "当前lastPages长度:", lastPages.length)
         if (reload) {
             let currentObjectName = normalizeKeyFromPage(pageKey).includes("/") ? 
                 normalizeKeyFromPage(pageKey).split("/").pop().replace(".qml", "") : 
@@ -393,17 +398,31 @@ RowLayout {
             }
         }
         if (currentPage !== "" && !fromNavigation) {
-            // console.log("添加到历史记录 - 当前页面:", currentPage)
-            if (lastPages.length === 0) {
-                lastPages = [currentPage]
-            } else if (lastPages.length === 1) {
-                lastPages = [lastPages[0], currentPage]
-            } else {
-                // 保持最多两个页面, 移除最旧的
-                lastPages = [lastPages[1], currentPage]
+            let currentObjectName = stackView.currentItem ? stackView.currentItem.objectName : ""
+            let targetObjectName = normalizeKeyFromPage(pageKey).includes("/") ? 
+                normalizeKeyFromPage(pageKey).split("/").pop().replace(".qml", "") : 
+                normalizeKeyFromPage(pageKey)
+
+            if (!reload || (reload && currentObjectName !== targetObjectName)) {
+                // console.log("添加到历史记录 - 当前页面:", currentPage)
+                if (lastPages.length === 0) {
+                    lastPages = [currentPage]
+                } else if (lastPages.length === 1) {
+                    lastPages = [lastPages[0], currentPage]
+                } else {
+                    // 保持最多两个页面, 移除最旧的
+                    lastPages = [lastPages[1], currentPage]
+                }
             }
         }
-        currentPage = pageKey
+        let currentObjectName = stackView.currentItem ? stackView.currentItem.objectName : ""
+        let targetObjectName = normalizeKeyFromPage(pageKey).includes("/") ? 
+            normalizeKeyFromPage(pageKey).split("/").pop().replace(".qml", "") : 
+            normalizeKeyFromPage(pageKey)
+
+        if (!reload || (reload && currentObjectName !== targetObjectName)) {
+            currentPage = pageKey
+        }
         // console.log("更新后 - currentPage:", currentPage, "lastPages长度:", lastPages.length, "内容:", JSON.stringify(lastPages))
         pageChanged()
         // 创建新的页面实例
