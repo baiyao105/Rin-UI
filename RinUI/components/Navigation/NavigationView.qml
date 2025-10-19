@@ -15,7 +15,7 @@ RowLayout {
     property alias navigationBar: navigationBar  // 导航栏
     property alias navigationItems: navigationBar.navigationItems  // 导航栏item
     property alias currentPage: navigationBar.currentPage  // 当前页面索引
-    property alias lastPages: navigationBar.lastPages  // 上个页面索引
+    property var lastPages: []  // 历史页面栈, 最多保存两个页面
     property string defaultPage: ""  // 默认索引项
     property int pushEnterFromY: height
     property var window: parent  // 窗口对象
@@ -171,13 +171,21 @@ RowLayout {
     }
 
     function safePop() {
+        // console.log("safePop调用 - 当前lastPages长度:", lastPages.length, "内容:", JSON.stringify(lastPages))
         // console.log("Popping Page; Depth:", stackView.depth)
-        if (lastPages.length > 1) {
-            lastPages.pop()
-            currentPage = lastPages[lastPages.length - 1]
+        if (lastPages.length > 0) {
+            let previousPage = lastPages[lastPages.length - 1]  // 获取最近的页面
+            if (lastPages.length === 1) {
+                lastPages = []
+            } else {
+                lastPages = lastPages.slice(0, -1)  // 移除最后一个元素
+            }
+            currentPage = previousPage
+            // console.log("执行pop操作 - 返回到页面:", currentPage, "剩余lastPages长度:", lastPages.length)
             stackView.pop()
+            pageChanged()
         } else {
-            console.log("Can't pop: only root page left")
+            console.log("Can't pop: no pages in history")
         }
     }
 
@@ -186,13 +194,15 @@ RowLayout {
     }
 
     function push(page, reload, fromNavigation) {
+        if (reload === undefined) reload = false
+        if (fromNavigation === undefined) fromNavigation = false
         safePush(page, reload, fromNavigation)
     }
 
     function safePush(page, reload, fromNavigation) {
         // 防止动画冲突
         if (pushInProgress) {
-            console.log("Push already in progress, queuing...")
+            // console.log("Push already in progress, queuing...")
             Qt.callLater(function() { safePush(page, reload, fromNavigation) })
             return
         }
@@ -348,6 +358,7 @@ RowLayout {
     }
 
     function asyncPush(component, pageKey, reload, fromNavigation) {
+        // console.log("asyncPush调用 - pageKey:", pageKey, "fromNavigation:", fromNavigation, "当前lastPages长度:", lastPages.length)
         if (reload) {
             let currentObjectName = pageKey.includes("/") ? pageKey.split("/").pop().replace(".qml", "") : pageKey
             if (stackView.currentItem && stackView.currentItem.objectName === currentObjectName) {
@@ -385,12 +396,18 @@ RowLayout {
             }
         }
         if (currentPage !== "" && !fromNavigation) {
-            lastPages.push(currentPage)
-        }
-        if (fromNavigation && lastPages.length === 0) {
-            lastPages.push(pageKey)
+            // console.log("添加到历史记录 - 当前页面:", currentPage)
+            if (lastPages.length === 0) {
+                lastPages = [currentPage]
+            } else if (lastPages.length === 1) {
+                lastPages = [lastPages[0], currentPage]
+            } else {
+                // 保持最多两个页面, 移除最旧的
+                lastPages = [lastPages[1], currentPage]
+            }
         }
         currentPage = pageKey
+        // console.log("更新后 - currentPage:", currentPage, "lastPages长度:", lastPages.length, "内容:", JSON.stringify(lastPages))
         pageChanged()
         // 创建新的页面实例
         let pageInstance = component.createObject(stackView, {
