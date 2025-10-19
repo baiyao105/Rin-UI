@@ -15,8 +15,8 @@ RowLayout {
     property alias navigationBar: navigationBar  // 导航栏
     property alias navigationItems: navigationBar.navigationItems  // 导航栏item
     property alias currentPage: navigationBar.currentPage  // 当前页面索引
+    property alias lastPages: navigationBar.lastPages  // 上个页面索引
     property string defaultPage: ""  // 默认索引项
-    property var lastPages: []  // 上个页面索引
     property int pushEnterFromY: height
     property var window: parent  // 窗口对象
 
@@ -24,6 +24,7 @@ RowLayout {
     property var componentCache: ({})
     property bool pushInProgress: false
     property var loadingPages: ({})
+    property var itemsToRestoreAfterReload: []
 
     signal pageChanged()  // 页面切换信号
 
@@ -161,9 +162,9 @@ RowLayout {
         Component.onCompleted: {
             if (navigationItems.length > 0) {
                 if (defaultPage !== "") {
-                    safePush(defaultPage, false)
+                    safePush(defaultPage, false, true)
                 } else {
-                    safePush(navigationItems[0].page, false)  // 推送默认页面
+                    safePush(navigationItems[0].page, false, true)  // 推送默认页面
                 }  // 推送页面
             }
         }
@@ -171,9 +172,9 @@ RowLayout {
 
     function safePop() {
         // console.log("Popping Page; Depth:", stackView.depth)
-        if (navigationBar.lastPages.length > 1) {
-            navigationBar.currentPage = navigationBar.lastPages.pop()  // Retrieve and remove the last page
-            navigationBar.lastPages = navigationBar.lastPages  // refresh
+        if (lastPages.length > 1) {
+            lastPages.pop()
+            currentPage = lastPages[lastPages.length - 1]
             stackView.pop()
         } else {
             console.log("Can't pop: only root page left")
@@ -210,19 +211,21 @@ RowLayout {
         } else {
             pageKey = page.toString()
         }
-        if (navigationBar.currentPage === pageKey && !reload) {
-            console.log("Page already current, skipping:", pageKey)
-            return
+        if (!fromNavigation) {
+            if (navigationBar.currentPage === pageKey && !reload) {
+                console.log("Page already current, skipping:", pageKey)
+                return
+            }
+            if (loadingPages[pageKey] && !reload) {
+                console.log("Page is loading, skipping:", pageKey)
+                return
+            }
         }
-        if (loadingPages[pageKey] && !reload) {
-            console.log("Page is loading, skipping:", pageKey)
-            return
-        }
-        pushInProgress = true
+        setPushInProgress(true)
 
         if (page instanceof Component) {
             // 对于Component类型, 直接使用
-            asyncPush(page, pageKey, reload)
+            asyncPush(page, pageKey, reload, fromNavigation)
         } else if (typeof page === "object" || typeof page === "string") {
             // 检查缓存
             if (!componentCache[pageKey] || reload) {
@@ -233,13 +236,14 @@ RowLayout {
                     componentCache[pageKey] = component
                     loadingPages[pageKey] = false
                     // console.log("Created and cached component:", pageKey)
-                    asyncPush(component, pageKey, reload)
+                    asyncPush(component, pageKey, reload, fromNavigation)
                 } else if (component.status === Component.Error) {
                     console.error("Failed to load:", page, component.errorString())
                     cleanupLoading(pageKey, true)
-                    navigationBar.lastPages.push(navigationBar.currentPage)
-                    navigationBar.lastPages = navigationBar.lastPages
-                    navigationBar.currentPage = pageKey
+                    if (currentPage !== "") {
+                        lastPages.push(currentPage)
+                    }
+                    currentPage = pageKey
                     pageChanged()
                     stackView.push("ErrorPage.qml", {
                         errorMessage: component.errorString(),
@@ -249,32 +253,44 @@ RowLayout {
                 } else {
                     // 组件还在加载中
                     let handler = function() {
+                        component.statusChanged.disconnect(handler)
                         if (component.status === Component.Ready) {
                             componentCache[pageKey] = component
                             loadingPages[pageKey] = false
                             // console.log("Async loaded and cached component:", pageKey)
-                            asyncPush(component, pageKey, reload)
+                            asyncPush(component, pageKey, reload, fromNavigation)
                         } else if (component.status === Component.Error) {
                             console.error("Failed to async load:", page, component.errorString())
                             cleanupLoading(pageKey, true)
                             // 失败时推送错误页面
-                            navigationBar.lastPages.push(navigationBar.currentPage)
-                            navigationBar.lastPages = navigationBar.lastPages
-                            navigationBar.currentPage = pageKey
+                            if (currentPage !== "") {
+                                lastPages.push(currentPage)
+                            }
+                            currentPage = pageKey
                             pageChanged()
                             stackView.push("ErrorPage.qml", {
-                        errorMessage: component.errorString(),
-                        page: page,
-                    })
+                                errorMessage: component.errorString(),
+                                page: page,
+                            })
                         }
-                        component.statusChanged.disconnect(handler)
                     }
-                    component.statusChanged.connect(handler)
+                    try {
+                        component.statusChanged.connect(handler)
+                    } catch (e) {
+                        console.warn("Handler connection failed, component may already be connected:", e)
+                        if (component.status === Component.Ready) {
+                            componentCache[pageKey] = component
+                            loadingPages[pageKey] = false
+                            asyncPush(component, pageKey, reload, fromNavigation)
+                        } else if (component.status === Component.Error) {
+                            cleanupLoading(pageKey, true)
+                        }
+                    }
                     return
                 }
             } else {
                 // console.log("Using cached component:", pageKey)
-                asyncPush(componentCache[pageKey], pageKey, reload)
+                asyncPush(componentCache[pageKey], pageKey, reload, fromNavigation)
             }
         }
     }
@@ -284,9 +300,10 @@ RowLayout {
         let foundAndCleaned = false
         // 查找匹配页面实例
         let targetIndex = -1
+        let targetObjectName = pageKey.includes("/") ? pageKey.split("/").pop().replace(".qml", "") : pageKey
         for (let i = stackView.depth - 1; i >= 0; i--) {
             let item = stackView.get(i)
-            if (item && item.__rin_pageKey === pageKey) {
+            if (item && item.objectName === targetObjectName) {
                 targetIndex = i
                 console.log("Found instance for reload:", pageKey, "at index:", i)
                 break // 只处理第一个匹配项
@@ -302,12 +319,16 @@ RowLayout {
                 }
             } else {
                 // 非顶层特殊处理
-                // 先pop到目标页面上方，然后replace目标页面
                 let itemsToRestore = []
                 for (let i = stackView.depth - 1; i > targetIndex; i--) {
                     let item = stackView.get(i)
                     if (item) {
-                        itemsToRestore.unshift(item) // 保持原有顺序
+                        let pageInfo = {
+                            component: componentCache[item.objectName] || null,
+                            pageKey: item.objectName,
+                            properties: {} // 扩展保存页面状态
+                        }
+                        itemsToRestore.unshift(pageInfo)
                     }
                 }
                 while (stackView.depth > targetIndex + 1) {
@@ -319,19 +340,57 @@ RowLayout {
                     console.log("Destroyed middle-level instance for reload:", pageKey)
                     targetItem.destroy()
                 }
+                navigationView.itemsToRestoreAfterReload = itemsToRestore
             }
         }
-        
+
         return foundAndCleaned
     }
 
-    function asyncPush(component, pageKey, reload) {
+    function asyncPush(component, pageKey, reload, fromNavigation) {
         if (reload) {
-            cleanupPageForReload(pageKey)
+            let currentObjectName = pageKey.includes("/") ? pageKey.split("/").pop().replace(".qml", "") : pageKey
+            if (stackView.currentItem && stackView.currentItem.objectName === currentObjectName) {
+                let newPageInstance = component.createObject(stackView, {
+                    objectName: pageKey.includes("/") ? pageKey.split("/").pop().replace(".qml", "") : pageKey
+                })
+                if (!newPageInstance) {
+                    console.error("Failed to create page instance for reload:", pageKey)
+                    setPushInProgress(false)
+                    return
+                }
+                stackView.replace(stackView.currentItem, newPageInstance)
+                Qt.callLater(function() {
+                    if (stackView.busy && stackView.currentItem === newPageInstance) {
+                        let animationHandler = function() {
+                            if (stackView.currentItem === newPageInstance && !stackView.busy) {
+                                setPushInProgress(false)
+                                stackView.busyChanged.disconnect(animationHandler)
+                                // console.log("Current page reload animation completed for:", pageKey)
+                            }
+                        }
+                        if (!stackView.busy) {
+                            setPushInProgress(false)
+                        } else {
+                            stackView.busyChanged.connect(animationHandler)
+                        }
+                    } else {
+                        setPushInProgress(false)
+                        // console.log("Current page reload completed immediately for:", pageKey)
+                    }
+                })
+                return
+            } else {
+                cleanupPageForReload(pageKey)
+            }
         }
-        navigationBar.lastPages.push(navigationBar.currentPage)
-        navigationBar.lastPages = navigationBar.lastPages
-        navigationBar.currentPage = pageKey
+        if (currentPage !== "" && !fromNavigation) {
+            lastPages.push(currentPage)
+        }
+        if (fromNavigation && lastPages.length === 0) {
+            lastPages.push(pageKey)
+        }
+        currentPage = pageKey
         pageChanged()
         // 创建新的页面实例
         let pageInstance = component.createObject(stackView, {
@@ -339,7 +398,7 @@ RowLayout {
         })
         if (!pageInstance) {
             console.error("Failed to create page instance for:", pageKey)
-            pushInProgress = false
+            setPushInProgress(false)
             return
         }
         stackView.push(pageInstance)
@@ -352,22 +411,47 @@ RowLayout {
             if (stackView.busy && stackView.currentItem === pageInstance) {
                 let animationHandler = function() {
                     if (stackView.currentItem === pageInstance && !stackView.busy) {
-                        pushInProgress = false
+                        setPushInProgress(false)
                         stackView.busyChanged.disconnect(animationHandler)
                         // console.log("Navigation animation completed for:", pageKey)
+                        restoreItemsAfterReload()
                     }
                 }
                 if (!stackView.busy) {
-                    pushInProgress = false
-                    // console.log("Navigation completed immediately for:", pageKey)
+                    setPushInProgress(false)
+                    restoreItemsAfterReload()
                 } else {
                     stackView.busyChanged.connect(animationHandler)
                 }
             } else {
-                pushInProgress = false
+                setPushInProgress(false)
                 // console.log("Navigation completed immediately for:", pageKey)
+                restoreItemsAfterReload()
             }
         })
+    }
+
+    function restoreItemsAfterReload() {
+        if (itemsToRestoreAfterReload.length > 0) {
+            // console.log("Restoring", itemsToRestoreAfterReload.length, "pages after reload")
+            let itemsToRestore = itemsToRestoreAfterReload
+            itemsToRestoreAfterReload = []
+            for (let i = 0; i < itemsToRestore.length; i++) {
+                let pageInfo = itemsToRestore[i]
+                if (pageInfo.component && pageInfo.pageKey) {
+                    // 创建页面实例
+                    let pageInstance = pageInfo.component.createObject(stackView, {
+                        objectName: pageInfo.pageKey.includes("/") ? pageInfo.pageKey.split("/").pop().replace(".qml", "") : pageInfo.pageKey
+                    })
+                    if (pageInstance) {
+                        stackView.push(pageInstance, {}, StackView.Immediate) // 立即推送，不播放动画
+                        // console.log("Restored page:", pageInfo.pageKey)
+                    } else {
+                        console.error("Failed to restore page instance for:", pageInfo.pageKey)
+                    }
+                }
+            }
+        }
     }
 
     function cleanupLoading(pageKey, resetPush) {  // 重置状态
@@ -377,8 +461,15 @@ RowLayout {
             delete loadingPages[pageKey]
             // console.log("Cleaned up loadingPages for:", pageKey)
         }
-        if (resetPush && pushInProgress) {
-            pushInProgress = false
+        if (resetPush) {
+            setPushInProgress(false)
+        }
+    }
+
+    function setPushInProgress(inProgress) {
+        pushInProgress = inProgress
+        if (!inProgress) {
+            // console.log("Push operation completed, ready for next navigation")
         }
     }
 
