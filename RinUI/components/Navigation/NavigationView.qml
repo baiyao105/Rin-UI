@@ -213,14 +213,7 @@ RowLayout {
             return
         }
 
-        let pageKey  // 缓存键
-        if (page instanceof Component) {
-            pageKey = page.objectName || page.toString()
-        } else if (typeof page === "string") {
-            pageKey = page
-        } else {
-            pageKey = page.toString()
-        }
+        let pageKey = normalizeKeyFromPage(page)  //缓存键
         if (!fromNavigation) {
             if (navigationBar.currentPage === pageKey && !reload) {
                 console.log("Page already current, skipping:", pageKey)
@@ -360,10 +353,14 @@ RowLayout {
     function asyncPush(component, pageKey, reload, fromNavigation) {
         // console.log("asyncPush调用 - pageKey:", pageKey, "fromNavigation:", fromNavigation, "当前lastPages长度:", lastPages.length)
         if (reload) {
-            let currentObjectName = pageKey.includes("/") ? pageKey.split("/").pop().replace(".qml", "") : pageKey
+            let currentObjectName = normalizeKeyFromPage(pageKey).includes("/") ? 
+                normalizeKeyFromPage(pageKey).split("/").pop().replace(".qml", "") : 
+                normalizeKeyFromPage(pageKey)
             if (stackView.currentItem && stackView.currentItem.objectName === currentObjectName) {
                 let newPageInstance = component.createObject(stackView, {
-                    objectName: pageKey.includes("/") ? pageKey.split("/").pop().replace(".qml", "") : pageKey
+                    objectName: normalizeKeyFromPage(pageKey).includes("/") ? 
+                        normalizeKeyFromPage(pageKey).split("/").pop().replace(".qml", "") : 
+                        normalizeKeyFromPage(pageKey)
                 })
                 if (!newPageInstance) {
                     console.error("Failed to create page instance for reload:", pageKey)
@@ -411,7 +408,9 @@ RowLayout {
         pageChanged()
         // 创建新的页面实例
         let pageInstance = component.createObject(stackView, {
-            objectName: pageKey.includes("/") ? pageKey.split("/").pop().replace(".qml", "") : pageKey
+            objectName: normalizeKeyFromPage(pageKey).includes("/") ? 
+                normalizeKeyFromPage(pageKey).split("/").pop().replace(".qml", "") : 
+                normalizeKeyFromPage(pageKey)
         })
         if (!pageInstance) {
             console.error("Failed to create page instance for:", pageKey)
@@ -454,20 +453,21 @@ RowLayout {
             let itemsToRestore = itemsToRestoreAfterReload
             itemsToRestoreAfterReload = []
             for (let i = 0; i < itemsToRestore.length; i++) {
-                let pageInfo = itemsToRestore[i]
-                if (pageInfo.component && pageInfo.pageKey) {
-                    // 创建页面实例
-                    let pageInstance = pageInfo.component.createObject(stackView, {
-                        objectName: pageInfo.pageKey.includes("/") ? pageInfo.pageKey.split("/").pop().replace(".qml", "") : pageInfo.pageKey
-                    })
-                    if (pageInstance) {
-                        stackView.push(pageInstance, {}, StackView.Immediate) // 立即推送，不播放动画
-                        // console.log("Restored page:", pageInfo.pageKey)
-                    } else {
-                        console.error("Failed to restore page instance for:", pageInfo.pageKey)
+                    let pageInfo = itemsToRestore[i]
+                    if (pageInfo.component && pageInfo.pageKey) {
+                        let pageInstance = pageInfo.component.createObject(stackView, {
+                            objectName: normalizeKeyFromPage(pageInfo.pageKey).includes("/") ? 
+                                normalizeKeyFromPage(pageInfo.pageKey).split("/").pop().replace(".qml", "") : 
+                                normalizeKeyFromPage(pageInfo.pageKey)
+                        })
+                        if (pageInstance) {
+                            stackView.push(pageInstance, {}, StackView.Immediate)
+                            // console.log("Restored page:", pageInfo.pageKey)
+                        } else {
+                            console.error("Failed to restore page instance for:", pageInfo.pageKey)
+                        }
                     }
                 }
-            }
         }
     }
 
@@ -487,6 +487,16 @@ RowLayout {
         pushInProgress = inProgress
         if (!inProgress) {
             // console.log("Push operation completed, ready for next navigation")
+        }
+    }
+
+    function normalizeKeyFromPage(page) {
+        if (page instanceof Component) {
+            return page.objectName || page.toString()
+        } else if (typeof page === "string") {
+            return page
+        } else {
+            return page.toString()
         }
     }
 

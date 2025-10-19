@@ -88,7 +88,7 @@ Item {
             width: 40
             height: 40
             size: 16
-            enabled: navigationView.lastPages.length > 1
+            enabled: navigationView.lastPages.length > 0
 
             ToolTip {
                 parent: parent
