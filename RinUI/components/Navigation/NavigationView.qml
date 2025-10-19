@@ -210,6 +210,10 @@ RowLayout {
         } else {
             pageKey = page.toString()
         }
+        if (navigationBar.currentPage === pageKey && !reload) {
+            console.log("Page already current, skipping:", pageKey)
+            return
+        }
         if (loadingPages[pageKey] && !reload) {
             console.log("Page is loading, skipping:", pageKey)
             return
@@ -232,9 +236,7 @@ RowLayout {
                     asyncPush(component, pageKey, reload)
                 } else if (component.status === Component.Error) {
                     console.error("Failed to load:", page, component.errorString())
-                    loadingPages[pageKey] = false
-                    delete loadingPages[pageKey]
-                    pushInProgress = false
+                    cleanupLoading(pageKey, true)
                     navigationBar.lastPages.push(navigationBar.currentPage)
                     navigationBar.lastPages = navigationBar.lastPages
                     navigationBar.currentPage = pageKey
@@ -254,9 +256,7 @@ RowLayout {
                             asyncPush(component, pageKey, reload)
                         } else if (component.status === Component.Error) {
                             console.error("Failed to async load:", page, component.errorString())
-                            loadingPages[pageKey] = false
-                            delete loadingPages[pageKey]
-                            pushInProgress = false
+                            cleanupLoading(pageKey, true)
                             // 失败时推送错误页面
                             navigationBar.lastPages.push(navigationBar.currentPage)
                             navigationBar.lastPages = navigationBar.lastPages
@@ -282,43 +282,46 @@ RowLayout {
     function cleanupPageForReload(pageKey) {
         if (!pageKey) return false
         let foundAndCleaned = false
-        // 查找并销毁栈中的匹配实例
+        // 查找匹配页面实例
+        let targetIndex = -1
         for (let i = stackView.depth - 1; i >= 0; i--) {
             let item = stackView.get(i)
             if (item && item.__rin_pageKey === pageKey) {
-                console.log("Destroying instance for reload:", pageKey, "at index:", i)
-                foundAndCleaned = true
-                if (i === stackView.depth - 1) {
-                    let poppedItem = stackView.pop(null, StackView.Immediate)
-                    if (poppedItem) {
-                        poppedItem.destroy()
+                targetIndex = i
+                console.log("Found instance for reload:", pageKey, "at index:", i)
+                break // 只处理第一个匹配项
+            }
+        }
+        if (targetIndex >= 0) {
+            foundAndCleaned = true
+            if (targetIndex === stackView.depth - 1) {
+                let poppedItem = stackView.pop(null, StackView.Immediate)
+                if (poppedItem) {
+                    // console.log("Destroyed top-level instance for reload:", pageKey)
+                    poppedItem.destroy()
+                }
+            } else {
+                // 非顶层特殊处理
+                // 先pop到目标页面上方，然后replace目标页面
+                let itemsToRestore = []
+                for (let i = stackView.depth - 1; i > targetIndex; i--) {
+                    let item = stackView.get(i)
+                    if (item) {
+                        itemsToRestore.unshift(item) // 保持原有顺序
                     }
-                } else {
-                    // 非顶层特殊处理
-                    let targetItem = item
-                    let itemsToRemove = []
-                    for (let j = i; j < stackView.depth; j++) {
-                        let currentItem = stackView.get(j)
-                        if (currentItem) {
-                            itemsToRemove.push(currentItem)
-                        }
-                    }
-                    for (let k = itemsToRemove.length - 1; k >= 0; k--) {
-                        let itemToRemove = itemsToRemove[k]
-                        let poppedItem = stackView.pop(null, StackView.Immediate)
-                        if (poppedItem === itemToRemove) {
-                            if (poppedItem === targetItem) {
-                                poppedItem.destroy()
-                                break
-                            }
-                        } else {
-                            console.error("Stack safety error: popped item mismatch")
-                            break
-                        }
-                    }
+                }
+                while (stackView.depth > targetIndex + 1) {
+                    stackView.pop(null, StackView.Immediate)
+                }
+                // 销毁目标页面
+                let targetItem = stackView.pop(null, StackView.Immediate)
+                if (targetItem) {
+                    console.log("Destroyed middle-level instance for reload:", pageKey)
+                    targetItem.destroy()
                 }
             }
         }
+        
         return foundAndCleaned
     }
 
@@ -334,9 +337,6 @@ RowLayout {
         let pageInstance = component.createObject(stackView, {
             objectName: pageKey.includes("/") ? pageKey.split("/").pop().replace(".qml", "") : pageKey
         })
-        if (pageInstance) {
-            pageInstance.__rin_pageKey = pageKey
-        }
         if (!pageInstance) {
             console.error("Failed to create page instance for:", pageKey)
             pushInProgress = false
@@ -368,6 +368,18 @@ RowLayout {
                 // console.log("Navigation completed immediately for:", pageKey)
             }
         })
+    }
+
+    function cleanupLoading(pageKey, resetPush) {  // 重置状态
+        if (resetPush === undefined) resetPush = true
+        if (pageKey && loadingPages[pageKey]) {
+            loadingPages[pageKey] = false
+            delete loadingPages[pageKey]
+            // console.log("Cleaned up loadingPages for:", pageKey)
+        }
+        if (resetPush && pushInProgress) {
+            pushInProgress = false
+        }
     }
 
     function findPageByKey(key) {
