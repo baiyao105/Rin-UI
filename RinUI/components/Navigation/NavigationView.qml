@@ -358,13 +358,13 @@ RowLayout {
     function asyncPush(component, pageKey, reload, fromNavigation) {
         // console.log("asyncPush调用 - pageKey:", pageKey, "reload:", reload, "fromNavigation:", fromNavigation, "当前lastPages长度:", lastPages.length)
         if (reload) {
-            let currentObjectName = normalizeKeyFromPage(pageKey).includes("/") ? 
-                normalizeKeyFromPage(pageKey).split("/").pop().replace(".qml", "") : 
+            let currentObjectName = normalizeKeyFromPage(pageKey).includes("/") ?
+                normalizeKeyFromPage(pageKey).split("/").pop().replace(".qml", "") :
                 normalizeKeyFromPage(pageKey)
             if (stackView.currentItem && stackView.currentItem.objectName === currentObjectName) {
                 let newPageInstance = component.createObject(stackView, {
-                    objectName: normalizeKeyFromPage(pageKey).includes("/") ? 
-                        normalizeKeyFromPage(pageKey).split("/").pop().replace(".qml", "") : 
+                    objectName: normalizeKeyFromPage(pageKey).includes("/") ?
+                        normalizeKeyFromPage(pageKey).split("/").pop().replace(".qml", "") :
                         normalizeKeyFromPage(pageKey)
                 })
                 if (!newPageInstance) {
@@ -399,8 +399,8 @@ RowLayout {
         }
         if (currentPage !== "" && !fromNavigation) {
             let currentObjectName = stackView.currentItem ? stackView.currentItem.objectName : ""
-            let targetObjectName = normalizeKeyFromPage(pageKey).includes("/") ? 
-                normalizeKeyFromPage(pageKey).split("/").pop().replace(".qml", "") : 
+            let targetObjectName = normalizeKeyFromPage(pageKey).includes("/") ?
+                normalizeKeyFromPage(pageKey).split("/").pop().replace(".qml", "") :
                 normalizeKeyFromPage(pageKey)
 
             if (!reload || (reload && currentObjectName !== targetObjectName)) {
@@ -416,8 +416,8 @@ RowLayout {
             }
         }
         let currentObjectName = stackView.currentItem ? stackView.currentItem.objectName : ""
-        let targetObjectName = normalizeKeyFromPage(pageKey).includes("/") ? 
-            normalizeKeyFromPage(pageKey).split("/").pop().replace(".qml", "") : 
+        let targetObjectName = normalizeKeyFromPage(pageKey).includes("/") ?
+            normalizeKeyFromPage(pageKey).split("/").pop().replace(".qml", "") :
             normalizeKeyFromPage(pageKey)
 
         if (!reload || (reload && currentObjectName !== targetObjectName)) {
@@ -427,8 +427,8 @@ RowLayout {
         pageChanged()
         // 创建新的页面实例
         let pageInstance = component.createObject(stackView, {
-            objectName: normalizeKeyFromPage(pageKey).includes("/") ? 
-                normalizeKeyFromPage(pageKey).split("/").pop().replace(".qml", "") : 
+            objectName: normalizeKeyFromPage(pageKey).includes("/") ?
+                normalizeKeyFromPage(pageKey).split("/").pop().replace(".qml", "") :
                 normalizeKeyFromPage(pageKey)
         })
         if (!pageInstance) {
@@ -475,8 +475,8 @@ RowLayout {
                     let pageInfo = itemsToRestore[i]
                     if (pageInfo.component && pageInfo.pageKey) {
                         let pageInstance = pageInfo.component.createObject(stackView, {
-                            objectName: normalizeKeyFromPage(pageInfo.pageKey).includes("/") ? 
-                                normalizeKeyFromPage(pageInfo.pageKey).split("/").pop().replace(".qml", "") : 
+                            objectName: normalizeKeyFromPage(pageInfo.pageKey).includes("/") ?
+                                normalizeKeyFromPage(pageInfo.pageKey).split("/").pop().replace(".qml", "") :
                                 normalizeKeyFromPage(pageInfo.pageKey)
                         })
                         if (pageInstance) {
