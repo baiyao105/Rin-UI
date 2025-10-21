@@ -3,7 +3,7 @@ from datetime import datetime
 from pathlib import Path
 
 from config import cfg
-from PySide6.QtCore import QLocale, QObject, QTranslator, Slot
+from PySide6.QtCore import QLocale, QObject, Qt, QTranslator, Slot
 from PySide6.QtGui import QGuiApplication
 from PySide6.QtWidgets import QApplication
 
@@ -78,6 +78,9 @@ class Backend(QObject):
 
 if __name__ == "__main__":
     print(RinUI.__file__)
+    QGuiApplication.setHighDpiScaleFactorRoundingPolicy(
+        Qt.HighDpiScaleFactorRoundingPolicy.PassThrough
+    )
     app = QApplication(sys.argv)
 
     # i18n
