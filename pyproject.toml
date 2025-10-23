@@ -36,7 +36,8 @@ path = "RinUI/__init__.py"
 include = [
   "RinUI/**/*",
   "LICENSE",
-  "README.md"]
+  "README.md"
+]
 
 [project.entry-points."pyinstaller40"]
 hook-dirs = "RinUI.hooks:get_hook_dirs"
