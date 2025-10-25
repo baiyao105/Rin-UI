@@ -36,13 +36,13 @@ Item {
 
     Behavior on width {
         NumberAnimation {
-            duration: Utils.animationSpeedFast
+            duration: Utils.animationSpeedFasterer
             easing.type: Easing.OutQuint
         }
     }
     Behavior on implicitWidth {
         NumberAnimation {
-            duration: Utils.animationSpeedFast
+            duration: Utils.animationSpeedFaster
             easing.type: Easing.OutQuint
         }
     }
