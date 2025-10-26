@@ -22,6 +22,29 @@ FluentWindow {
         }));
     }
 
+    // search field
+    titleBarArea: AutoSuggestBox {
+        id: searchField
+        width: 325
+        anchors.centerIn: parent
+        placeholderText: qsTr("Search controls and samples...")
+        model: ItemData.allControls
+        textRole: "title"
+
+        onAccepted: {
+            var selected = ItemData.allControls.find(c => c.title === searchField.text)
+            if (selected && selected.page) {
+                navigationView.push(selected.page)
+            } else {
+                // 没找到，跳到搜索页面
+                console.log("Search for: " + searchField.text)
+                navigationView.push(Qt.resolvedUrl("pages/Search.qml"), { query: searchField.text || "" })
+            }
+        }
+    }
+
+
+
     Component {
         id: tips
         InfoBar {
