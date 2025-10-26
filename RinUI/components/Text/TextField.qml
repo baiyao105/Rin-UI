@@ -11,7 +11,6 @@ TextField {
     property bool editable: true
     property color primaryColor: Theme.currentTheme.colors.primaryColor
     property bool clearEnabled: true
-    property int extraRightPadding: 0
 
     selectByMouse: true
     enabled: editable

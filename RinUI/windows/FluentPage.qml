@@ -16,6 +16,7 @@ Page {
     property int radius: Theme.currentTheme.appearance.windowRadius
     property int wrapperWidth: 1000
     horizontalPadding: 56
+    bottomPadding: 24
     // StackView.onRemoved: destroy()
     spacing: 0
     property alias contentSpacing: container.spacing

@@ -49,6 +49,7 @@ TextArea 1.0 components/Text/TextArea.qml
 ScrollableTextArea 1.0 components/Text/ScrollableTextArea.qml
 SpinBox 1.0 components/Text/SpinBox.qml
 TextInput 1.0 components/Text/TextInput.qml
+AutoSuggestBox 1.0 components/Text/AutoSuggestBox.qml
 
 
 # Status & Info

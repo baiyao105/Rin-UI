@@ -11,7 +11,7 @@ ComboBox {
     // 属性 / Properties
     property real controlRadius: Theme.currentTheme.appearance.buttonRadius
     property string placeholderText: ""
-    property alias maxHeight: menu.maxHeight
+    property alias maximumHeight: menu.maximumHeight
     property string headerText: ""
 
     implicitWidth: Math.max(contentItem.implicitWidth + 50, 60)

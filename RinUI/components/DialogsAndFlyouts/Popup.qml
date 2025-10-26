@@ -7,8 +7,11 @@ import "../../components"
 
 Popup {
     id: popup
-    property int position: Position.Bottom
+    property int position: Position.None
     property real posX: {
+        if (x) {
+            return x
+        }
         switch (position) {
             case Position.Top:
             case Position.Bottom:
@@ -23,6 +26,9 @@ Popup {
     }
 
     property real posY: {
+        if (y) {
+            return y
+        }
         switch (position) {
             case Position.Top:
                 return -popup.height - 5

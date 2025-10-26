@@ -44,7 +44,7 @@ ListView {
     }
 
     add: Transition {
-        ParallelAnimation{
+        ParallelAnimation {
             NumberAnimation {
                 property: "opacity"
                 from: 0
@@ -82,24 +82,58 @@ ListView {
         }
     }
 
+    property Animation updateAnimation: ParallelAnimation {
+        NumberAnimation {
+            target: root
+            property: "contentY"
+            from: -12
+            to: 0
+            duration: Utils.animationSpeedMiddle
+            easing.type: Easing.OutQuint
+        }
+        NumberAnimation {
+            target: root
+            property: "opacity"
+            from: 0
+            to: 1
+            duration: Utils.animationSpeed
+            easing.type: Easing.OutQuart
+        }
+    }
+
+    onModelChanged: {
+        // 动画移动到 targetOffset
+        updateAnimation.restart()
+    }
+
     delegate: ListViewDelegate {
-        middleArea: [
-            Text {
-                Layout.alignment: Qt.AlignVCenter | Qt.AlignLeft
-                id: text
-                typography: Typography.Body
-                wrapMode: Text.Wrap
-                text: {
-                    switch (root.modelType) {
-                        case "array": return modelData;
-                        case "array-with-role": return modelData[root.textRole] || modelData || "";
-                        case "listmodel":
-                        case "listmodel-like":
-                            return model[root.textRole] || modelData || "";
-                        default: return "";
-                    }
-                }
+        text: {
+            switch (root.modelType) {
+                case "array": return modelData;
+                case "array-with-role": return modelData[root.textRole] || modelData || "";
+                case "listmodel":
+                case "listmodel-like":
+                    return model[root.textRole] || modelData || "";
+                default: return "";
             }
-        ]
+        }
+        // middleArea: [
+        //     Text {
+        //         Layout.alignment: Qt.AlignVCenter | Qt.AlignLeft
+        //         id: text
+        //         typography: Typography.Body
+        //         wrapMode: Text.Wrap
+        //         text: {
+        //             switch (root.modelType) {
+        //                 case "array": return modelData;
+        //                 case "array-with-role": return modelData[root.textRole] || modelData || "";
+        //                 case "listmodel":
+        //                 case "listmodel-like":
+        //                     return model[root.textRole] || modelData || "";
+        //                 default: return "";
+        //             }
+        //         }
+        //     }
+        // ]
     }
 }

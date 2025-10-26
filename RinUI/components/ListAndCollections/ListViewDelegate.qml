@@ -22,6 +22,8 @@ ItemDelegate {
     property alias rightArea: rightArea.data
     property alias contents: contents.data
 
+    contentItem: Item {}
+
     RowLayout {
         id: contents
         anchors.fill: parent
@@ -37,6 +39,16 @@ ItemDelegate {
         ColumnLayout {
             id: middleArea
             Layout.fillHeight: true
+            Text {
+                visible: text.text.length > 0
+                Layout.alignment: Qt.AlignVCenter | Qt.AlignLeft
+                id: text
+                typography: Typography.Body
+                wrapMode: Text.Wrap
+                text: {
+                    delegate.text
+                }
+            }
         }
 
         RowLayout {

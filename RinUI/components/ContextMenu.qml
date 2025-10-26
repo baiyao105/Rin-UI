@@ -12,12 +12,12 @@ Popup {
 
     property alias model: listView.model
     property alias currentIndex: listView.currentIndex
-    property int maxHeight: 300  // 最大高度
+    property int maximumHeight: 300  // 最大高度
     property string textRole: ""
     property bool keyboardNavigation: false
 
     implicitWidth: 100
-    implicitHeight: Math.min(listView.contentHeight + 6, maxHeight)
+    implicitHeight: Math.min(listView.contentHeight + 6, maximumHeight)
     y: (parent.height - contextMenu.height) / 2
     height: implicitHeight  // 保持隐式绑定
     closePolicy: Popup.CloseOnPressOutside
