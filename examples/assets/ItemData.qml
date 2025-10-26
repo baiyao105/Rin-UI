@@ -21,13 +21,31 @@ QtObject {
             // .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
     }
 
+    function getItemsByTitle(title = null) {
+        if (!title) return allControls.slice();  // title 为 null 或空时返回全部
+
+        const lowerTitle = title.toLowerCase();
+        return allControls.filter(item =>
+            item.title && item.title.toLowerCase().includes(lowerTitle)
+        );
+    }
+
     property var recentlyAddedItems: getRecentlyAddedItems()
     property var recentlyUpdatedItems: getRecentlyUpdatedItems()
 
 
     // data / 控件数据 //
 
+    // ps: sort by name
     property var allControls: [
+        {
+            icon: Qt.resolvedUrl("controls/AutoSuggestBox.png"),
+            title: qsTr("AutoSuggestBox"),
+            type: "text",
+            desc: qsTr("A control to provide suggestions as a user is typing."),
+            page: Qt.resolvedUrl("../pages/controls/AutoSuggestBox.qml"),
+            updated: true,
+        },
         {
             icon: Qt.resolvedUrl("controls/PersonPicture.png"),
             title: qsTr("Avatar"),

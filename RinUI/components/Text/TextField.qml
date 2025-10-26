@@ -82,7 +82,7 @@ TextField {
     placeholderTextColor: Theme.currentTheme.colors.textSecondaryColor
 
     leftPadding: 12
-    rightPadding: (clearEnabled && clearBtn.visible ? 28 : 12) + extraRightPadding
+    rightPadding: (clearEnabled && clearBtn.visible ? 28 : 12)
     topPadding: 5
     bottomPadding: 7
 
