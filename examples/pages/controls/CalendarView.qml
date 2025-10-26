@@ -8,8 +8,6 @@ import "../../components"
 
 ControlPage {
     title: qsTr("Calendar")
-    badgeText: qsTr("New")
-    badgeSeverity: Severity.Success
 
     // 辅助函数：格式化日期为 YYYY-MM-DD
     function fmtDate(d) {
@@ -37,7 +35,7 @@ ControlPage {
 
         Text {
             typography: Typography.BodyStrong
-            text: qsTr("A simple Calendar with Mon-first toggle.")
+            text: qsTr("A basic Calendar.")
         }
         ControlShowcase {
             width: parent.width
@@ -143,7 +141,7 @@ ControlPage {
                 CalendarDatePicker {
                     id: datePicker
                     useISOWeek: isoSwitch.checked
-                    weekNumbersVisible: true
+                    // weekNumbersVisible: true
                     onDateSelected: (d) => selText.text = qsTr("Selected: ") + d.toDateString()
                 }
                 CheckBox {

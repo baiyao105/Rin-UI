@@ -44,7 +44,7 @@ QtObject {
             type: "text",
             desc: qsTr("A control to provide suggestions as a user is typing."),
             page: Qt.resolvedUrl("../pages/controls/AutoSuggestBox.qml"),
-            updated: true,
+            added: true,
         },
         {
             icon: Qt.resolvedUrl("controls/PersonPicture.png"),
@@ -96,9 +96,17 @@ QtObject {
             icon: Qt.resolvedUrl("controls/CalendarView.png"),
             title: qsTr("Calendar"),
             type: "date&time",
-            desc: qsTr("A month view with ISO week numbers and range selection."),
+            desc: qsTr("A control that presents a calendar for a user to set choose a date form."),
             page: Qt.resolvedUrl("../pages/controls/CalendarView.qml"),
-            updated: true,
+            added: true,
+        },
+        {
+            icon: Qt.resolvedUrl("controls/CalendarDatePicker.png"),
+            title: qsTr("CalendarDatePicker"),
+            type: "date&time",
+            desc: qsTr("A control that let user pick a date value using a calendar."),
+            page: Qt.resolvedUrl("../pages/controls/CalendarDatePicker.qml"),
+            added: true,
         },
         {
             icon: Qt.resolvedUrl("controls/DropDownButton.png"),
@@ -112,8 +120,7 @@ QtObject {
             title: qsTr("Expander"),
             type: "layout",
             desc: qsTr("A container with a header that can be expanded to show a body with more content."),
-            page: Qt.resolvedUrl("../pages/controls/Expander.qml"),
-            added: true,
+            page: Qt.resolvedUrl("../pages/controls/Expander.qml")
         },
         {
             icon: Qt.resolvedUrl("controls/Flyout.png"),
@@ -218,8 +225,7 @@ QtObject {
             title: qsTr("RoundButton"),
             type: "basicInput",
             desc: qsTr("A control likes Button except that it has a radius property."),
-            page: Qt.resolvedUrl("../pages/controls/RoundButton.qml"),
-            added: true,
+            page: Qt.resolvedUrl("../pages/controls/RoundButton.qml")
         },
         {
             icon: Qt.resolvedUrl("controls/Pivot.png"),
@@ -250,24 +256,21 @@ QtObject {
             title: qsTr("SpinBox"),
             type: "text",
             desc: qsTr("A text control used for numeric input and evaluation of algebraic equations."),
-            page: Qt.resolvedUrl("../pages/controls/SpinBox.qml"),
-            added: true,
+            page: Qt.resolvedUrl("../pages/controls/SpinBox.qml")
         },
         {
             icon: Qt.resolvedUrl("controls/Button.png"),
             title: qsTr("PillButton"),
             type: "basicInput",
             desc: qsTr("A button that can toggled between 2 states like a ToggleButton."),
-            page: Qt.resolvedUrl("../pages/controls/PillButton.qml"),
-            added: true,
+            page: Qt.resolvedUrl("../pages/controls/PillButton.qml")
         },
         {
             icon: Qt.resolvedUrl("controls/Pivot.png"),
             title: qsTr("Segmented"),
             type: "navigation",
             desc: qsTr("A common UI control to configure a view or setting."),
-            page: Qt.resolvedUrl("../pages/controls/Segmented.qml"),
-            added: true,
+            page: Qt.resolvedUrl("../pages/controls/Segmented.qml")
         },
         {
             icon: Qt.resolvedUrl("controls/ToggleButton.png"),
@@ -299,8 +302,7 @@ QtObject {
             title: qsTr("TextArea"),
             type: "text",
             desc: qsTr("A multi-line plain text field."),
-            page: Qt.resolvedUrl("../pages/controls/TextArea.qml"),
-            added: true,
+            page: Qt.resolvedUrl("../pages/controls/TextArea.qml")
         },
         {
             icon: Qt.resolvedUrl("controls/TextBox.png"),

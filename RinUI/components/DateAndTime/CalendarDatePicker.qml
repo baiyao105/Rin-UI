@@ -7,8 +7,8 @@ import "../../components"
 Button {
     id: root
 
-    implicitHeight: 32
-    implicitWidth: 120
+    // implicitHeight: 32
+    implicitWidth: 135
 
     // Public API
     property alias selectedDate: cal.selectedDate
@@ -19,7 +19,7 @@ Button {
     property bool weekNumbersVisible: false
     property var minimumDate: undefined
     property var maximumDate: undefined
-    property string placeholderText: qsTr("Select date")
+    property string placeholderText: qsTr("Pick a date")
     property string textFormat: "MM/dd/yyyy"
 
     leftPadding: 12
@@ -42,7 +42,7 @@ Button {
     }
 
     text: root.selectedDate ? root.fmt(root.selectedDate) : root.placeholderText
-    onClicked: { pickerPopup.reposition(); pickerPopup.open() }
+    onClicked: { pickerPopup.open() }
 
 
     contentItem: RowLayout {
@@ -54,6 +54,8 @@ Button {
             elide: Text.ElideRight
             verticalAlignment: Text.AlignVCenter
             text: root.selectedDate ? root.fmt(root.selectedDate) : root.placeholderText
+            color: root.selectedDate ? Colors.proxy.textColor
+                : Colors.proxy.textSecondaryColor
         }
         Icon {
             visible: root.iconVisible
@@ -66,24 +68,13 @@ Button {
     Popup {
         id: pickerPopup
         padding: 0
-        parent: root
         width: cal.implicitWidth
         height: cal.implicitHeight
-        closePolicy: Popup.CloseOnPressOutside
 
-        property bool autoPlacement: true
-
-        onVisibleChanged: if (visible && autoPlacement) Qt.callLater(reposition)
-
-        function reposition() {
-            var overlay = root.window ? root.window.contentItem : root
-            var btnPos = root.mapToItem(overlay, 0, 0)
-            var btnTop = btnPos.y
-            var btnBottom = btnTop + root.height
-            var spaceAbove = btnTop
-            var spaceBelow = overlay.height - btnBottom
-            var popupH = Math.max(height, implicitHeight || height)
-            pickerPopup.position = (spaceBelow >= popupH) ? Position.Bottom : Position.Top
+        onVisibleChanged: {
+            if (visible) {
+                autoPosition()
+            }
         }
 
         Calendar {
@@ -92,7 +83,6 @@ Button {
 
             selectionMode: "single"
             useISOWeek: root.useISOWeek
-            weekNumbersVisible: root.weekNumbersVisible
             minimumDate: root.minimumDate
             maximumDate: root.maximumDate
             onDateSelected: function(d) {

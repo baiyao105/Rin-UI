@@ -8,40 +8,75 @@ import "../../components"
 Popup {
     id: popup
     property int position: Position.None
+    property Item anchorItem: parent
     property real posX: {
-        if (x) {
+        if (typeof x === "number" && x !== 0 && position=== Position.None)
             return x
-        }
         switch (position) {
             case Position.Top:
             case Position.Bottom:
-                return (parent.width - popup.width) / 2
+                return (anchorItem ? (anchorItem.width - popup.width) / 2 : 0)
             case Position.Left:
-                return - popup.width - 5
+                return -(popup.width + 5)
             case Position.Right:
-                return parent.width + 5
+                return (anchorItem ? anchorItem.width + 5 : 0)
             default:
-                return (parent.width - popup.width) / 2
+                return (anchorItem ? (anchorItem.width - popup.width) / 2 : 0)
         }
     }
 
     property real posY: {
-        if (y) {
+        if (typeof y === "number" && y !== 0 && position=== Position.None)
             return y
-        }
         switch (position) {
             case Position.Top:
-                return -popup.height - 5
+                return -(popup.height + 5)
             case Position.Bottom:
-                return parent.height + 5
+                return (anchorItem ? anchorItem.height + 5 : 0)
             case Position.Left:
             case Position.Center:
             case Position.Right:
-                return (parent.height - popup.height) / 2
+                return (anchorItem ? (anchorItem.height - popup.height) / 2 : 0)
             default:
-                return -popup.height + 5  // 默认顶部
+                return -(popup.height + 5)
         }
     }
+
+    onVisibleChanged: {  // 自动调整位置
+        if (visible) {
+            console.log("visible changed")
+            Qt.callLater(function() {
+                if (
+                    (position === Position.None || position === undefined) &&
+                    (popup.x === 0 || popup.x === undefined) &&
+                    (popup.y === 0 || popup.y === undefined)
+                ) {
+                    console.log("auto position")
+                    popup.autoPosition()
+                }
+            })
+        }
+    }
+
+    function autoPosition() {
+        if (!anchorItem) return
+
+        // 获取按钮的屏幕坐标
+        var btnGlobal = anchorItem.mapToGlobal(0, 0)
+
+        var btnTop = btnGlobal.y
+        var btnBottom = btnTop + anchorItem.height
+
+        var screenH = Qt.application.primaryScreen ? Qt.application.primaryScreen.height : 1080
+        var popupH = Math.max(popup.implicitHeight, popup.height)
+        var spaceAbove = btnTop
+        var spaceBelow = screenH - btnBottom
+
+        console.log("autoPosition", {btnTop, btnBottom, screenH, popupH, spaceAbove, spaceBelow})
+
+        popup.position = (spaceBelow >= popupH) ? Position.Bottom : Position.Top
+    }
+
 
     Overlay.modal: Rectangle {
         color: Theme.currentTheme.colors.backgroundSmokeColor

@@ -15,7 +15,7 @@ Item {
     property int displayYear: new Date().getFullYear()
     property int displayMonth: new Date().getMonth() + 1
 
-    property var selectedDate: new Date()
+    property var selectedDate: null
     property var rangeStart: null
     property var rangeEnd: null
 
@@ -34,7 +34,7 @@ Item {
     property bool navigationBarVisible: true
     property int visibleMonth: displayMonth - 1
     property int visibleYear: displayYear
-    property bool weekNumbersVisible: false
+    readonly property bool weekNumbersVisible: false  // 有Bug禁用 @Cheukfung
 
     property bool useISOWeek: true
     property bool fastMode: true
@@ -232,7 +232,7 @@ Item {
         anchors.right: parent.right
         anchors.top: parent.top
         anchors.margins: 0
-        height: navigationBarVisible ? 44 : 0
+        height: navigationBarVisible ? 48 : 0
         color: Theme.currentTheme.colors.cardSecondaryColor
 
         // 底部分隔线
@@ -252,8 +252,6 @@ Item {
         // 增加左右边距
         anchors.leftMargin: 16
         anchors.rightMargin: 8
-        anchors.topMargin: 0
-        anchors.bottomMargin: 0
         spacing: 8
 
         Item {
@@ -324,6 +322,9 @@ Item {
         ToolButton { /* up */
             flat: true
             icon.name: "ic_fluent_caret_up_20_filled"
+            Layout.preferredWidth: 40
+            Layout.preferredHeight: 40
+            size: 16
             onClicked: {
                 if (calendar.viewMode === "day") {
                     navigateMonth(-1)
@@ -337,6 +338,9 @@ Item {
         ToolButton { /* down */
             flat: true
             icon.name: "ic_fluent_caret_down_20_filled"
+            Layout.preferredWidth: 40
+            Layout.preferredHeight: 40
+            size: 16
             onClicked: {
                 if (calendar.viewMode === "day") {
                     navigateMonth(1)
@@ -466,7 +470,7 @@ Item {
                             height: monthsView.cellSize
                             property int monthNumber: index < 12 ? (index + 1) : (index - 12 + 1)
                             property int tileYear: index < 12 ? calendar.displayYear : (calendar.displayYear + 1)
-                            property bool isSelected: (tileYear === calendar.displayYear) && (monthNumber === calendar.displayMonth)
+                            readonly property bool isSelected: calendar.selectedDate !== null && date && calendar.toKey(calendar.selectedDate) === calendar.toKey(date)
                             property real bgScale: 0.8
                             Rectangle {
                                 id: mBg
@@ -578,19 +582,36 @@ Item {
                 height: Math.min(parent.width, parent.height) - 2
                 anchors.centerIn: parent
                 radius: (width + height) / 2
-                color: isSelected ? Theme.currentTheme.colors.primaryColor
-                      : inRange(date) ? Qt.alpha(Theme.currentTheme.colors.primaryColor, Theme.isDark() ? 0.12 : 0.18)
-                      : (ma.containsMouse ? Theme.currentTheme.colors.subtleSecondaryColor : "transparent")
-                border.color: (!isSelected && isToday(date)) ? Theme.currentTheme.colors.primaryColor : "transparent"
-                border.width: (!isSelected && isToday(date)) ? 1 : 0
+                // 现在 border 的颜色逻辑和原来的 color 逻辑相同
+                border.color: isSelected ? Theme.currentTheme.colors.primaryColor
+                               : inRange(date) ? Qt.alpha(Theme.currentTheme.colors.primaryColor, Theme.isDark() ? 0.12 : 0.18)
+                               : "transparent"
+                border.width: 1
+                color: isToday(date) ? Theme.currentTheme.colors.primaryColor
+                    : ma.containsMouse ? Theme.currentTheme.colors.subtleSecondaryColor
+                    : "transparent"
                 Behavior on color { ColorAnimation { duration: calendar.suppressCellBehavior ? 0 : Utils.animationSpeed; easing.type: Easing.OutQuad } }
+
+                // inner border
+
+                Rectangle {
+                    id: innerBorder
+                    anchors.centerIn: parent
+                    width: Math.min(parent.width, parent.height) - 2
+                    height: Math.min(parent.width, parent.height) - 2
+                    radius: (width + height) / 2
+                    color: "transparent"
+                    border.width: 1
+                    border.color: isSelected ? Theme.currentTheme.colors.cardColor : "transparent"
+                }
             }
             Text {
                 anchors.centerIn: parent
                 typography: Typography.Body
                 color: !inMonth ? Theme.currentTheme.colors.textSecondaryColor
                       : disabled ? Theme.currentTheme.colors.textSecondaryColor
-                      : isSelected ? Theme.currentTheme.colors.textOnAccentColor
+                      : isToday(date) ? Theme.currentTheme.colors.textOnAccentColor
+                      : isSelected ? Theme.currentTheme.colors.primaryColor
                       : Theme.currentTheme.colors.textColor
                 text: date.getDate()
             }
@@ -688,7 +709,7 @@ Item {
         _highlightedMap = hm
         // 初始化首格日期
         firstCellDate = computeFirstCellDate()
-        selectedDate = clampDate(selectedDate)
+        // selectedDate = clampDate(selectedDate)
     }
 
     onSelectedDateChanged: {
