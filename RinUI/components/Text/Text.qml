@@ -8,6 +8,7 @@ Text {
     property int typography: -1
 
     color: targetColor
+    linkColor: Theme.currentTheme.colors.primaryColor
     property color targetColor: Theme.currentTheme.colors.textColor  // 目标颜色，用于切换动画
     wrapMode: Text.WordWrap
 
