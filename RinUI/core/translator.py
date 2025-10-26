@@ -28,4 +28,7 @@ class RinUITranslator(QTranslator):
         if not path.exists():
             print(f'Language file "{path}" not found. Fallback to default (en_US)')
             path = Path(RINUI_PATH) / "RinUI" / "languages" / "en_US.qm"
+            QLocale().setDefault(QLocale("en_US"))
+
+        QLocale().setDefault(locale)
         return super().load(str(path))
