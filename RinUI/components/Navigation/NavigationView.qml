@@ -3,6 +3,7 @@ import QtQuick.Controls 2.15
 import QtQuick.Layouts 2.15
 import QtQuick.Window 2.15
 import "../../themes"
+import "../../animations"
 import "../../components"
 import "../../windows"
 
@@ -20,7 +21,7 @@ RowLayout {
     property alias currentPage: navigationBar.currentPage  // 当前页面索引
     property var lastPages: []  // 历史页面栈, 最多保存两个页面
     property string defaultPage: ""  // 默认索引项
-    property int pushEnterFromY: height
+    property int pushEnterFromY: height / 2
     property var window: parent  // 窗口对象
 
     // 页面组件缓存(Component)
@@ -140,7 +141,8 @@ RowLayout {
                     from: pushEnterFromY
                     to: 0
                     duration: Utils.animationSpeedMiddle
-                    easing.type: Easing.OutQuint
+                    easing.type: Easing.Bezier
+                    easing.bezierCurve: BezierCurve.pointToPoint
                 }
             }
 
@@ -199,7 +201,7 @@ RowLayout {
                         value: 0
                     }
                     PauseAnimation {
-                        duration: replaceBackInProgress ? Utils.animationSpeed : 0
+                        duration: replaceBackInProgress ? Utils.animationSpeed : 87
                     }
                     PropertyAnimation {
                         property: "opacity"
@@ -210,30 +212,49 @@ RowLayout {
                     }
                 }
 
-                PropertyAnimation {
-                    property: "y"
-                    from: replaceBackInProgress ? 0 : pushEnterFromY
-                    to: 0
-                    duration: replaceBackInProgress ? 0 : Utils.animationSpeedMiddle
-                    easing.type: Easing.OutQuint
+                SequentialAnimation {
+                    PropertyAction {
+                        property: "y"
+                        value: replaceBackInProgress ? 0 : pushEnterFromY
+                    }
+                    PauseAnimation {
+                        duration: replaceBackInProgress ? 0 : 87
+                    }
+                    PropertyAnimation {
+                        property: "y"
+                        from: replaceBackInProgress ? 0 : pushEnterFromY
+                        to: 0
+                        duration: replaceBackInProgress ? 0 : 333
+                        easing.type: Easing.Bezier
+                        easing.bezierCurve: BezierCurve.pointToPoint
+                    }
                 }
             }
 
             replaceExit: Transition {
-                PropertyAnimation {
-                    property: "opacity"
-                    from: 1
-                    to: replaceBackInProgress ? 0 : 0
-                    duration: replaceBackInProgress ? Utils.appearanceSpeed : Utils.animationSpeed
-                    easing.type: Easing.InOutQuad
+                SequentialAnimation {
+                    PropertyAction {
+                        property: "opacity"
+                        value: 1
+                    }
+                    PauseAnimation {
+                        duration: replaceBackInProgress ? 100 : 0
+                    }
+                    PropertyAnimation {
+                        property: "opacity"
+                        from: 1
+                        to: replaceBackInProgress ? 0 : 0
+                        duration: replaceBackInProgress ? 83 : 167
+                    }
                 }
 
                 PropertyAnimation {
                     property: "y"
                     from: 0
                     to: replaceBackInProgress ? pushEnterFromY : 0
-                    duration: replaceBackInProgress ? Utils.animationSpeed : 0
-                    easing.type: Easing.InQuint
+                    duration: replaceBackInProgress ? Utils.appearanceSpeed : 0
+                    easing.type: Easing.Bezier
+                    easing.bezierCurve: BezierCurve.softDismiss
                 }
             }
 

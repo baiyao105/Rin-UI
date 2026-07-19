@@ -24,10 +24,10 @@ QtObject {
 
     property bool backdropEnabled: false // 是否启用背景特效
     property int animationSpeed: 250 // 动画速度 (ms)
-    property int animationSpeedExpander: 375 // 动画速度 (ms)
-    property int animationSpeedFaster: 120 // 动画速度 (ms)
-    property int appearanceSpeed: 175 // 界面切换速度 (ms)
-    property int animationSpeedMiddle: 450 // 动画速度 (ms)
+    property int animationSpeedExpander: 333 // 动画速度 (ms)
+    property int animationSpeedFaster: 167 // 动画速度 (ms)
+    property int appearanceSpeed: 187 // 界面切换速度 (ms)
+    property int animationSpeedMiddle: 667 // 动画速度 (ms)
     property int progressBarAnimationSpeed: 1550 // 进度条动画速度 (ms)
 
     // 当前屏幕 devicePixelRatio（只读诊断用）。
