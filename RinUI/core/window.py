@@ -1,31 +1,38 @@
 import ctypes
 import platform
+import sys
 import weakref
 from ctypes import wintypes
 
-import win32con
 from PySide6.QtCore import QAbstractNativeEventFilter, QByteArray, QObject, QTimer, Slot
 from PySide6.QtGui import QGuiApplication
 from PySide6.QtQuick import QQuickWindow
-from win32api import GetSystemMetrics, MonitorFromWindow, SendMessage
-from win32com.shell.shellcon import (
-    ABM_GETSTATE,
-    ABM_GETTASKBARPOS,
-    ABS_AUTOHIDE,
-)
-from win32con import (
-    MONITOR_DEFAULTTONEAREST,
-    MONITOR_DEFAULTTOPRIMARY,
-    SM_CXSIZEFRAME,
-    SM_CYSIZEFRAME,
-    SW_MAXIMIZE,
-    WS_BORDER,
-    WS_CAPTION,
-    WS_THICKFRAME,
-)
-from win32gui import FindWindow, GetWindowPlacement, ReleaseCapture
 
 from RinUI.core.config import is_windows
+from RinUI.core.errors import WindowError
+
+_win32_available = sys.platform == "win32"
+if _win32_available:
+    import win32con
+    from win32api import GetSystemMetrics, MonitorFromWindow, SendMessage
+    from win32com.shell.shellcon import (
+        ABM_GETSTATE,
+        ABM_GETTASKBARPOS,
+        ABS_AUTOHIDE,
+    )
+    from win32con import (
+        MONITOR_DEFAULTTONEAREST,
+        MONITOR_DEFAULTTOPRIMARY,
+        SM_CXSIZEFRAME,
+        SM_CYSIZEFRAME,
+        SW_MAXIMIZE,
+        WS_BORDER,
+        WS_CAPTION,
+        WS_THICKFRAME,
+    )
+    from win32gui import FindWindow, GetWindowPlacement, ReleaseCapture
+
+    user32 = ctypes.windll.user32
 
 # 定义 Windows 类型
 ULONG_PTR = (
@@ -90,8 +97,6 @@ class MARGINS(ctypes.Structure):
         ("cyBottomHeight", ctypes.c_int),
     ]
 
-
-user32 = ctypes.windll.user32
 
 # 定义必要的 Windows 常量
 WM_NCCALCSIZE = 0x0083
@@ -240,12 +245,11 @@ class WinEventManager(QObject):
     def drag_window_event(self, hwnd: int):
         """在Windows 用原生方法拖动"""
         if not is_windows() or type(hwnd) is not int or hwnd == 0:
-            print(
+            raise WindowError(
                 f"Use Qt method to drag window on: {platform.system()}"
                 if not is_windows()
                 else f"Invalid window handle: {hwnd}"
             )
-            return
 
         ReleaseCapture()
         SendMessage(
@@ -290,12 +294,11 @@ class WinEventManager(QObject):
     def maximizeWindow(self, window):
         """在Windows上最大化或还原窗口"""
         if not is_windows() or window is None:
-            print(
+            raise WindowError(
                 f"Use Qt method to drag window on: {platform.system()}"
                 if not is_windows()
                 else "Invalid window object"
             )
-            return
 
         try:
             hwnd = int(window.winId())
@@ -305,8 +308,7 @@ class WinEventManager(QObject):
                 window.showMaximized()
 
         except Exception as err:
-            msg = f"Error toggling window state: {err}"
-            print(msg)
+            raise WindowError(f"Error toggling window state: {err}") from err
 
 
 class WinEventFilter(QAbstractNativeEventFilter):
@@ -564,7 +566,11 @@ class WinEventFilter(QAbstractNativeEventFilter):
             return -1
         window_monitor = MonitorFromWindow(hwnd, MONITOR_DEFAULTTONEAREST)
         taskbar_monitor = MonitorFromWindow(taskbar_hwnd, MONITOR_DEFAULTTOPRIMARY)
-        if not window_monitor or not taskbar_monitor or taskbar_monitor != window_monitor:
+        if (
+            not window_monitor
+            or not taskbar_monitor
+            or taskbar_monitor != window_monitor
+        ):
             return -1
         abd2 = APPBARDATA()
         ctypes.memset(ctypes.byref(abd2), 0, ctypes.sizeof(abd2))

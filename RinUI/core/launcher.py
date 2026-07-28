@@ -9,6 +9,7 @@ from PySide6.QtQuick import QQuickWindow
 from PySide6.QtWidgets import QApplication
 
 from .config import RINUI_PATH, BackdropEffect, Theme, is_windows
+from .errors import QmlLoadError, ThemeError, WindowNotReadyError
 from .theme import ThemeManager
 
 _shared_engine = None
@@ -64,7 +65,7 @@ class RinUIWindow:
         app_instance = QCoreApplication.instance()
         if not app_instance:
             msg = "QApplication must be created before RinUIWindow."
-            raise RuntimeError(msg)
+            raise WindowNotReadyError(msg)
 
         app_instance.aboutToQuit.connect(self.theme_manager.clean_up)
 
@@ -94,7 +95,7 @@ class RinUIWindow:
                 self.engine.addImportPath(RINUI_PATH)
         else:
             msg = f"Cannot find RinUI module: {RINUI_PATH}"
-            raise FileNotFoundError(msg)
+            raise QmlLoadError(msg)
 
         # 主题管理器
         self.engine.rootContext().setContextProperty("ThemeManager", self.theme_manager)
@@ -102,12 +103,12 @@ class RinUIWindow:
             self.engine.load(self.qml_path)
         except Exception as e:
             msg = f"Failed to load QML file: {self.qml_path}"
-            raise RuntimeError(msg) from e
+            raise QmlLoadError(msg) from e
 
         root_objects = self.engine.rootObjects()
         if len(root_objects) <= self._loaded_root_count:
             msg = f"Error loading QML file: {self.qml_path}"
-            raise RuntimeError(msg)
+            raise QmlLoadError(msg)
 
         # 窗口设置
         self.root_window = root_objects[-1]
@@ -183,9 +184,10 @@ class RinUIWindow:
             import AppKit
             import objc
         except Exception as err:
-            print(f"Cannot enable native macOS titlebar integration: {err}")
             self._disable_native_mac_frame()
-            return
+            raise ThemeError(
+                f"Cannot enable native macOS titlebar integration: {err}"
+            ) from err
 
         self._mac_appkit = AppKit
         self._mac_objc = objc
@@ -234,8 +236,10 @@ class RinUIWindow:
             ns_window.setStyleMask_(style_mask)
             self._schedule_macos_traffic_light_shift(window, retry_count=0)
         except Exception as err:
-            print(f"Failed to apply macOS native titlebar style: {err}")
             window.setProperty("useNativeMacFrame", False)
+            raise ThemeError(
+                f"Failed to apply macOS native titlebar style: {err}"
+            ) from err
 
     def _schedule_macos_traffic_light_shift(
         self, window: QQuickWindow, retry_count: int
@@ -308,10 +312,10 @@ class RinUIWindow:
                         frame.origin.y - self._mac_traffic_lights_offset_down,
                     )
                 )
-            return True
+            moved = True
         except Exception as err:
-            print(f"Failed to shift macOS traffic lights: {err}")
-            return False
+            raise ThemeError(f"Failed to shift macOS traffic lights: {err}") from err
+        return moved
 
     def setIcon(self, path: Union[str, Path] = None) -> None:
         """
@@ -326,7 +330,7 @@ class RinUIWindow:
             self.root_window.setProperty("icon", QUrl.fromLocalFile(path))
         else:
             msg = "Cannot set icon before QApplication is created."
-            raise RuntimeError(msg)
+            raise WindowNotReadyError(msg)
 
     def _apply_windows_effects(self) -> None:
         """
@@ -348,7 +352,7 @@ class RinUIWindow:
         """
         if not is_windows() and effect != BackdropEffect.None_:
             msg = "Only can set backdrop effect on Windows platform."
-            raise OSError(msg)
+            raise ThemeError(msg)
         self.theme_manager.apply_backdrop_effect(effect.value)
 
     def setTheme(self, theme: Theme) -> None:

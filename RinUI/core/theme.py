@@ -14,6 +14,7 @@ from .config import (
     is_win11,
     is_windows,
 )
+from .errors import ThemeError
 
 
 def check_darkdetect_support():
@@ -138,7 +139,9 @@ class ThemeManager(QObject):
         self.is_darkdetect_supported = check_darkdetect_support()
 
         try:
-            self.current_theme = RinConfig["theme"]["current_theme"]
+            theme_config = RinConfig["theme"]
+            if theme_config and "current_theme" in theme_config:
+                self.current_theme = theme_config["current_theme"]
         except Exception as e:
             print(f"Failed to load config because of {e}, using default config")
 
@@ -170,18 +173,17 @@ class ThemeManager(QObject):
         """
         应用背景效果
         :param effect_type: str, 背景效果类型（acrylic, mica, tabbed, none）
+        :raises ThemeError: 平台不支持或效果不支持
         """
-        self._update_window_theme()
-        if not is_windows() or not self.windows:
-            print(f'Cannot apply effect "{effect_type}" on this platform')
-            return -2  # 非 windows或未绑定窗口
+        if not is_windows() or not self.windows:  # 非 windows或未绑定窗口
+            raise ThemeError(f'Cannot apply effect "{effect_type}" on this platform')
         self.backdropChanged.emit(effect_type)
 
         accent_state = ACCENT_STATES.get(effect_type, 0)
-        if not ACCENT_SUPPORT.get(effect_type, False):
-            print(f'Effect "{effect_type}" not supported on this platform')
-            return -1  # 效果不支持
+        if not ACCENT_SUPPORT.get(effect_type, False):  # 效果不支持
+            raise ThemeError(f'Effect "{effect_type}" not supported on this platform')
 
+        self._update_window_theme()
         for hwnd in self.windows:
             if is_win11():
                 dark_mode = ctypes.c_int(self.theme_dict[self._actual_theme()])
@@ -242,7 +244,7 @@ class ThemeManager(QObject):
             set_window_composition = ctypes.windll.user32.SetWindowCompositionAttribute
             set_window_composition(hwnd, ctypes.byref(data))
         except Exception as e:
-            print(f"Failed to apply acrylic on Win10: {e}")
+            raise ThemeError(f"Failed to apply Win10 backdrop effect: {e}") from e
 
     def apply_window_effects(self):  # 启用圆角阴影
         if sys.platform != "win32" or not self.windows:
@@ -288,7 +290,7 @@ class ThemeManager(QObject):
             ):
                 self._apply_win10_effect(RinConfig["backdrop_effect"], hwnd)
             else:
-                print(f"Cannot apply backdrop on {platform.system()}")
+                raise ThemeError(f"Cannot apply backdrop on {platform.system()}")
 
         # print(f"Window theme updated to {actual_theme}")
 

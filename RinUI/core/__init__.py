@@ -7,6 +7,18 @@ from .config import (
     Theme,
     is_windows,
 )
+from .errors import (
+    ConfigError,
+    ConfigParseError,
+    ConfigWriteError,
+    PlatformError,
+    QmlLoadError,
+    RinUIError,
+    ThemeError,
+    TranslationError,
+    WindowError,
+    WindowNotReadyError,
+)
 from .launcher import RinUIWindow
 from .theme import ThemeManager
 from .translator import RinUITranslator

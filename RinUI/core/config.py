@@ -4,6 +4,8 @@ import sys
 from enum import Enum
 from pathlib import Path
 
+from .errors import ConfigParseError, ConfigWriteError
+
 
 def is_win11():
     return bool(
@@ -84,12 +86,16 @@ class ConfigManager:
 
     def load_config(self, default_config):
         if default_config is None:
-            print('Warning: "default_config" is None, use empty config instead.')
             default_config = {}
         # 如果文件存在，加载配置
         if self.full_path.exists():
-            with self.full_path.open(encoding="utf-8") as f:
-                self.config = json.load(f)
+            try:
+                with self.full_path.open(encoding="utf-8") as f:
+                    self.config = json.load(f)
+            except json.JSONDecodeError as e:
+                raise ConfigParseError(f"Invalid JSON in config file: {e}") from e
+            except OSError as e:
+                raise ConfigWriteError(f"Cannot read config file: {e}") from e
         else:
             self.config = default_config  # 如果文件不存在，使用默认配置
             self.save_config()
@@ -98,9 +104,10 @@ class ConfigManager:
         try:
             with self.full_path.open(encoding="utf-8") as f:
                 self.config = json.load(f)
-        except Exception as e:
-            print(f"Error: {e}")
-            self.config = {}
+        except json.JSONDecodeError as e:
+            raise ConfigParseError(f"Invalid JSON in config file: {e}") from e
+        except OSError as e:
+            raise ConfigWriteError(f"Cannot read config file: {e}") from e
 
     def upload_config(self, key: str | list[str], value=None):
         if isinstance(key, str):
@@ -122,8 +129,8 @@ class ConfigManager:
                 self.path.mkdir(parents=True)
             with self.full_path.open("w", encoding="utf-8") as f:
                 json.dump(self.config, f, ensure_ascii=False, indent=4)
-        except Exception as e:
-            print(f"Error: {e}")
+        except OSError as e:
+            raise ConfigWriteError(f"Cannot save config file: {e}") from e
 
     def __getitem__(self, key):
         return self.config.get(key)
