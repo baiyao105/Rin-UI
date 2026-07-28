@@ -233,7 +233,7 @@ class WinEventManager(QObject):
     @Slot(QObject, result=int)
     def getWindowId(self, window):
         """获取窗口的句柄"""
-        print(f"GetWindowId: {window.winId()}")
+        # print(f"GetWindowId: {window.winId()}")
         return int(window.winId())
 
     @Slot(int)
@@ -313,7 +313,7 @@ class WinEventFilter(QAbstractNativeEventFilter):
     def __init__(self, windows: list, on_window_visible=None):
         super().__init__()
         self.windows = [weakref.ref(w) for w in windows]
-        self.hwnds = {}  # 用于存储每个窗口的 hwnd
+        self.hwnds = {}  # hwnd(int) -> window 映射
         self.resize_border = 8
 
         for window_ref in self.windows:
@@ -330,13 +330,16 @@ class WinEventFilter(QAbstractNativeEventFilter):
                 self._init_window_handle(window)
 
     def _on_visible_changed(self, visible: bool, window: QQuickWindow):
-        if visible and self.hwnds.get(window) is None:
+        if visible and window.winId() not in self.hwnds:
             self._init_window_handle(window)
 
     def _init_window_handle(self, window: QQuickWindow):
         hwnd = int(window.winId())
-        self.hwnds[window] = hwnd
+        self.hwnds[hwnd] = window
         self.sync_window_backdrop(window)
+
+    def _find_window_by_hwnd(self, hwnd: int) -> QQuickWindow | None:
+        return self.hwnds.get(hwnd)
 
     def sync_window_backdrop(self, window: QQuickWindow):
         self.set_window_styles(window)
@@ -344,7 +347,7 @@ class WinEventFilter(QAbstractNativeEventFilter):
         self.apply_fullscreen_opengl_border_workaround(window)
 
     def set_window_styles(self, window: QQuickWindow):
-        hwnd = self.hwnds.get(window)
+        hwnd = int(window.winId()) if window else None
         if hwnd is None:
             return
 
@@ -358,7 +361,7 @@ class WinEventFilter(QAbstractNativeEventFilter):
         self.refresh_window_frame(window)
 
     def refresh_window_frame(self, window: QQuickWindow):
-        hwnd = self.hwnds.get(window)
+        hwnd = int(window.winId()) if window else None
         if hwnd is None:
             return
 
@@ -367,7 +370,7 @@ class WinEventFilter(QAbstractNativeEventFilter):
         )  # SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE | SWP_FRAMECHANGED
 
     def refresh_window_frame_if_needed(self, window: QQuickWindow):
-        hwnd = self.hwnds.get(window)
+        hwnd = int(window.winId()) if window else None
         if hwnd is None:
             return
 
@@ -381,7 +384,7 @@ class WinEventFilter(QAbstractNativeEventFilter):
         if not window.property("backdropEnabled"):
             return
 
-        hwnd = self.hwnds.get(window)
+        hwnd = int(window.winId()) if window else None
         if hwnd is None or not is_composition_enabled():
             return
 
@@ -392,7 +395,7 @@ class WinEventFilter(QAbstractNativeEventFilter):
         if not window.property("enableFullscreenOpenGLBorderWorkaround"):
             return
 
-        hwnd = self.hwnds.get(window)
+        hwnd = int(window.winId()) if window else None
         if hwnd is None or not is_exact_monitor_sized_window(window, hwnd):
             return
 
@@ -425,201 +428,199 @@ class WinEventFilter(QAbstractNativeEventFilter):
             message_addr + 3 * ctypes.sizeof(ctypes.c_void_p)
         ).value
 
-        # 遍历每个窗口，检查哪个窗口收到了消息
-        for window_ref in self.windows:
-            window = window_ref()
-            if window is None:
-                continue
-            hwnd_window = self.hwnds.get(window)
-            if hwnd_window != hwnd:
-                continue
+        window = self._find_window_by_hwnd(hwnd)
+        if window is None:
+            return False, 0
+        # 消息分发
+        if message_id == WM_NCHITTEST:
+            return self._handle_nchittest(window, l_param)
+        if message_id == WM_NCCALCSIZE:
+            return self._handle_nccalsize(window, w_param, l_param)
+        if message_id == WM_GETMINMAXINFO:
+            return self._handle_getminmaxinfo(window, hwnd, l_param)
+        if message_id == WM_SYSCOMMAND:
+            return False, 0  # 支持动画
+        if message_id in (
+            WM_SIZE,
+            WM_WINDOWPOSCHANGED,
+            WM_SHOWWINDOW,
+            WM_ACTIVATE,
+            WM_NCACTIVATE,
+            WM_ACTIVATEAPP,
+            WM_DWMCOMPOSITIONCHANGED,
+        ):
+            self.extend_frame_into_client_area(window)
 
-            if message_id in (
-                WM_SIZE,
-                WM_WINDOWPOSCHANGED,
-                WM_SHOWWINDOW,
-                WM_ACTIVATE,
-                WM_NCACTIVATE,
-                WM_ACTIVATEAPP,
-                WM_DWMCOMPOSITIONCHANGED,
-            ):
-                self.extend_frame_into_client_area(window)
-
-            if message_id in (
-                WM_SIZE,
-                WM_WINDOWPOSCHANGED,
-                WM_DWMCOMPOSITIONCHANGED,
-            ):
-                self.apply_fullscreen_opengl_border_workaround(window)
-
-            if message_id == WM_NCHITTEST:
-                x = ctypes.c_short(l_param & 0xFFFF).value
-                y = ctypes.c_short((l_param >> 16) & 0xFFFF).value
-
-                rect = wintypes.RECT()
-                user32.GetWindowRect(hwnd_window, ctypes.byref(rect))
-                left, top, right, bottom = (
-                    rect.left,
-                    rect.top,
-                    rect.right,
-                    rect.bottom,
-                )
-                border = self.resize_border
-
-                if left <= x < left + border:
-                    if top <= y < top + border:
-                        return True, 13  # HTTOPLEFT
-                    if bottom - border <= y < bottom:
-                        return True, 16  # HTBOTTOMLEFT
-                    return True, 10  # HTLEFT
-                if right - border <= x < right:
-                    if top <= y < top + border:
-                        return True, 14  # HTTOPRIGHT
-                    if bottom - border <= y < bottom:
-                        return True, 17  # HTBOTTOMRIGHT
-                    return True, 11  # HTRIGHT
-                if top <= y < top + border:
-                    return True, 12  # HTTOP
-                if bottom - border <= y < bottom:
-                    return True, 15  # HTBOTTOM
-
-                # 标题栏区域返回 HTCAPTION 让 Windows 处理原生窗口交互
-                try:
-                    title_bar_height = window.property("titleBarHeight")
-                except Exception:
-                    title_bar_height = None
-                if not title_bar_height:
-                    title_bar_height = 32
-                screen = window.screen()
-                dp_ratio = screen.devicePixelRatio() if screen else 1.0
-                title_bar_height_px = int(title_bar_height * dp_ratio)
-                if top <= y < top + title_bar_height_px:
-                    return True, 1  # HTCAPTION
-
-                # 其他区域不处理
-                return False, 0
-
-            # 移除标题栏
-            if message_id == WM_NCCALCSIZE and w_param:
-                client_rect = ctypes.cast(
-                    l_param, ctypes.POINTER(NCCALCSIZE_PARAMS)
-                ).contents.rgrc[0]
-                if is_maximized(hwnd):
-                    ty = get_resize_border_thickness(hwnd, False)
-                    client_rect.top += ty
-                    client_rect.bottom -= ty
-                    tx = get_resize_border_thickness(hwnd, True)
-                    client_rect.left += tx
-                    client_rect.right -= tx
-                    abd = APPBARDATA()
-                    ctypes.memset(ctypes.byref(abd), 0, ctypes.sizeof(abd))
-                    abd.cbSize = ctypes.sizeof(APPBARDATA)
-                    taskbar_state = ctypes.windll.shell32.SHAppBarMessage(
-                        ABM_GETSTATE, ctypes.byref(abd)
-                    )
-                    if taskbar_state & ABS_AUTOHIDE:
-                        edge = -1
-                        abd2 = APPBARDATA()
-                        ctypes.memset(ctypes.byref(abd2), 0, ctypes.sizeof(abd2))
-                        abd2.cbSize = ctypes.sizeof(APPBARDATA)
-                        abd2.hWnd = FindWindow("Shell_TrayWnd", None)
-                        if abd2.hWnd:
-                            window_monitor = MonitorFromWindow(
-                                hwnd, MONITOR_DEFAULTTONEAREST
-                            )
-                            if window_monitor:
-                                taskbar_monitor = MonitorFromWindow(
-                                    abd2.hWnd, MONITOR_DEFAULTTOPRIMARY
-                                )
-                                if (
-                                    taskbar_monitor
-                                    and taskbar_monitor == window_monitor
-                                ):
-                                    ctypes.windll.shell32.SHAppBarMessage(
-                                        ABM_GETTASKBARPOS, ctypes.byref(abd2)
-                                    )
-                                    edge = abd2.uEdge
-                        top = edge == 1
-                        bottom = edge == 3
-                        left = edge == 0
-                        right = edge == 2
-                        if top:
-                            client_rect.top += 1
-                        elif bottom:
-                            client_rect.bottom -= 1
-                        elif left:
-                            client_rect.left += 1
-                        elif right:
-                            client_rect.right -= 1
-                        else:
-                            client_rect.bottom -= 1
-                return True, 0
-
-            # 支持动画
-            if message_id == WM_SYSCOMMAND:
-                return False, 0
-
-            # 处理 WM_GETMINMAXINFO 消息以支持 Snap 功能
-            if message_id == WM_GETMINMAXINFO:
-                # 获取屏幕工作区大小
-                monitor = user32.MonitorFromWindow(
-                    hwnd_window, 2
-                )  # MONITOR_DEFAULTTONEAREST
-
-                # 使用自定义的 MONITORINFO 结构
-                monitor_info = MONITORINFO()
-                monitor_info.cbSize = ctypes.sizeof(MONITORINFO)
-                monitor_info.dwFlags = 0
-                user32.GetMonitorInfoW(monitor, ctypes.byref(monitor_info))
-
-                # 获取 MINMAXINFO 结构
-                minmax_info = MINMAXINFO.from_address(l_param)
-
-                # 最大化位置和大小
-                minmax_info.ptMaxPosition.x = (
-                    monitor_info.rcWork.left - monitor_info.rcMonitor.left
-                )
-                minmax_info.ptMaxPosition.y = (
-                    monitor_info.rcWork.top - monitor_info.rcMonitor.top
-                )
-                minmax_info.ptMaxSize.x = (
-                    monitor_info.rcWork.right - monitor_info.rcMonitor.left
-                )
-                minmax_info.ptMaxSize.y = (
-                    monitor_info.rcWork.bottom - monitor_info.rcMonitor.top
-                )
-
-                screen = window.screen()
-                dp_ratio = screen.devicePixelRatio() if screen else 1.0
-
-                min_w = int(
-                    _get_window_int_property(window, "minimumWidth", 0) * dp_ratio
-                )
-                min_h = int(
-                    _get_window_int_property(window, "minimumHeight", 0) * dp_ratio
-                )
-                max_w = int(
-                    _get_window_int_property(
-                        window,
-                        "maximumWidth",
-                        monitor_info.rcWork.right - monitor_info.rcWork.left,
-                    )
-                    * dp_ratio
-                )
-                max_h = int(
-                    _get_window_int_property(
-                        window,
-                        "maximumHeight",
-                        monitor_info.rcWork.bottom - monitor_info.rcWork.top,
-                    )
-                    * dp_ratio
-                )
-
-                minmax_info.ptMinTrackSize.x = min_w
-                minmax_info.ptMinTrackSize.y = min_h
-                minmax_info.ptMaxTrackSize.x = max_w
-                minmax_info.ptMaxTrackSize.y = max_h
-
-                return True, 0
+        if message_id in (
+            WM_SIZE,
+            WM_WINDOWPOSCHANGED,
+            WM_DWMCOMPOSITIONCHANGED,
+        ):
+            self.apply_fullscreen_opengl_border_workaround(window)
 
         return False, 0
+
+    def _handle_nchittest(self, window: QQuickWindow, l_param):
+        x = ctypes.c_short(l_param & 0xFFFF).value
+        y = ctypes.c_short((l_param >> 16) & 0xFFFF).value
+
+        hwnd = int(window.winId())
+        rect = wintypes.RECT()
+        user32.GetWindowRect(hwnd, ctypes.byref(rect))
+        win_left, win_top, win_right, win_bottom = (
+            rect.left,
+            rect.top,
+            rect.right,
+            rect.bottom,
+        )
+        border = self.resize_border
+        # 边框区域
+        hit_result = self._hit_test_border(
+            x, y, win_left, win_top, win_right, win_bottom, border
+        )
+        if hit_result is not None:
+            return True, hit_result
+        # 标题栏区域
+        title_bar_height = window.property("titleBarHeight") or 32
+        screen = window.screen()
+        dp_ratio = screen.devicePixelRatio() if screen else 1.0
+        title_bar_height_px = int(title_bar_height * dp_ratio)
+        if win_top <= y < win_top + title_bar_height_px:
+            return True, 1  # HTCAPTION
+
+        return False, 0
+
+    def _hit_test_border(self, x, y, win_left, win_top, win_right, win_bottom, border):
+        """边框区域"""
+        if win_left <= x < win_left + border:
+            if win_top <= y < win_top + border:
+                return 13  # HTTOPLEFT
+            if win_bottom - border <= y < win_bottom:
+                return 16  # HTBOTTOMLEFT
+            return 10  # HTLEFT
+        if win_right - border <= x < win_right:
+            if win_top <= y < win_top + border:
+                return 14  # HTTOPRIGHT
+            if win_bottom - border <= y < win_bottom:
+                return 17  # HTBOTTOMRIGHT
+            return 11  # HTRIGHT
+        if win_top <= y < win_top + border:
+            return 12  # HTTOP
+        if win_bottom - border <= y < win_bottom:
+            return 15  # HTBOTTOM
+        return None
+
+    def _handle_nccalsize(self, window: QQuickWindow, w_param, l_param):
+        if not w_param:
+            return False, 0
+
+        # 移除标题栏
+        client_rect = ctypes.cast(
+            l_param, ctypes.POINTER(NCCALCSIZE_PARAMS)
+        ).contents.rgrc[0]
+
+        hwnd = int(window.winId())
+        if is_maximized(hwnd):
+            self._adjust_maximized_rect(hwnd, client_rect)
+        return True, 0
+
+    def _adjust_maximized_rect(self, hwnd: int, client_rect):
+        """最大化时客户区矩形"""
+        ty = get_resize_border_thickness(hwnd, False)
+        client_rect.top += ty
+        client_rect.bottom -= ty
+        tx = get_resize_border_thickness(hwnd, True)
+        client_rect.left += tx
+        client_rect.right -= tx
+        # 检查任务栏
+        taskbar_edge = self._get_taskbar_edge(hwnd)
+        if taskbar_edge == 1:  # top
+            client_rect.top += 1
+        elif taskbar_edge == 3:  # bottom
+            client_rect.bottom -= 1
+        elif taskbar_edge == 0:  # left
+            client_rect.left += 1
+        elif taskbar_edge == 2:  # right
+            client_rect.right -= 1
+        else:
+            client_rect.bottom -= 1
+
+    def _get_taskbar_edge(self, hwnd: int) -> int:
+        """
+        获取任务栏位置
+        返回: 0=left, 1=top, 2=right, 3=bottom, -1=unknown
+        """
+        abd = APPBARDATA()
+        ctypes.memset(ctypes.byref(abd), 0, ctypes.sizeof(abd))
+        abd.cbSize = ctypes.sizeof(APPBARDATA)
+        taskbar_state = ctypes.windll.shell32.SHAppBarMessage(
+            ABM_GETSTATE, ctypes.byref(abd)
+        )
+
+        if not (taskbar_state & ABS_AUTOHIDE):
+            return -1
+        taskbar_hwnd = FindWindow("Shell_TrayWnd", None)
+        if not taskbar_hwnd:
+            return -1
+        window_monitor = MonitorFromWindow(hwnd, MONITOR_DEFAULTTONEAREST)
+        taskbar_monitor = MonitorFromWindow(taskbar_hwnd, MONITOR_DEFAULTTOPRIMARY)
+        if not window_monitor or not taskbar_monitor or taskbar_monitor != window_monitor:
+            return -1
+        abd2 = APPBARDATA()
+        ctypes.memset(ctypes.byref(abd2), 0, ctypes.sizeof(abd2))
+        abd2.cbSize = ctypes.sizeof(APPBARDATA)
+        abd2.hWnd = taskbar_hwnd
+        ctypes.windll.shell32.SHAppBarMessage(ABM_GETTASKBARPOS, ctypes.byref(abd2))
+        return abd2.uEdge
+
+    def _handle_getminmaxinfo(self, window: QQuickWindow, hwnd: int, l_param):
+        monitor = user32.MonitorFromWindow(hwnd, MONITOR_DEFAULTTONEAREST)
+
+        monitor_info = MONITORINFO()
+        monitor_info.cbSize = ctypes.sizeof(MONITORINFO)
+        monitor_info.dwFlags = 0
+        user32.GetMonitorInfoW(monitor, ctypes.byref(monitor_info))
+
+        minmax_info = MINMAXINFO.from_address(l_param)
+
+        # 最大化位置和大小
+        minmax_info.ptMaxPosition.x = (
+            monitor_info.rcWork.left - monitor_info.rcMonitor.left
+        )
+        minmax_info.ptMaxPosition.y = (
+            monitor_info.rcWork.top - monitor_info.rcMonitor.top
+        )
+        minmax_info.ptMaxSize.x = (
+            monitor_info.rcWork.right - monitor_info.rcMonitor.left
+        )
+        minmax_info.ptMaxSize.y = (
+            monitor_info.rcWork.bottom - monitor_info.rcMonitor.top
+        )
+
+        screen = window.screen()
+        dp_ratio = screen.devicePixelRatio() if screen else 1.0
+
+        minmax_info.ptMinTrackSize.x = int(
+            _get_window_int_property(window, "minimumWidth", 0) * dp_ratio
+        )
+        minmax_info.ptMinTrackSize.y = int(
+            _get_window_int_property(window, "minimumHeight", 0) * dp_ratio
+        )
+        minmax_info.ptMaxTrackSize.x = int(
+            _get_window_int_property(
+                window,
+                "maximumWidth",
+                monitor_info.rcWork.right - monitor_info.rcWork.left,
+            )
+            * dp_ratio
+        )
+        minmax_info.ptMaxTrackSize.y = int(
+            _get_window_int_property(
+                window,
+                "maximumHeight",
+                monitor_info.rcWork.bottom - monitor_info.rcWork.top,
+            )
+            * dp_ratio
+        )
+
+        return True, 0
