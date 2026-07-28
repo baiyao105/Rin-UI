@@ -2,7 +2,7 @@ import sys
 from pathlib import Path
 from typing import Union
 
-from PySide6.QtCore import QCoreApplication, QObject, QUrl, QTimer
+from PySide6.QtCore import QCoreApplication, QObject, QTimer, QUrl
 from PySide6.QtGui import QColor, QIcon
 from PySide6.QtQml import QQmlApplicationEngine
 from PySide6.QtQuick import QQuickWindow
@@ -10,7 +10,6 @@ from PySide6.QtWidgets import QApplication
 
 from .config import RINUI_PATH, BackdropEffect, Theme, is_windows
 from .theme import ThemeManager
-
 
 _shared_engine = None
 
@@ -102,7 +101,8 @@ class RinUIWindow:
         try:
             self.engine.load(self.qml_path)
         except Exception as e:
-            print(f"Cannot Load QML file: {e}")
+            msg = f"Failed to load QML file: {self.qml_path}"
+            raise RuntimeError(msg) from e
 
         root_objects = self.engine.rootObjects()
         if len(root_objects) <= self._loaded_root_count:
@@ -135,7 +135,9 @@ class RinUIWindow:
 
         from .window import WinEventFilter, WinEventManager
 
-        self.win_event_filter = WinEventFilter(self.windows, self._apply_windows_effects)
+        self.win_event_filter = WinEventFilter(
+            self.windows, self._apply_windows_effects
+        )
         if self.win_event_manager is None:
             self.win_event_manager = WinEventManager()
         self.win_event_manager.set_windows(self.windows, self._apply_windows_effects)
@@ -199,7 +201,9 @@ class RinUIWindow:
                 )
             )
 
-    def _on_macos_window_visible_changed(self, window: QQuickWindow, visible: bool) -> None:
+    def _on_macos_window_visible_changed(
+        self, window: QQuickWindow, visible: bool
+    ) -> None:
         if visible and window.property("useNativeMacFrame"):
             window.setProperty("_rinuiMacTrafficLightsShiftApplied", False)
             window.setProperty("_rinuiMacTrafficLightsShiftRetryCount", 0)
@@ -276,12 +280,16 @@ class RinUIWindow:
             zoom_button = ns_window.standardWindowButton_(
                 self._mac_appkit.NSWindowZoomButton
             )
-            buttons = [btn for btn in (close_button, minimize_button, zoom_button) if btn]
+            buttons = [
+                btn for btn in (close_button, minimize_button, zoom_button) if btn
+            ]
             if not buttons:
                 return False
 
             # Move the shared container first to preserve native spacing.
-            button_host = close_button.superview() if close_button else buttons[0].superview()
+            button_host = (
+                close_button.superview() if close_button else buttons[0].superview()
+            )
             if button_host:
                 host_frame = button_host.frame()
                 button_host.setFrameOrigin_(
@@ -353,12 +361,13 @@ class RinUIWindow:
 
     def __getattr__(self, name) -> QObject:
         """获取 QML 窗口属性"""
-        try:
-            root = object.__getattribute__(self, "root_window")
-            return getattr(root, name)
-        except AttributeError as err:
+        if name.startswith("_"):
+            raise AttributeError(name)
+        root_window = self.__dict__.get("root_window")
+        if root_window is None:
             msg = f"\"RinUIWindow\" object has no attribute '{name}', you need to load() qml at first."
-            raise AttributeError(msg) from err
+            raise AttributeError(msg)
+        return getattr(root_window, name)
 
     def _print_startup_info(self) -> None:
         border = "=" * 40

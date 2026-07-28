@@ -62,9 +62,13 @@ class ThemeListener(QThread):
 
     themeChanged = Signal(str)
 
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self._is_running = True
+
     def run(self):
         last_theme = darkdetect.theme()
-        while True:
+        while self._is_running:
             current_theme = darkdetect.theme()
             if current_theme != last_theme:
                 last_theme = current_theme
@@ -73,13 +77,14 @@ class ThemeListener(QThread):
             time.sleep(1)
 
     def stop(self):
-        self.terminate()
+        self._is_running = False
+        self.quit()
+        self.wait(1000)
 
 
 class ThemeManager(QObject):
     themeChanged = Signal(str)
     backdropChanged = Signal(str)
-    windows = []  # 窗口句柄们（
     _instance = None
 
     # DWM 常量保持不变
@@ -125,6 +130,7 @@ class ThemeManager(QObject):
             return
         self._initialized = True
         super().__init__()
+        self.windows = []
         self.theme_dict = {"Light": 0, "Dark": 1}
 
         self.listener = None  # 监听线程

@@ -11,6 +11,8 @@ class RinUITranslator(QTranslator):
     :param locale: QLocale, optional, default is system locale
     """
 
+    _LANGUAGES_DIR = Path(RINUI_PATH) / "RinUI" / "languages"
+
     def __init__(
         self, locale: QLocale = QLocale.system().name(), parent=None
     ):  # follow system
@@ -23,12 +25,23 @@ class RinUITranslator(QTranslator):
         :param locale: QLocale, the locale to load (eg = QLocale(QLocale.Chinese, QLocale.China), QLocale("zh_CN"))
         :return: bool
         """
-        print(f"🌏 Current locale: {locale.name()}")
-        path = Path(RINUI_PATH) / "RinUI" / "languages" / f"{locale.name()}.qm"
+        locale_name = locale.name()
+        print(f"🌏 Current locale: {locale_name}")
+        path = self._LANGUAGES_DIR / f"{locale_name}.qm"
+
         if not path.exists():
-            print(f'Language file "{path}" not found. Fallback to default (en_US)')
-            path = Path(RINUI_PATH) / "RinUI" / "languages" / "en_US.qm"
-            QLocale().setDefault(QLocale("en_US"))
+            print(
+                f'Language file "{locale_name}" not found. Fallback to default (en_US)'
+            )
+            path = self._LANGUAGES_DIR / "en_US.qm"
+            locale = QLocale("en_US")
 
         QLocale().setDefault(locale)
-        return super().load(str(path))
+        try:
+            result = super().load(str(path))
+        except Exception as e:
+            print(f"Error loading translation: {e}")
+            return False
+        if not result:
+            print(f"Warning: Failed to load translation file: {path}")
+        return result

@@ -1,5 +1,6 @@
 import ctypes
 import platform
+import weakref
 from ctypes import wintypes
 
 import win32con
@@ -15,12 +16,16 @@ from win32com.shell.shellcon import (
 from win32con import (
     MONITOR_DEFAULTTONEAREST,
     MONITOR_DEFAULTTOPRIMARY,
+    SM_CXSIZEFRAME,
+    SM_CYSIZEFRAME,
     SW_MAXIMIZE,
+    WS_BORDER,
+    WS_CAPTION,
+    WS_THICKFRAME,
 )
 from win32gui import FindWindow, GetWindowPlacement, ReleaseCapture
 
 from RinUI.core.config import is_windows
-
 
 # 定义 Windows 类型
 ULONG_PTR = (
@@ -103,13 +108,24 @@ WM_NCACTIVATE = 0x0086
 WM_ACTIVATEAPP = 0x001C
 WM_SHOWWINDOW = 0x0018
 
-WS_CAPTION = 0x00C00000
-WS_THICKFRAME = 0x00040000
-WS_BORDER = 0x00800000
-
 SC_MINIMIZE = 0xF020
 SC_MAXIMIZE = 0xF030
 SC_RESTORE = 0xF120
+
+
+def _get_window_int_property(window, name: str, default: int) -> int:
+    """获取窗口整数属性"""
+    val = getattr(window, name, None)
+    if val is None:
+        return default
+    if callable(val):
+        val = val()
+    if val is None:
+        return default
+    try:
+        return int(val)
+    except (TypeError, ValueError):
+        return default
 
 
 class MINMAXINFO(ctypes.Structure):
@@ -152,7 +168,7 @@ def get_resize_border_thickness(hwnd: wintypes.HWND, horizontal=True) -> int:
     if not window:
         return 0
 
-    frame = win32con.SM_CXSIZEFRAME if horizontal else win32con.SM_CYSIZEFRAME
+    frame = SM_CXSIZEFRAME if horizontal else SM_CYSIZEFRAME
     result = GetSystemMetrics(frame) + GetSystemMetrics(92)
 
     if result > 0:
@@ -296,19 +312,22 @@ class WinEventManager(QObject):
 class WinEventFilter(QAbstractNativeEventFilter):
     def __init__(self, windows: list, on_window_visible=None):
         super().__init__()
-        self.windows = windows  # 接受多个窗口
+        self.windows = [weakref.ref(w) for w in windows]
         self.hwnds = {}  # 用于存储每个窗口的 hwnd
         self.resize_border = 8
 
-        for window in self.windows:
-            # 使用lambda创建闭包来捕获特定的窗口对象
-            window.visibleChanged.connect(
-                lambda visible, w=window: self._on_visible_changed(visible, w)
-            )
+        for window_ref in self.windows:
+            window = window_ref()
+            if window is not None:
+                window.visibleChanged.connect(
+                    lambda visible, w=window: self._on_visible_changed(visible, w)
+                )
 
     def initialize_windows(self):
-        for window in self.windows:
-            self._init_window_handle(window)
+        for window_ref in self.windows:
+            window = window_ref()
+            if window is not None:
+                self._init_window_handle(window)
 
     def _on_visible_changed(self, visible: bool, window: QQuickWindow):
         if visible and self.hwnds.get(window) is None:
@@ -367,9 +386,7 @@ class WinEventFilter(QAbstractNativeEventFilter):
             return
 
         margins = MARGINS(-1, -1, -1, -1)
-        ctypes.windll.dwmapi.DwmExtendFrameIntoClientArea(
-            hwnd, ctypes.byref(margins)
-        )
+        ctypes.windll.dwmapi.DwmExtendFrameIntoClientArea(hwnd, ctypes.byref(margins))
 
     def apply_fullscreen_opengl_border_workaround(self, window: QQuickWindow):
         if not window.property("enableFullscreenOpenGLBorderWorkaround"):
@@ -409,7 +426,10 @@ class WinEventFilter(QAbstractNativeEventFilter):
         ).value
 
         # 遍历每个窗口，检查哪个窗口收到了消息
-        for window in self.windows:
+        for window_ref in self.windows:
+            window = window_ref()
+            if window is None:
+                continue
             hwnd_window = self.hwnds.get(window)
             if hwnd_window != hwnd:
                 continue
@@ -569,25 +589,17 @@ class WinEventFilter(QAbstractNativeEventFilter):
                     monitor_info.rcWork.bottom - monitor_info.rcMonitor.top
                 )
 
-                def get_window_int_property(window, name, default):
-                    val = getattr(window, name, default)
-                    if callable(val):
-                        val = val()  # 如果是方法就调用
-                    if val is None:
-                        val = default
-                    return int(val)
-
                 screen = window.screen()
                 dp_ratio = screen.devicePixelRatio() if screen else 1.0
 
                 min_w = int(
-                    get_window_int_property(window, "minimumWidth", 0) * dp_ratio
+                    _get_window_int_property(window, "minimumWidth", 0) * dp_ratio
                 )
                 min_h = int(
-                    get_window_int_property(window, "minimumHeight", 0) * dp_ratio
+                    _get_window_int_property(window, "minimumHeight", 0) * dp_ratio
                 )
                 max_w = int(
-                    get_window_int_property(
+                    _get_window_int_property(
                         window,
                         "maximumWidth",
                         monitor_info.rcWork.right - monitor_info.rcWork.left,
@@ -595,7 +607,7 @@ class WinEventFilter(QAbstractNativeEventFilter):
                     * dp_ratio
                 )
                 max_h = int(
-                    get_window_int_property(
+                    _get_window_int_property(
                         window,
                         "maximumHeight",
                         monitor_info.rcWork.bottom - monitor_info.rcWork.top,

@@ -102,15 +102,17 @@ class ConfigManager:
             print(f"Error: {e}")
             self.config = {}
 
-    def upload_config(self, key=str or list, value=None):
-        if type(key) is str:
-            self.config[key] = value
-        elif type(key) is list:
-            for k in key:
-                self.config[k] = value
+    def upload_config(self, key: str | list[str], value=None):
+        if isinstance(key, str):
+            keys = [key]
+        elif isinstance(key, list):
+            keys = key
         else:
-            msg = "Key must be str or list"
+            msg = "Key must be str or list[str]"
             raise TypeError(msg) from None
+
+        for k in keys:
+            self.config[k] = value
         self.save_config()
 
     def save_config(self):
