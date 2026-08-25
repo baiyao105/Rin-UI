@@ -75,7 +75,7 @@ Popup {
     // 按钮 / Button //
 
 
-    // Behavior on y { NumberAnimation { duration: Utils.animationSpeed; easing.type:Easing.InOutQuart } }
+    Behavior on y { NumberAnimation { duration: Utils.animationSpeed; easing.type:Easing.InOutQuart } }
 
     enter: Transition {
         ParallelAnimation {
