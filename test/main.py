@@ -12,9 +12,9 @@ from RinUI import RinUIWindow
 if __name__ == '__main__':
     app = QApplication(sys.argv)
 
-    window = RinUIWindow("popup-pos.qml")
+    # window = RinUIWindow("popup-pos.qml")
     # window.set
-    # window2 = RinUIWindow("test3.qml")
+    window2 = RinUIWindow("test2.qml")
     # window3 = RinUIWindow("test3.qml")
     # print(window.engine)
     # print(window2.engine)

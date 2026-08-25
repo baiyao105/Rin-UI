@@ -25,7 +25,7 @@ FluentWindow {
     }
 
     // search field
-    titleBarArea: ComboBox {
+    titleBarArea: AutoSuggestBox {
         id: searchField
         width: 325
         anchors.centerIn: parent

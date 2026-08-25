@@ -11,7 +11,6 @@ ItemDelegate {
     height: contentItem.implicitHeight + 20  // 自适应
     highlighted: ListView.isCurrentItem  // 当前项高亮
     property bool keyboardNavigation: false
-    // focusPolicy: Qt.StrongFocus
 
     leftPadding: 16
     rightPadding: 5
@@ -22,7 +21,7 @@ ItemDelegate {
         visible: text.length > 0
         typography: Typography.Body
         verticalAlignment: Text.AlignVCenter
-        wrapMode: Text.Wrap
+        maximumLineCount: 1
         text: delegate.text
     }
 

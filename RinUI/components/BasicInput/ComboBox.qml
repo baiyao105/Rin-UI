@@ -131,7 +131,7 @@ ComboBox {
     // 弹出菜单 / Menu //
     popup: ContextMenu {
         id: menu
-        width: root.width
+        minimumWidth: root.width
         model: root.delegateModel
         textRole: root.textRole
 
@@ -139,7 +139,11 @@ ComboBox {
         // 不能依赖常驻绑定 currentIndex: root.currentIndex：
         // 点击/键盘会直接改写 ListView.currentIndex 从而打断该绑定，
         // 导致下次打开时弹出列表的高亮与 ComboBox.currentIndex 失步。
-        onAboutToShow: root.syncMenuCurrentIndex()
+        // 注意：必须先同步索引再 relayout，否则定位会用过期索引计算（未选中时会错算成选中态布局）
+        onAboutToShow: {
+            root.syncMenuCurrentIndex()
+            menu.relayout()
+        }
 
         function handleItemSelected(index) {
             root.currentIndex = index

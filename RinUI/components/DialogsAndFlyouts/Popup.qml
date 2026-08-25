@@ -53,8 +53,7 @@ QQC2.Popup {
 
     function _reposition() {
         if (position === Position.None)
-            return
-
+            return 
         var overlay = _overlay()
         if (!overlay || !parent)
             return
@@ -64,7 +63,14 @@ QQC2.Popup {
         var bounds = { x: 0, y: 0, width: overlay.width, height: overlay.height }
         var result
 
-        if (position === Position.Center) {
+        if (position === Position.None && _manualPosition) {
+            var manualInOverlay = parent.mapToItem(overlay, _manualX, _manualY)
+            result = {
+                x: PopupPositioner.clamp(manualInOverlay.x, _margin, overlay.width - popupWidth - _margin),
+                y: PopupPositioner.clamp(manualInOverlay.y, _margin, overlay.height - popupHeight - _margin),
+                position: Position.None
+            }
+        } else if (position === Position.Center) {
             result = PopupPositioner.resolve(
                 bounds, popupWidth, popupHeight, bounds, Position.Center, _spacing, _margin, Position)
         } else if (anchorItem) {
@@ -99,10 +105,8 @@ QQC2.Popup {
     }
 
     onAboutToShow: {
-        if (position !== Position.None) {
-            _captureManualPosition()
-            _reposition()
-        }
+        _captureManualPosition()
+        _reposition()
     }
 
     onVisibleChanged: {
