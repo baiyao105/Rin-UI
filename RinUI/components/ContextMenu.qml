@@ -1,7 +1,9 @@
 import QtQuick 2.15
 import QtQuick.Controls.Basic 2.15
+import QtQuick.Controls.Basic 2.15
 import "../themes"
 import "../components"
+import "ListAndCollections" as Collections
 
 
 Popup {
@@ -15,7 +17,6 @@ Popup {
     property alias currentIndex: listView.currentIndex
     property int maximumHeight: 300  // 最大高度
     property string textRole: ""
-    property bool keyboardNavigation: false
 
     implicitWidth: 100
     implicitHeight: Math.min(listView.contentHeight + 6, maximumHeight)
@@ -25,89 +26,34 @@ Popup {
     focus: true
 
     // 内容 / ListView //
-    contentItem: ListView {
+    contentItem: Collections.ListView {
         id: listView
         clip: true
         focus: true
-        spacing: 0
+        focusPolicy: Qt.StrongFocus
+        textRole: contextMenu.textRole
         anchors.fill: parent  // 清除边距
         anchors.topMargin: 2
         anchors.bottomMargin: 2
 
-        // 垂直滚动条 / Vertical ScrollBar //
         ScrollBar.vertical: ScrollBar {
             id: scrollBar
-            policy: ScrollBar.AsNeeded
+            visible: false
         }
-        model: control.popup.visible ? control.delegateModel : null
 
-        // 选择器 / Selection //
-        delegate: ItemDelegate {
-            id: delegate
-            width: listView.width
-            height: text.implicitHeight + 20  // 自适应
-            highlighted: ListView.isCurrentItem  // 当前项高亮
-            focusPolicy: Qt.StrongFocus
-
-            background: Rectangle {
-                id: itemBg
-                anchors.fill: parent
-                anchors.leftMargin: 5
-                anchors.rightMargin: 5
-                anchors.topMargin: 3
-                radius: Theme.currentTheme.appearance.buttonRadius
-                color: pressed
-                    ? Theme.currentTheme.colors.subtleTertiaryColor
-                    : (highlighted || hovered)
-                        ? Theme.currentTheme.colors.subtleSecondaryColor
-                        : Theme.currentTheme.colors.subtleColor
-
-                Text {
-                    id: text
-                    anchors.fill: parent
-                    anchors.leftMargin: 11
-                    anchors.rightMargin: 11
-                    anchors.topMargin: 6
-                    anchors.bottomMargin: 8
-                    verticalAlignment: Text.AlignVCenter
-
-                    typography: Typography.Body
-                    wrapMode: Text.Wrap
-                    text: model[contextMenu.parent.textRole]
-                }
-
-                // 选择指示器
-                Indicator {
-                    currentItemHeight: itemBg.height
-                    visible: highlighted
-                }
-
-                // accessibility
-                FocusIndicator {
-                    control: parent
-                    visible: highlighted && keyboardNavigation
-                }
-
-                Behavior on color { ColorAnimation { duration: Utils.appearanceSpeed; easing.type:Easing.InOutQuart } }
-            }
-
-            Keys.onUpPressed: {
-                contextMenu.keyboardNavigation = true
-                listView.decrementCurrentIndex()
-            }
-
-            Keys.onDownPressed: {
-                contextMenu.keyboardNavigation = true
-                listView.incrementCurrentIndex()
-            }
-
-            onClicked: {
-                contextMenu.close()
-                listView.currentIndex = index
-                contextMenu.itemSelected(index)
-            }
+        onItemClicked: function(index) {
+            contextMenu.close()
+            contextMenu.itemSelected(index)
         }
     }
+
+    onOpened: listView.forceActiveFocus()
+    onAboutToShow: {
+        listView.forceLayout()
+        scrollBar.visible = false
+    }
+    // 关闭时重置键盘导航标记，避免下次鼠标打开时残留键盘高亮框
+    onClosed: listView.keyboardNavigation = false
 
     // 背景 / Background //
     background: Rectangle {
@@ -129,7 +75,7 @@ Popup {
     // 按钮 / Button //
 
 
-    Behavior on y { NumberAnimation { duration: Utils.animationSpeed; easing.type:Easing.InOutQuart } }
+    // Behavior on y { NumberAnimation { duration: Utils.animationSpeed; easing.type:Easing.InOutQuart } }
 
     enter: Transition {
         ParallelAnimation {
@@ -150,21 +96,13 @@ Popup {
             //     easing.type: Easing.InOutCubic
             // }
             NumberAnimation {
-                target: scrollBar
-                property: "opacity"
-                from: 0
-                to: 1
-                duration: 1000
-                easing.type: Easing.InOutCubic
-            }
-            NumberAnimation {
                 target: contextMenu
                 property: "height"
                 from: 46
-                to: contextMenu.implicitHeight
+                to: Math.max(contextMenu.implicitHeight, 46)
                 duration: Utils.animationSpeedMiddle
                 easing.type: Easing.OutQuint
-                onRunningChanged: {
+                onFinished: {
                     scrollBar.visible = true;
                 }
             }

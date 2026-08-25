@@ -10,17 +10,25 @@ ListView {
     property string textRole: ""  // 文字role
 
     property bool keyboardNavigation: false
+    property alias verticalScrollBar: scrollBar
+    signal itemClicked(int index)
     // 自动检测模型类型
     readonly property string modelType: {
         if (!model) return "null";
-        if (Array.isArray(model) && root.textRole) return "array-with-role";
-        if (Array.isArray(model)) return "array";
+        const isArrayModel = Array.isArray(model) || model instanceof Array;
+        if (isArrayModel && root.textRole) return "array-with-role";
+        if (isArrayModel) return "array";
         if (model instanceof ListModel) return "listmodel";
         if (typeof model === "object" && "count" in model) return "listmodel-like";
         return "unknown";
     }
 
     clip: true
+
+    Keys.onPressed: function(event) {
+        if (event.key === Qt.Key_Up || event.key === Qt.Key_Down)
+            root.keyboardNavigation = true
+    }
 
     // 垂直滚动条 / Vertical ScrollBar //
     ScrollBar.vertical: ScrollBar {
@@ -108,13 +116,14 @@ ListView {
     }
 
     delegate: ListViewDelegate {
+        keyboardNavigation: root.keyboardNavigation && highlighted
         text: {
             switch (root.modelType) {
                 case "array": return modelData;
                 case "array-with-role": return modelData[root.textRole] || modelData || "";
                 case "listmodel":
                 case "listmodel-like":
-                    return model[root.textRole] || modelData || "";
+                    return modelData[root.textRole] || model[root.textRole] || modelData || model || "";
                 default: return "";
             }
         }

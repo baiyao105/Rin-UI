@@ -120,12 +120,26 @@ ComboBox {
         clearEnabled: false
     }
 
+    function syncMenuCurrentIndex() {
+        if (menu.currentIndex !== root.currentIndex)
+            menu.currentIndex = root.currentIndex
+    }
+
+    // Keep an already-open popup in sync when the ComboBox is changed externally.
+    onCurrentIndexChanged: syncMenuCurrentIndex()
+
     // 弹出菜单 / Menu //
     popup: ContextMenu {
         id: menu
         width: root.width
-        model: root.model
-        currentIndex: root.currentIndex
+        model: root.delegateModel
+        textRole: root.textRole
+
+        // 每次打开时把高亮同步到当前选中项。
+        // 不能依赖常驻绑定 currentIndex: root.currentIndex：
+        // 点击/键盘会直接改写 ListView.currentIndex 从而打断该绑定，
+        // 导致下次打开时弹出列表的高亮与 ComboBox.currentIndex 失步。
+        onAboutToShow: root.syncMenuCurrentIndex()
 
         function handleItemSelected(index) {
             root.currentIndex = index

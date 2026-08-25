@@ -8,10 +8,11 @@ Item {
 
     required property Item control
     property real radius: Theme.currentTheme.appearance.buttonRadius
+    property bool keyboardFocus: false
 
-    visible: control.visualFocus &&
-         (control.focusReason === Qt.TabFocusReason ||
-          control.focusReason === Qt.BacktabFocusReason)
+    visible: keyboardFocus || (control.visualFocus &&
+        (control.focusReason === Qt.TabFocusReason ||
+         control.focusReason === Qt.BacktabFocusReason))
 
     Rectangle {
         anchors.fill: parent

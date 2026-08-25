@@ -67,8 +67,8 @@ QQC2.Menu {
         function onHeightChanged() { root._scheduleReposition() }
     }
 
-    width: Math.min(Math.max(contentItem.implicitWidth, 80), Math.max(0, QQC2.Overlay.overlay.width - _margin * 2))
-    height: Math.min(implicitHeight, Math.max(0, QQC2.Overlay.overlay.height - _margin * 2))
+    width: Math.min(Math.max(contentItem.implicitWidth, 80), Math.max(0, QQC2.Overlay.overlay ? QQC2.Overlay.overlay.width - _margin * 2 : 0))
+    height: Math.min(implicitHeight, Math.max(0, QQC2.Overlay.overlay ? QQC2.Overlay.overlay.height - _margin * 2 : 0))
 
     enter: Transition {
         ParallelAnimation {

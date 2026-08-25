@@ -10,17 +10,13 @@ ItemDelegate {
     width: ListView.view ? ListView.view.width : 200
     height: contentItem.implicitHeight + 20  // 自适应
     highlighted: ListView.isCurrentItem  // 当前项高亮
+    property bool keyboardNavigation: false
     // focusPolicy: Qt.StrongFocus
 
     leftPadding: 16
     rightPadding: 5
     topPadding: 3
     bottomPadding: 0
-
-    // accessibility
-    FocusIndicator {
-        control: parent
-    }
 
     contentItem: Text {
         visible: text.length > 0
@@ -32,6 +28,11 @@ ItemDelegate {
 
     background: Rectangle {
         id: itemBg
+        // accessibility
+        FocusIndicator {
+            control: delegate
+            keyboardFocus: delegate.keyboardNavigation
+        }
         anchors.fill: parent
         anchors.leftMargin: 5
         anchors.rightMargin: 5
@@ -62,5 +63,6 @@ ItemDelegate {
 
     onClicked: {
         ListView.view.currentIndex = index
+        ListView.view.itemClicked(index)
     }
 }

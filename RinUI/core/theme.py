@@ -77,6 +77,7 @@ class ThemeListener(QThread):
 
 
 class ThemeManager(QObject):
+    #TODO: 窗口cleanup
     themeChanged = Signal(str)
     backdropChanged = Signal(str)
     windows = []  # 窗口句柄们（
