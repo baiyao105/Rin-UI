@@ -6,6 +6,7 @@ import "../components"
 
 Popup {
     id: contextMenu
+    position: Position.None
 
     // 选中信号 / Signal //
     signal itemSelected(int index)

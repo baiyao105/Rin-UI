@@ -69,7 +69,7 @@ Button {
         id: pickerPopup
         padding: 0
         width: cal.implicitWidth
-        height: cal.implicitHeight
+        height: Math.min(cal.implicitHeight, Math.max(0, Overlay.overlay.height - 16))
 
         onVisibleChanged: {
             if (visible) {

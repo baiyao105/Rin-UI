@@ -1,22 +1,26 @@
 import QtQuick 2.15
-import QtQuick.Controls 2.15
+import QtQuick.Controls 2.15 as QQC2
 import QtQuick.Layouts 2.15
 import "../../themes"
 import "../../components"
 
 
-Dialog {
+QQC2.Dialog {
     id: root
 
     property bool titleBarVisible: false
 
-    anchors.centerIn: Overlay.overlay  // Center in the overlay
-    closePolicy: Popup.NoAutoClose  // 更符合fds规范
+    anchors.centerIn: QQC2.Overlay.overlay  // Center in the overlay
+    closePolicy: QQC2.Popup.NoAutoClose  // 更符合fds规范
 
     padding: 24
     topPadding: 24
     bottomPadding: 24
-    implicitWidth: Math.max(Utils.dialogMinimumWidth, Math.min(implicitContentWidth + 48, Utils.dialogMaximumWidth))
+    implicitWidth: Math.min(
+        Math.max(Utils.dialogMinimumWidth, Math.min(implicitContentWidth + 48, Utils.dialogMaximumWidth)),
+        Math.max(0, QQC2.Overlay.overlay.width - 16)
+    )
+    implicitHeight: Math.min(implicitContentHeight + topPadding + bottomPadding + footer.implicitHeight, Math.max(0, QQC2.Overlay.overlay.height - 16))
 
     contentItem: ColumnLayout {
         spacing: 12
@@ -57,7 +61,7 @@ Dialog {
         }
     }
 
-    Overlay.modal: Rectangle {
+    QQC2.Overlay.modal: Rectangle {
         color: Theme.currentTheme.colors.backgroundSmokeColor
     }
 

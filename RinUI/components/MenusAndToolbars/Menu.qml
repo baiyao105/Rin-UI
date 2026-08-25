@@ -1,45 +1,74 @@
 import QtQuick 2.15
-import QtQuick.Controls 2.15
+import QtQuick.Controls 2.15 as QQC2
 import QtQuick.Layouts 2.15
 import "../../themes"
 import "../../components"
+import "../DialogsAndFlyouts/PopupPositioner.js" as PopupPositioner
 
 
-Menu {
+QQC2.Menu {
     id: root
 
     property int position: Position.Bottom  // 位置
+    property real posX: _targetX
+    property real posY: _targetY
+    property real _targetX: x
+    property real _targetY: y
+    property int _resolvedPosition: position
+    property bool _repositionPending: false
+    readonly property real _spacing: 5
+    readonly property real _margin: 8
 
-    property real posX: {
-        switch (position) {
-            case Position.Top:
-            case Position.Bottom:
-                return (parent.width - root.width) / 2
-            case Position.Left:
-                return - root.width - 5
-            case Position.Right:
-                return parent.width + 5
-            default:
-                // return (parent.width - root.width) / 2
-                return root.x
-        }
+    function _scheduleReposition() {
+        if (!visible || _repositionPending)
+            return
+
+        _repositionPending = true
+        Qt.callLater(function() {
+            _repositionPending = false
+            _reposition()
+        })
     }
 
-    property real posY: {
-        switch (position) {
-            case Position.Top:
-                return -root.height - 5
-            case Position.Bottom:
-                return parent.height + 5
-            case Position.Left:
-            case Position.Right:
-                return (parent.height - root.height) / 2
-            default:
-                return root.y
-        }
+    function _reposition() {
+        var overlay = QQC2.Overlay.overlay
+        if (!overlay || !parent)
+            return
+
+        var anchorOrigin = parent.mapToItem(overlay, 0, 0)
+        var anchor = { x: anchorOrigin.x, y: anchorOrigin.y, width: parent.width, height: parent.height }
+        var bounds = { x: 0, y: 0, width: overlay.width, height: overlay.height }
+        var result = PopupPositioner.resolve(
+            anchor, Math.max(width, implicitWidth), Math.max(height, implicitHeight),
+            bounds, position, _spacing, _margin, Position)
+        var localPosition = overlay.mapToItem(parent, result.x, result.y)
+
+        _resolvedPosition = result.position
+        _targetX = localPosition.x
+        _targetY = localPosition.y
+        x = _targetX
+        y = _targetY
     }
 
-    width: Math.max(contentItem.implicitWidth, 80)
+    onAboutToShow: _reposition()
+    onVisibleChanged: {
+        if (visible)
+            _scheduleReposition()
+    }
+    onPositionChanged: _scheduleReposition()
+    onWidthChanged: _scheduleReposition()
+    onHeightChanged: _scheduleReposition()
+    onImplicitWidthChanged: _scheduleReposition()
+    onImplicitHeightChanged: _scheduleReposition()
+
+    Connections {
+        target: QQC2.Overlay.overlay
+        function onWidthChanged() { root._scheduleReposition() }
+        function onHeightChanged() { root._scheduleReposition() }
+    }
+
+    width: Math.min(Math.max(contentItem.implicitWidth, 80), Math.max(0, QQC2.Overlay.overlay.width - _margin * 2))
+    height: Math.min(implicitHeight, Math.max(0, QQC2.Overlay.overlay.height - _margin * 2))
 
     enter: Transition {
         ParallelAnimation {
@@ -54,15 +83,15 @@ Menu {
             NumberAnimation {
                 target: root
                 property: "height"
-                from: (position === Position.Top || position === Position.Bottom ? 0 : root.implicitHeight)
-                to: root.implicitHeight
+                from: (_resolvedPosition === Position.Top || _resolvedPosition === Position.Bottom ? 0 : root.implicitHeight)
+                to: root.height
                 duration: Utils.animationSpeed
                 easing.type: Easing.OutQuart
             }
             NumberAnimation {
                 target: root
                 property: "x"
-                from: posX + (position === Position.Left ? 5 : position === Position.Right ? -5 : 0)
+                from: posX + (_resolvedPosition === Position.Left ? 5 : _resolvedPosition === Position.Right ? -5 : 0)
                 to: posX
                 duration: Utils.animationSpeedMiddle
                 easing.type: Easing.OutQuint
@@ -73,8 +102,8 @@ Menu {
             NumberAnimation {
                 target: root
                 property: "y"
-                from: posY + (position === Position.Top || position === Position.Bottom
-                    ? (position === Position.Top ? implicitHeight / 2 : position === Position.Bottom ? -implicitHeight / 2 : implicitHeight / 2)
+                from: posY + (_resolvedPosition === Position.Top || _resolvedPosition === Position.Bottom
+                    ? (_resolvedPosition === Position.Top ? height / 2 : _resolvedPosition === Position.Bottom ? -height / 2 : height / 2)
                     : 0)
                 to: posY
                 duration: Utils.animationSpeedMiddle
@@ -120,7 +149,7 @@ Menu {
     contentItem: Flickable {
         id: flickable
         clip: true
-        anchors.centerIn: parent
+        anchors.fill: parent
         implicitWidth: column.implicitWidth
         implicitHeight: column.implicitHeight
 

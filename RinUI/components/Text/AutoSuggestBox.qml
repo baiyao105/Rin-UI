@@ -56,10 +56,12 @@ TextField {
 
     Popup {
         id: suggestionsPopup
+        position: Position.None
         width: input.width
         y: input.height
         implicitWidth: 100
         implicitHeight: Math.min(filteredModel.contentHeight + 6, maximumMenuHeight)
+        height: Math.min(implicitHeight, Math.max(0, Overlay.overlay.height - 16))
         padding: 0
 
 

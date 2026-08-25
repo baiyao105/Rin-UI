@@ -11,7 +11,7 @@ Popup {
     height: 330
     implicitHeight: 330
     y: -height / 2 + buttonRow.height
-    position: Position.Center  // RinUI popup自定义属性
+    position: Position.None
 
     property var value1: undefined
     property var value2: undefined

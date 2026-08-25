@@ -57,7 +57,7 @@ Popup {
             NumberAnimation {
                 target: flyout
                 property: "y"
-                from: posY + (position === Position.Top ? 15 : position === Position.Bottom ? -15 : 0)
+                from: posY + (_resolvedPosition === Position.Top ? 15 : _resolvedPosition === Position.Bottom ? -15 : 0)
                 to: posY
                 duration: Utils.animationSpeedMiddle * 1.25
                 easing.type: Easing.OutQuint
@@ -65,7 +65,7 @@ Popup {
             NumberAnimation {
                 target: flyout
                 property: "x"
-                from: posX + (position === Position.Left ? 15 : position === Position.Right ? -15 : 0)
+                from: posX + (_resolvedPosition === Position.Left ? 15 : _resolvedPosition === Position.Right ? -15 : 0)
                 to: posX
                 duration: Utils.animationSpeedMiddle * 1.25
                 easing.type: Easing.OutQuint

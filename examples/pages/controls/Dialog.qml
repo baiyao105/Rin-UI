@@ -1,5 +1,6 @@
 import QtQuick 2.15
 import QtQuick.Controls 2.15
+import QtQuick.Controls as QQC
 import QtQuick.Layouts 2.15
 import RinUI
 import "../../components"
@@ -26,6 +27,17 @@ ControlPage {
             cuteText.text = "Hmm... You rejected ╥﹏╥"
         }
         standardButtons: Dialog.Ok | Dialog.Cancel
+    //     footer: DialogButtonBox {
+    //     QQC.Button {
+    //         text: "保存"
+    //         highlighted: true // 关键：开启高亮显示，吸引用户注意
+    //         DialogButtonBox.buttonRole: DialogButtonBox.AcceptRole
+    //     }
+    //     Button {
+    //         text: "取消"
+    //         DialogButtonBox.buttonRole: DialogButtonBox.RejectRole
+    //     }
+    // }
     }
 
     // customDialog //

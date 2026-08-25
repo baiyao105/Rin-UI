@@ -1,84 +1,163 @@
 import QtQuick 2.15
-import QtQuick.Controls.Basic 2.15
+import QtQuick.Controls.Basic 2.15 as QQC2
 import QtQuick.Layouts 2.15
 import Qt5Compat.GraphicalEffects
 import "../../themes"
 import "../../components"
+import "PopupPositioner.js" as PopupPositioner
 
-Popup {
+QQC2.Popup {
     id: popup
-    property int position: Position.None
+    property int position: Position.Bottom
     property Item anchorItem: parent
-    property real posX: {
-        if (typeof x === "number" && x !== 0 && position=== Position.None)
-            return x
-        switch (position) {
-            case Position.Top:
-            case Position.Bottom:
-                return (anchorItem ? (anchorItem.width - popup.width) / 2 : 0)
-            case Position.Left:
-                return -(popup.width + 5)
-            case Position.Right:
-                return (anchorItem ? anchorItem.width + 5 : 0)
-            default:
-                return (anchorItem ? (anchorItem.width - popup.width) / 2 : 0)
-        }
+    property real posX: _targetX
+    property real posY: _targetY
+    property real _targetX: x
+    property real _targetY: y
+    property int _resolvedPosition: position
+    property bool _repositionPending: false
+    property bool _manualPosition: false
+    property real _manualX: 0
+    property real _manualY: 0
+    property bool _settingPosition: false
+    property bool _componentCompleted: false
+    readonly property real _spacing: 5
+    readonly property real _margin: 8
+
+    function _overlay() {
+        return QQC2.Overlay.overlay
     }
 
-    property real posY: {
-        if (typeof y === "number" && y !== 0 && position=== Position.None)
-            return y
-        switch (position) {
-            case Position.Top:
-                return -(popup.height + 5)
-            case Position.Bottom:
-                return (anchorItem ? anchorItem.height + 5 : 0)
-            case Position.Left:
-            case Position.Center:
-            case Position.Right:
-                return (anchorItem ? (anchorItem.height - popup.height) / 2 : 0)
-            default:
-                return -(popup.height + 5)
-        }
+    function _scheduleReposition() {
+        if (!visible || _repositionPending)
+            return
+
+        _repositionPending = true
+        Qt.callLater(function() {
+            _repositionPending = false
+            _reposition()
+        })
     }
 
-    onVisibleChanged: {  // 自动调整位置
-        if (visible) {
-            console.log("visible changed")
-            Qt.callLater(function() {
-                if (
-                    (position === Position.None || position === undefined) &&
-                    (popup.x === 0 || popup.x === undefined) &&
-                    (popup.y === 0 || popup.y === undefined)
-                ) {
-                    console.log("auto position")
-                    popup.autoPosition()
-                }
-            })
-        }
+    function _captureManualPosition() {
+        if (position !== Position.None)
+            return
+
+        // x/y changes captured before opening are authoritative, including 0.
+        if (_manualPosition)
+            return
+
+        // Explicit x/y assignments are captured by onXChanged/onYChanged.
+        // Do not infer from the current value: it may be a previous automatic placement.
     }
 
+    function _reposition() {
+        if (position === Position.None)
+            return
+
+        var overlay = _overlay()
+        if (!overlay || !parent)
+            return
+
+        var popupWidth = Math.max(width, implicitWidth)
+        var popupHeight = Math.max(height, implicitHeight)
+        var bounds = { x: 0, y: 0, width: overlay.width, height: overlay.height }
+        var result
+
+        if (position === Position.None && _manualPosition) {
+            var manualInOverlay = parent.mapToItem(overlay, _manualX, _manualY)
+            result = {
+                x: PopupPositioner.clamp(manualInOverlay.x, _margin, overlay.width - popupWidth - _margin),
+                y: PopupPositioner.clamp(manualInOverlay.y, _margin, overlay.height - popupHeight - _margin),
+                position: Position.None
+            }
+        } else if (position === Position.Center) {
+            result = PopupPositioner.resolve(
+                bounds, popupWidth, popupHeight, bounds, Position.Center, _spacing, _margin, Position)
+        } else if (anchorItem) {
+            var anchorOrigin = anchorItem.mapToItem(overlay, 0, 0)
+            var anchor = {
+                x: anchorOrigin.x,
+                y: anchorOrigin.y,
+                width: anchorItem.width,
+                height: anchorItem.height
+            }
+            result = PopupPositioner.resolve(
+                anchor, popupWidth, popupHeight, bounds, position, _spacing, _margin, Position)
+        } else {
+            result = PopupPositioner.resolve(
+                bounds, popupWidth, popupHeight, bounds, Position.Center, _spacing, _margin, Position)
+        }
+
+        var localPosition = overlay.mapToItem(parent, result.x, result.y)
+        _resolvedPosition = result.position
+        _targetX = localPosition.x
+        _targetY = localPosition.y
+        _settingPosition = true
+        x = _targetX
+        y = _targetY
+        _settingPosition = false
+    }
+
+    // Kept for existing controls that already call autoPosition().
     function autoPosition() {
-        if (!anchorItem) return
-
-        // 获取按钮的屏幕坐标
-        var btnGlobal = anchorItem.mapToGlobal(0, 0)
-
-        var btnTop = btnGlobal.y
-        var btnBottom = btnTop + anchorItem.height
-
-        var screenH = Qt.application.primaryScreen ? Qt.application.primaryScreen.height : 1080
-        var popupH = Math.max(popup.implicitHeight, popup.height)
-        var spaceAbove = btnTop
-        var spaceBelow = screenH - btnBottom
-
-        console.log("autoPosition", {btnTop, btnBottom, screenH, popupH, spaceAbove, spaceBelow})
-
-        popup.position = (spaceBelow >= popupH) ? Position.Bottom : Position.Top
+        _captureManualPosition()
+        _reposition()
     }
 
+    onAboutToShow: {
+        _captureManualPosition()
+        _reposition()
+    }
 
-    Overlay.modal: Rectangle {
+    onVisibleChanged: {
+        if (visible)
+            _scheduleReposition()
+    }
+
+    onPositionChanged: _scheduleReposition()
+    onXChanged: {
+        if (_componentCompleted && !visible && !_settingPosition && position === Position.None) {
+            _manualPosition = true
+            _manualX = x
+        }
+    }
+    onYChanged: {
+        if (_componentCompleted && !visible && !_settingPosition && position === Position.None) {
+            _manualPosition = true
+            _manualY = y
+        }
+    }
+    onAnchorItemChanged: _scheduleReposition()
+    onWidthChanged: _scheduleReposition()
+    onHeightChanged: _scheduleReposition()
+    onImplicitWidthChanged: _scheduleReposition()
+    onImplicitHeightChanged: _scheduleReposition()
+
+    Connections {
+        target: popup._overlay()
+        function onWidthChanged() { popup._scheduleReposition() }
+        function onHeightChanged() { popup._scheduleReposition() }
+    }
+
+    Connections {
+        target: popup.anchorItem
+        function onXChanged() { popup._scheduleReposition() }
+        function onYChanged() { popup._scheduleReposition() }
+        function onWidthChanged() { popup._scheduleReposition() }
+        function onHeightChanged() { popup._scheduleReposition() }
+    }
+
+    Component.onCompleted: {
+        _componentCompleted = true
+        if (position === Position.None && !_manualPosition && (x !== 0 || y !== 0)) {
+            _manualPosition = true
+            _manualX = x
+            _manualY = y
+        }
+    }
+
+    QQC2.Overlay.modal: Rectangle {
         color: Theme.currentTheme.colors.backgroundSmokeColor
     }
 
@@ -107,6 +186,7 @@ Popup {
 
     // 动画 / Animation //
     enter: Transition {
+        enabled: position !== Position.None
         ParallelAnimation {
             NumberAnimation {
                 target: popup
@@ -119,8 +199,8 @@ Popup {
             NumberAnimation {
                 target: popup
                 property: "y"
-                from: posY + (position !== Position.Center
-                    ? (position === Position.Top ? 15 : position === Position.Bottom ? -15 : 0) : 0)
+                from: posY + (_resolvedPosition !== Position.Center
+                    ? (_resolvedPosition === Position.Top ? 15 : _resolvedPosition === Position.Bottom ? -15 : 0) : 0)
                 to: posY
                 duration: Utils.animationSpeedMiddle * 1.25
                 easing.type: Easing.OutQuint
@@ -128,8 +208,8 @@ Popup {
             NumberAnimation {
                 target: popup
                 property: "x"
-                from: posX + (position !== Position.Center
-                    ? (position === Position.Left ? 15 : position === Position.Right ? -15 : 0) : 0)
+                from: posX + (_resolvedPosition !== Position.Center
+                    ? (_resolvedPosition === Position.Left ? 15 : _resolvedPosition === Position.Right ? -15 : 0) : 0)
                 to: posX
                 duration: Utils.animationSpeedMiddle * 1.25
                 easing.type: Easing.OutQuint
@@ -137,6 +217,7 @@ Popup {
         }
     }
     exit: Transition {
+        enabled: position !== Position.None
         ParallelAnimation {
             NumberAnimation {
                 target: popup

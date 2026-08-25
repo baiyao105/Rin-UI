@@ -12,6 +12,12 @@ from RinUI import RinUIWindow
 if __name__ == '__main__':
     app = QApplication(sys.argv)
 
-    window = RinUIWindow("test3.qml")
+    window = RinUIWindow("popup-pos.qml")
+    # window.set
+    # window2 = RinUIWindow("test3.qml")
+    # window3 = RinUIWindow("test3.qml")
+    # print(window.engine)
+    # print(window2.engine)
+    # print(window3.engine)
 
     app.exec()

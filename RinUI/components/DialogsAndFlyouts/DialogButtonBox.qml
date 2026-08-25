@@ -30,6 +30,16 @@ DialogButtonBox {
 
     alignment: undefined
 
+    function setPrimaryButton(button) {
+        if (!button)
+            return
+
+        if ("defaultButton" in buttonBox)
+            buttonBox["defaultButton"] = button
+        else
+            button.highlighted = true
+    }
+
     contentItem: RowLayout {
         spacing: buttonBox.spacing
 
@@ -43,5 +53,10 @@ DialogButtonBox {
         Layout.preferredWidth: buttonBox.availableWidth / 2
         Layout.fillWidth: !(buttonBox.count === 1)
         highlighted: DialogButtonBox.buttonRole === DialogButtonBox.AcceptRole  // 高亮
+
+        Component.onCompleted: {
+            if (highlighted)
+                buttonBox.setPrimaryButton(this)
+        }
     }
 }
