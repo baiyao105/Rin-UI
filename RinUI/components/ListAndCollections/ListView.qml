@@ -123,7 +123,14 @@ ListView {
                 case "array-with-role": return modelData[root.textRole] || modelData || "";
                 case "listmodel":
                 case "listmodel-like":
-                    return modelData[root.textRole] || model[root.textRole] || modelData || model || "";
+                    // modelData 仅对 JS 数组/QStringList/单 role 模型注入；
+                    // 多 role 的 ListModel 里 modelData 为 undefined，直接索引会抛
+                    // TypeError 并中止整个 || 链，因此先做空值保护
+                    return (modelData ? modelData[root.textRole] : "")
+                        || model[root.textRole]
+                        || modelData
+                        || model
+                        || "";
                 default: return "";
             }
         }

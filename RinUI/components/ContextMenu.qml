@@ -192,11 +192,12 @@ Popup {
                 contentY = 0
                 aligned = true
             } else {
-                // 2) 对齐上：菜单顶部贴 combobox 顶部，选中项在列表最上方
+                // 2) 对齐上：菜单顶部贴 combobox 顶部，选中项尽量在列表最上方。
+                //    高度不再受“选中项须贴列表最上方”约束（窗口边界避让优先）：
+                //    上方边界不足时整块向下生长，选中项由 contentY 夹紧处理（会回到底部）。
                 var topY = anchorY + offset - consts.listInset
                 var topH = topY >= consts.margin
-                    ? Math.min(menuH, overlay.height - topY - consts.margin,
-                               contentH - selTop + consts.listInset * 2)
+                    ? Math.min(menuH, overlay.height - topY - consts.margin)
                     : 0
                 // 3) 对齐下：菜单底部贴 combobox 底部，选中项尽量在列表最下方。
                 //    高度不再受“选中项须贴列表最下方”约束（窗口边界避让优先）：
@@ -322,15 +323,20 @@ Popup {
             props.yTo = contextMenu.y
             props.startContentY = _scrollFor(props.heightFrom)   // 起始滚动：先对准选中项
             props.finalContentY = layout.contentY
-            if (props.mode === 2)
-                // 对齐下：底部固定，y 随高度反向补偿 → 菜单始终自 combobox 底边向上生长
-                // （contentY 被夹到 0 时旧公式退化为固定顶部、向下生长，方向就反了）
+            // 打开动画的“固定点”按方向统一调度（不再各方向各写一套）：
+            //   贴锚边的对齐菜单自锚边生长（顶/底边固定）；居中菜单以选中项或中心为锚
+            if (props.mode === 1)
+                // 对齐上：顶边固定，自 combobox 顶边向下生长
+                props.yFrom = contextMenu.y
+            else if (props.mode === 2)
+                // 对齐下：底边固定，自 combobox 底边向上生长
+                // （若用居中·选中项公式，contentY 被夹到 0 时会退化为顶边固定、方向反掉）
                 props.yFrom = contextMenu.y + props.heightTo - props.heightFrom
             else if (listView.currentIndex < 0)
-                // 未选中（居中）：垂直中心固定，向上下对称展开，起始即居中
+                // 居中·无选中：垂直中心固定，上下对称展开
                 props.yFrom = contextMenu.y + (props.heightTo - props.heightFrom) / 2
             else
-                // mode 0/1 选中：contentY 与 y 同缓动同步，令 “y - contentY” 恒为常量 → 选中项全程贴住 combobox
+                // 居中·有选中：y 与 contentY 同步缓动，令 “y - contentY” 恒定 → 选中项全程贴住 combobox
                 props.yFrom = contextMenu.y - props.finalContentY + props.startContentY
         }
         props.busy = false
@@ -346,9 +352,24 @@ Popup {
     }
     onAboutToShow: relayout()
     onHeightChanged: {
-        // 打开动画期间 contentY 由动画本身驱动，这里仅在非动画时跟随高度
-        if (visible && !props.animating)
+        // contentY 与 height 同帧推导：避免独立的 contentY 动画与 ListView 的夹紧
+        // 在不同子帧交错写入（contentY 贴住合法边界时会逐帧抖动）。
+        if (!visible || props.busy)
+            return
+        if (props.animating) {
+            if (props.mode === 0)
+                // 居中·选中：contentY 线性插值到 finalContentY(=0)，配合 yFrom 的
+                // “y - contentY” 恒定，令选中项全程贴住 combobox
+                listView.contentY = props.startContentY
+                    + (props.finalContentY - props.startContentY)
+                    * (height - props.heightFrom)
+                    / Math.max(1, props.heightTo - props.heightFrom)
+            else
+                // 对齐：contentY 即 _scrollFor(当前高度, mode)，恒落在合法范围、贴边界不抖
+                listView.contentY = _scrollFor(height, props.mode)
+        } else {
             listView.contentY = _scrollFor(height)
+        }
     }
     onWidthChanged: {
         if (visible && !props.busy)
@@ -406,11 +427,11 @@ Popup {
         }
     }
 
-    // 动画：高度从起始高度展开到最终高度，同时 y 与 contentY 以相同缓动同步移动，
-    // 令 “y - contentY” 保持常量，选中项全程贴住 combobox——
-    // mode 0（居中）：从选中项（combobox）处向上下展开，过渡到最终位置
-    // mode 1（对齐上）：顶部固定，内容自顶部向下展开
-    // mode 2（对齐下）：底部固定，内容自底部向上展开
+    // 动画：高度从起始高度展开到最终高度，y 以相同缓动同步移动；
+    // contentY 不再用独立动画，而是由 onHeightChanged 跟随 height 同帧推导，
+    // 避免与 ListView 夹紧在不同子帧交错而抖动。因 height 的缓动分数即 y 的分数，
+    // mode 0（居中）/ mode 2（对齐下）的 “y - contentY” 仍恒定，选中项/底边全程贴住锚边；
+    // mode 1（对齐上）顶边固定向下展开，选中项不要求贴 combobox
     enter: Transition {
         ParallelAnimation {
             NumberAnimation {
@@ -428,13 +449,10 @@ Popup {
                 to: props.heightTo
                 duration: Utils.animationSpeedMiddle
                 easing.type: Easing.OutQuint
-                onStarted: {
-                    listView.contentY = props.startContentY
-                }
                 onFinished: {
-                    // 展开完成：动画结束，滚动条恢复按需显示，并收敛到最终滚动位置
+                    // 展开完成：滚动条恢复按需显示
+                    // contentY 已由 onHeightChanged 在末帧同步到 finalContentY
                     props.animating = false
-                    listView.contentY = props.finalContentY
                 }
             }
             NumberAnimation {
@@ -442,15 +460,6 @@ Popup {
                 property: "y"
                 from: props.yFrom
                 to: props.yTo
-                duration: Utils.animationSpeedMiddle
-                easing.type: Easing.OutQuint
-            }
-            // 滚动与 y 同步动画（同一时长/缓动），保证选中项与 combobox 精确对准
-            NumberAnimation {
-                target: listView
-                property: "contentY"
-                from: props.startContentY
-                to: props.finalContentY
                 duration: Utils.animationSpeedMiddle
                 easing.type: Easing.OutQuint
             }

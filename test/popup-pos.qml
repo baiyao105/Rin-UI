@@ -27,6 +27,23 @@ Window {
         }
     }
 
+    ComboBox {
+        DragHandler {
+        }
+        model: ListModel {
+            ListElement {
+                text: qsTr("Pin on Top"); value: "top"
+            }
+            ListElement {
+                text: qsTr("Send to Back"); value: "bottom"
+            }
+            ListElement {
+                text: qsTr("Send tdsfsdfsdfsdfsdfsdo Back"); value: "bottodm"
+            }
+        }
+        textRole: "text"
+    }
+
     Button {
         x: root.width / 2
         y: root.height /2

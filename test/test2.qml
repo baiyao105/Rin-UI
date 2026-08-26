@@ -1,9 +1,9 @@
 import QtQuick
 import QtQuick.Controls
-import QtQuick as QQ
-// import RinUI
+import QtQuick.Layouts
+import RinUI
 import Qt.labs.qmlmodels
-import QtQuick.Controls.FluentWinUI3
+// import QtQuick.Controls.FluentWinUI3
 
 ApplicationWindow {
     visible: true
@@ -13,6 +13,43 @@ ApplicationWindow {
 
 
 
+    RowLayout {
+        ComboBox {
+            model: ListModel {
+                ListElement {
+                    text: qsTr("Pin on Top"); value: "top"
+                }
+                ListElement {
+                    text: qsTr("Send to Back"); value: "bottom"
+                }
+            }
+            textRole: "text"
+        }
+
+        ComboBox {
+            model: [
+                {text: "sdfsdf", value: "1"},
+                {text: "sdfsdsdf", value: "1"}
+            ]
+            textRole: "text"
+        }
+
+    }
+    // ListView {
+    //     model: ListModel {
+    //         ListElement {
+    //             text: qsTr("Pin on Top"); value: "top"
+    //         }
+    //         ListElement {
+    //             text: qsTr("Send to Back"); value: "bottom"
+    //         }
+    //     }
+    //     textRole: "text"
+    //
+    //     width: 500
+    //     height: 400
+    //     anchors.centerIn: parent
+    // }
 
     // Rectangle {
     //     color: "transparent"
@@ -88,44 +125,10 @@ ApplicationWindow {
     //     }
     // }
 
-    QQ.ListView {
-        id: listView
-        width: 150
-        height: 400
-        // textRole: "name"
-
-        model: studentsModel
-
-        delegate: ItemDelegate {
-            width: listView.width
-            text: "sdfsdfsdfsdfsdfdsfdsfsdafasdkfhasdfhjkasdfhbjkasdhfjkashdfjkasdhjffsfsdf"
-        }
-
-        ListModel {
-        id: studentsModel
-
-        ListElement { name: qsTr("Aikiyo Fuuka") }  // 风香
-        ListElement { name: qsTr("Hayase Yuuka") }  // 邮箱
-        ListElement { name: qsTr("Hanaoka Yuzu") }  // 柚子
-        ListElement { name: qsTr("Kuromi Serika") }  // 芹香
-        ListElement { name: qsTr("Kurosaki Koyuki") }  // 小雪
-        ListElement { name: qsTr("Kuda Izuna") }  // 泉奈
-        ListElement { name: qsTr("Okusora Ayane") }  // 绫音
-        ListElement { name: qsTr("Saiba Midori") }  // 绿
-        ListElement { name: qsTr("Saiba Momoi") }  // 桃
-        ListElement { name: qsTr("Shiromi Iori") }  // 伊织
-        ListElement { name: qsTr("Shishidou Nonomi") }  // 野宫
-        ListElement { name: qsTr("Sunaookami Shiroko") }  // 白子😋
-        ListElement { name: qsTr("Tendou Aris") }  // aris
-        ListElement { name: qsTr("Ushio Noa") }  // 诺亚
-        ListElement { name: qsTr("Yutori Natsu") }  // 夏
-    }
-    }
-
-    Button {
-        text: "btn"
-        highlighted: true
-        ToolTip.visible: hovered
-        ToolTip.text:"sdfsdfafsdaf"
-    }
+    // Button {
+    //     text: "btn"
+    //     highlighted: true
+    //     ToolTip.visible: hovered
+    //     ToolTip.text:"sdfsdfafsdaf"
+    // }
 }
