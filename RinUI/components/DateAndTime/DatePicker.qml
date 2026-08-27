@@ -144,6 +144,14 @@ Button {
         width: parent.width
         anchorItem: datePicker
 
+        // 弹窗列顺序保持与按钮显示顺序一致
+        columnOrder: dateOrder.map(function (name) {
+            if (name === "month") return 1
+            if (name === "day") return 2
+            if (name === "year") return 3
+            return 0
+        })
+
         model3: yearVisible
             ? (
                 startYear <= endYear

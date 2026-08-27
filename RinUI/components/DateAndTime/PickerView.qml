@@ -22,13 +22,41 @@ Popup {
     property var value2: undefined
     property var value3: undefined
 
-    property alias index1: hours.currentIndex
-    property alias index2: minutes.currentIndex
-    property alias index3: added.currentIndex
+    // 当前三列（视觉左→右）对应的 Tumbler。由 Repeater onCompleted 填充。
+    readonly property var _tumblers: [null, null, null]
+
+    function _tumblerForSlot(slot) {
+        for (let i = 0; i < root._tumblers.length; ++i) {
+            let t = root._tumblers[i]
+            if (t && t.slot === slot) return t
+        }
+        return null
+    }
+
+    property int index1: {
+        let t = _tumblerForSlot(1)
+        return t ? t.currentIndex : _slotIndexOfValue(1, value1)
+    }
+    property int index2: {
+        let t = _tumblerForSlot(2)
+        return t ? t.currentIndex : _slotIndexOfValue(2, value2)
+    }
+    property int index3: {
+        let t = _tumblerForSlot(3)
+        if (t) return t.currentIndex
+        // slot 3 被隐藏（yearVisible=false）时依然要有合理的 fallback，供 model2 计算天数等
+        return typeof model3 !== "undefined"
+            ? _slotIndexOfValue(3, value3)
+            : -1
+    }
 
     property var model1: 12
     property var model2: 60
     property var model3: [qsTr("AM"), qsTr("PM")]
+
+    // 列顺序：左→右依次展示的 slot。slot=1 对应 value1/model1，slot=2/3 同理。
+    // model3 为 undefined 时 slot 3 会自动隐藏。
+    property var columnOrder: [1, 2, 3]
 
     property bool gotData: typeof value1!== "undefined" && typeof value2!== "undefined"
 
@@ -38,6 +66,37 @@ Popup {
         let data = modelData;
         return data.toString().length < 2 && count === 60  ? "0" + data
             : data === 0 && count === 12 ? 12 : data
+    }
+
+    // 根据 slot 号获取对应 model/value/currentIndex 的读写
+    function _slotModel(slot) {
+        if (slot === 1) return model1
+        if (slot === 2) return model2
+        if (slot === 3) return model3
+        return undefined
+    }
+    function _slotValue(slot) {
+        if (slot === 1) return value1
+        if (slot === 2) return value2
+        if (slot === 3) return value3
+        return undefined
+    }
+    function _slotIndexOfValue(slot, value) {
+        let m = _slotModel(slot)
+        if (typeof m === "undefined") return 0
+        if (typeof value === "undefined") return 0
+        if (typeof m === "number") return value
+        // 数组：对 value3 年份可能元素是数字，其他一般是字符串
+        let idx = m.indexOf(value)
+        if (idx >= 0) return idx
+        if (typeof value === "string") {
+            let n = parseInt(value)
+            if (!Number.isNaN(n)) {
+                idx = m.indexOf(n)
+                if (idx >= 0) return idx
+            }
+        }
+        return 0
     }
 
     property int visibleItemCount: 7
@@ -87,38 +146,52 @@ Popup {
             RowLayout {
                 id: tumblerRow
                 anchors.fill: parent
+                spacing: 0
 
-                Tumbler {
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    id: hours
-                    model: model1
-                    visibleItemCount: root.visibleItemCount
-                    delegate: delegateComponent
-                }
-                ToolSeparator {
-                    Layout.fillHeight: true
-                }
-                Tumbler {
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    id: minutes
-                    model: model2
-                    visibleItemCount: root.visibleItemCount
-                    delegate: delegateComponent
-                }
-                ToolSeparator {
-                    Layout.fillHeight: true
-                    visible: added.visible
-                }
-                Tumbler {
-                    Layout.fillWidth: true
-                    Layout.fillHeight: true
-                    id: added
-                    model: model3
-                    visibleItemCount: root.visibleItemCount
-                    delegate: delegateComponent
-                    visible: typeof model3 !== "undefined"
+                Repeater {
+                    id: tumblerRepeater
+                    model: {
+                        // 过滤掉 slot=3 且 model3 为 undefined 的情况
+                        return columnOrder.filter(function (slot) {
+                            return slot !== 3 || typeof model3 !== "undefined"
+                        })
+                    }
+
+                    delegate: Item {
+                        readonly property int slot: modelData
+                        Layout.fillWidth: true
+                        Layout.fillHeight: true
+
+                        // 列之间的分隔符（最后一列不显示；slot 3 隐藏时，原位于其后的分隔符也不显示）
+                        ToolSeparator {
+                            Layout.fillHeight: true
+                            anchors.right: parent.right
+                            anchors.verticalCenter: parent.verticalCenter
+                            implicitHeight: parent.height
+                            visible: index !== tumblerRepeater.count - 1
+                        }
+
+                        Tumbler {
+                            id: _col
+                            anchors.fill: parent
+                            property int slot: parent.slot
+                            model: _slotModel(slot)
+                            visibleItemCount: root.visibleItemCount
+                            delegate: delegateComponent
+                        }
+
+                        Component.onCompleted: {
+                            // 将 Tumbler 按视觉顺序登记到 _tumblers；注意这里 index 是视觉顺序
+                            if (index >= 0 && index < 3) {
+                                root._tumblers[index] = _col
+                            }
+                        }
+                        Component.onDestruction: {
+                            if (index >= 0 && index < 3 && root._tumblers[index] === _col) {
+                                root._tumblers[index] = null
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -143,10 +216,15 @@ Popup {
                 flat: true
                 icon.name: "ic_fluent_checkmark_20_regular"
                 onClicked: {
-                    value1 = hours.currentItem.text
-                    value2 = minutes.currentItem.text
-                    typeof model3 !== "undefined" ? value3 = added.currentItem.text : undefined
-                    valueChanged(value1, value2, value3)
+                    for (let i = 0; i < tumblerRepeater.count; ++i) {
+                        let tmb = root._tumblers[i]
+                        if (!tmb) continue
+                        let txt = tmb.currentItem ? tmb.currentItem.text : undefined
+                        if (tmb.slot === 1) root.value1 = txt
+                        else if (tmb.slot === 2) root.value2 = txt
+                        else if (tmb.slot === 3) root.value3 = txt
+                    }
+                    root.valueChanged(root.value1, root.value2, root.value3)
                     root.close()
                 }
             }
@@ -204,18 +282,13 @@ Popup {
             }
             ScriptAction {
                 script: {
-                    hours.positionViewAtIndex(
-                        typeof value1 === "undefined" ? 0
-                        : typeof model1 === "number" ? value1 : model1.indexOf(value1), Tumbler.Center
-                    )
-                    minutes.positionViewAtIndex(
-                        typeof value2 === "undefined" ? 0
-                        : typeof model2 === "number" ? value2 : model2.indexOf(value2), Tumbler.Center
-                    )
-                    added.positionViewAtIndex(
-                        typeof value3 === "undefined" ? 0
-                        : typeof model3 === "number" ? value3 : model3.indexOf(parseInt(value3)), Tumbler.Center
-                    )
+                    for (let i = 0; i < tumblerRepeater.count; ++i) {
+                        let tmb = root._tumblers[i]
+                        if (!tmb) continue
+                        let v = _slotValue(tmb.slot)
+                        let targetIdx = _slotIndexOfValue(tmb.slot, v)
+                        tmb.positionViewAtIndex(targetIdx, Tumbler.Center)
+                    }
                 }
             }
         }
