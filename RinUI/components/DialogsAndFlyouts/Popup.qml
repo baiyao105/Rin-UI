@@ -10,6 +10,8 @@ QQC2.Popup {
     id: popup
     property int position: Position.Bottom
     property Item anchorItem: parent
+    // AlignCenter 覆盖对齐时的 Y 微调（如高亮条不在 popup 几何中心的控件）
+    property real alignOffsetY: 0
     property real posX: _targetX
     property real posY: _targetY
     property real _targetX: x
@@ -30,6 +32,10 @@ QQC2.Popup {
 
     function _scheduleReposition() {
         if (position === Position.None || !visible || _repositionPending)
+            return
+        // 进出场动画期间跳过：动画中的尺寸变化会逐帧触发此函数，
+        // 若重设 x/y 会覆盖 enter 中的 y 位置动画（导致展开方向错误）
+        if (enter.running || exit.running)
             return
 
         _repositionPending = true
@@ -83,6 +89,11 @@ QQC2.Popup {
             }
             result = PopupPositioner.resolve(
                 anchor, popupWidth, popupHeight, bounds, position, _spacing, _margin, Position)
+            // AlignCenter 覆盖对齐的 Y 微调 + 夹紧，保证不越界
+            if (result.position === Position.AlignCenter && alignOffsetY !== 0) {
+                result.y = PopupPositioner.clamp(result.y + alignOffsetY,
+                    _margin, overlay.height - popupHeight - _margin)
+            }
         } else {
             result = PopupPositioner.resolve(
                 bounds, popupWidth, popupHeight, bounds, Position.Center, _spacing, _margin, Position)

@@ -108,6 +108,7 @@ Button {
     PickerView {
         id: pickerView
         width: parent.width
+        anchorItem: timePickerButton
 
         model1: use24Hour ? 24 : 12
         model3: use24Hour ? undefined : [amText, pmText]

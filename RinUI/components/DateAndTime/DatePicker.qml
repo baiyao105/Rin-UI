@@ -142,6 +142,7 @@ Button {
     PickerView {
         id: pickerView
         width: parent.width
+        anchorItem: datePicker
 
         model3: yearVisible
             ? (

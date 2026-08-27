@@ -10,8 +10,13 @@ Popup {
     width: 300
     height: 330
     implicitHeight: 330
-    y: -height / 2 + buttonRow.height
-    position: Position.None
+
+    // 覆盖式对齐：高亮条中心与触发按钮中心重合；放不下时由基类回退到 Bottom/Top
+    position: Position.AlignCenter
+
+    // 高亮条（Tumbler 高亮区）中心相对 popup 几何中心的补偿：
+    // popup 中心比高亮条中心低 (buttonRow.height + 分割线) / 2
+    alignOffsetY: (buttonRow.implicitHeight + 1) / 2
 
     property var value1: undefined
     property var value2: undefined
@@ -161,6 +166,7 @@ Popup {
     }
 
     enter: Transition {
+        enabled: position !== Position.None
         ParallelAnimation {
             NumberAnimation {
                 target: root
@@ -170,11 +176,29 @@ Popup {
                 duration: Utils.appearanceSpeed
                 easing.type: Easing.OutQuint
             }
+            // AlignCenter（高亮条覆盖对齐）：从中间（高亮条处）向上下扩散。
+            // y 与 height 同参数联动（y = posY + (H - height)/2），保证高亮条中心全程钉在按钮处：
+            // height: H/2 → H, y: posY + H/4 → posY
+            // Bottom：从下往上滑入(y -15)；Top：从上往下滑入(y +15)
+            NumberAnimation {
+                target: root
+                property: "y"
+                from: root._resolvedPosition === Position.AlignCenter
+                    ? root.posY + root.implicitHeight / 4
+                    : root.posY + (root._resolvedPosition !== Position.Center
+                        ? (root._resolvedPosition === Position.Top ? 15
+                            : root._resolvedPosition === Position.Bottom ? -15 : 0) : 0)
+                to: root.posY
+                duration: Utils.animationSpeedMiddle * 0.8
+                easing.type: Easing.OutQuint
+            }
+            // 高度生长仅在覆盖对齐时生效（避让滑入时高度不变）
             NumberAnimation {
                 target: root
                 property: "height"
-                from: implicitHeight / 2
-                to: implicitHeight
+                from: root._resolvedPosition === Position.AlignCenter
+                    ? root.implicitHeight / 2 : root.implicitHeight
+                to: root.implicitHeight
                 duration: Utils.animationSpeedMiddle * 0.8
                 easing.type: Easing.OutQuint
             }
@@ -194,30 +218,6 @@ Popup {
                     )
                 }
             }
-        }
-    }
-
-    background: Rectangle {
-        id: background
-        anchors.fill: parent
-        anchors.horizontalCenter: parent.horizontalCenter
-        y: -6
-
-        radius: Theme.currentTheme.appearance.windowRadius
-        color: Theme.currentTheme.colors.backgroundAcrylicColor
-        border.color: Theme.currentTheme.colors.flyoutBorderColor
-
-        Behavior on color {
-            ColorAnimation {
-                duration: Utils.appearanceSpeed
-                easing.type: Easing.OutQuart
-            }
-        }
-
-        layer.enabled: true
-        layer.effect: Shadow {
-            style: "flyout"
-            source: background
         }
     }
 }

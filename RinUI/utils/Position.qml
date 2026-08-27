@@ -14,6 +14,7 @@ QtObject {
         BottomLeft,
         BottomRight,
         Center,
+        AlignCenter,
         None
     }
 }
