@@ -12,6 +12,7 @@ from .config import (
     RinConfig,
     is_win10,
     is_win11,
+    is_win11_22h2,
     is_windows,
 )
 
@@ -33,7 +34,7 @@ ACCENT_STATES = {"acrylic": 3, "mica": 2, "tabbed": 4, "none": 0}
 ACCENT_SUPPORT = {
     "acrylic": is_win10(),
     "mica": is_win11(),
-    "tabbed": is_win10(),
+    "tabbed": is_win11_22h2(),
     "none": True,
 }
 
@@ -89,6 +90,7 @@ class ThemeManager(QObject):
     DWMWA_NCRENDERING_POLICY = 2
     DWMNCRENDERINGPOLICY_ENABLED = 2
     DWMWA_SYSTEMBACKDROP_TYPE = 38
+    DWMWA_MICA_EFFECT = 1029  # Win11 21H2 旧 API（undocumented），22H2 起被 SYSTEMBACKDROP_TYPE 取代
     DWMWA_BORDER_COLOR = 34
     DWMWA_CAPTION_COLOR = 35
     DWMWA_TEXT_COLOR = 36
@@ -172,48 +174,71 @@ class ThemeManager(QObject):
             return -2  # 非 windows或未绑定窗口
         self.backdropChanged.emit(effect_type)
 
-        accent_state = ACCENT_STATES.get(effect_type, 0)
-        if not ACCENT_SUPPORT.get(effect_type, False):
-            print(f'Effect "{effect_type}" not supported on this platform')
+        # Win11 21H2 不支持 acrylic/tabbed，fallback 为 mica
+        applied_effect = effect_type
+        if is_win11() and not is_win11_22h2() and effect_type in ("acrylic", "tabbed"):
+            print(f'Effect "{effect_type}" not supported on Win11 21H2, fallback to "mica"')
+            applied_effect = "mica"
+
+        accent_state = ACCENT_STATES.get(applied_effect, 0)
+        if not ACCENT_SUPPORT.get(applied_effect, False):
+            print(f'Effect "{applied_effect}" not supported on this platform')
             return -1  # 效果不支持
 
         for hwnd in self.windows:
             if is_win11():
-                dark_mode = ctypes.c_int(self.theme_dict[self._actual_theme()])
-                ctypes.windll.dwmapi.DwmSetWindowAttribute(
-                    hwnd,
-                    self.DWMWA_USE_IMMERSIVE_DARK_MODE,
-                    ctypes.byref(dark_mode),
-                    ctypes.sizeof(dark_mode),
-                )
-                ctypes.windll.dwmapi.DwmSetWindowAttribute(
-                    hwnd,
-                    self.DWMWA_SYSTEMBACKDROP_TYPE,
-                    ctypes.byref(ctypes.c_int(accent_state)),
-                    ctypes.sizeof(ctypes.c_int),
-                )
-                transparent_color = ctypes.c_int(0xFFFFFFFE)
-                ctypes.windll.dwmapi.DwmSetWindowAttribute(
-                    hwnd,
-                    self.DWMWA_CAPTION_COLOR,
-                    ctypes.byref(transparent_color),
-                    ctypes.sizeof(transparent_color),
-                )
-                ctypes.windll.dwmapi.DwmSetWindowAttribute(
-                    hwnd,
-                    self.DWMWA_BORDER_COLOR,
-                    ctypes.byref(transparent_color),
-                    ctypes.sizeof(transparent_color),
-                )
-            elif is_win10() and effect_type == BackdropEffect.Acrylic.value:
-                self._apply_win10_effect(effect_type, hwnd)
+                self._apply_win11_effect(hwnd, applied_effect, accent_state)
+            elif is_win10() and applied_effect == BackdropEffect.Acrylic.value:
+                self._apply_win10_effect(applied_effect, hwnd)
 
         RinConfig["backdrop_effect"] = effect_type
-        # print(
-        #     f"Applied \"{effect_type.strip().capitalize()}\" effect with "
-        #     f"{platform.system() + '11' if is_win11() else '10'}"
-        # )
         return 0  # 成功
+
+    def _apply_win11_effect(self, hwnd, effect_type, accent_state):
+        """
+        Win11 应用背景效果
+        - 22H2+ 使用 DWMWA_SYSTEMBACKDROP_TYPE 现代 API
+        - 21H2 使用 DWMWA_MICA_EFFECT (1029) 旧 API（仅 mica）
+        """
+        dwm = ctypes.windll.dwmapi
+        dark_mode = ctypes.c_int(self.theme_dict[self._actual_theme()])
+        dwm.DwmSetWindowAttribute(
+            hwnd,
+            self.DWMWA_USE_IMMERSIVE_DARK_MODE,
+            ctypes.byref(dark_mode),
+            ctypes.sizeof(dark_mode),
+        )
+
+        if is_win11_22h2():
+            dwm.DwmSetWindowAttribute(
+                hwnd,
+                self.DWMWA_SYSTEMBACKDROP_TYPE,
+                ctypes.byref(ctypes.c_int(accent_state)),
+                ctypes.sizeof(ctypes.c_int),
+            )
+        else:
+            # 21H2: 仅 mica 可用（acrylic/tabbed 已在外部 fallback 为 mica）
+            enable = ctypes.c_int(1 if effect_type == "mica" else 0)
+            dwm.DwmSetWindowAttribute(
+                hwnd,
+                self.DWMWA_MICA_EFFECT,
+                ctypes.byref(enable),
+                ctypes.sizeof(enable),
+            )
+
+        transparent_color = ctypes.c_int(0xFFFFFFFE)
+        dwm.DwmSetWindowAttribute(
+            hwnd,
+            self.DWMWA_CAPTION_COLOR,
+            ctypes.byref(transparent_color),
+            ctypes.sizeof(transparent_color),
+        )
+        dwm.DwmSetWindowAttribute(
+            hwnd,
+            self.DWMWA_BORDER_COLOR,
+            ctypes.byref(transparent_color),
+            ctypes.sizeof(transparent_color),
+        )
 
     def _apply_win10_effect(self, effect_type, hwnd):
         """

@@ -15,6 +15,17 @@ def is_win11():
     )
 
 
+def is_win11_22h2():
+    """Win11 22H2 (Build 22621) 及以上——支持 DWMWA_SYSTEMBACKDROP_TYPE 现代 API"""
+    return bool(
+        is_windows()
+        and (
+            platform.release() >= "10"
+            and int(platform.version().split(".")[2]) >= 22621
+        )
+    )
+
+
 def is_win10():
     return bool(
         is_windows()
