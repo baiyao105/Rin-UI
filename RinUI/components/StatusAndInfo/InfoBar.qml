@@ -123,13 +123,12 @@ Frame {
             }
             Text {
                 id: bodyText
-                property bool wrap: (
-                    (
-                        infoBar.width - iconWidget.width - rights.width - custom.width
-                        - main.spacing * 5 - infoBar.padding * 2
-                    )
-                    < implicitWidth
-                )
+                property bool wrap: {
+                    // 始终以横排模式（标题与内容并排）下是否被挤压作为换行的唯一标准
+                    var horizontalSpacing = 12
+                    var horizontalNeeded = titleText.implicitWidth + horizontalSpacing + implicitWidth
+                    return horizontalNeeded > flow.width
+                }
                 width: wrap ?
                     parent.width : implicitWidth
                 typography: Typography.Body
