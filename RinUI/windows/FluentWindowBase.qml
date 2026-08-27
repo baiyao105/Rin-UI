@@ -186,6 +186,19 @@ ApplicationWindow {
         acceptedButtons: Qt.NoButton
     }
 
+    // 内容区域强制 ArrowCursor，防止边缘resize光标在被上层控件遮挡时残留
+    MouseArea {
+        anchors.fill: parent
+        anchors.topMargin: 0
+        anchors.bottomMargin: baseWindow.useNativeMacFrame ? 0 : Utils.windowDragArea
+        anchors.leftMargin: baseWindow.useNativeMacFrame ? 0 : Utils.windowDragArea
+        anchors.rightMargin: baseWindow.useNativeMacFrame ? 0 : Utils.windowDragArea
+        z: -1
+        acceptedButtons: Qt.NoButton
+        hoverEnabled: false
+        cursorShape: Qt.ArrowCursor
+    }
+
     DragHandler {
         id: resizeHandler
         grabPermissions: TapHandler.TakeOverForbidden
