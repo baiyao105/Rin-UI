@@ -4,10 +4,10 @@ import QtQuick.Layouts
 import RinUI
 
 
-Window {
+ApplicationWindow {
     id: root
-    width: 800
-    height: 600
+    width: 960
+    height: 640
     visible: true
 
     SettingCard {
@@ -42,6 +42,11 @@ Window {
             }
         }
         textRole: "text"
+    }
+
+    TimePicker {
+        DragHandler {
+        }
     }
 
     Button {

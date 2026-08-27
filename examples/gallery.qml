@@ -72,6 +72,17 @@ FluentWindow {
         }
     }
 
+    Component.onCompleted: {
+        floatLayer.createInfoBar({
+            severity: Severity.Info,
+            position: Position.TopRight,
+            timeout: 10000,
+            closable: true,
+            title: qsTr("Image & Asset Copyright Notice"),
+            text: qsTr("Some images are copyrighted by their respective authors or copyright holders. RinUI does not claim ownership of these copyrights.")
+        })
+    }
+
     navigationItems: [
         {
             title: qsTr("Home"),

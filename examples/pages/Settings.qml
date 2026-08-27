@@ -164,7 +164,7 @@ FluentPage {
             width: parent.width
             title: qsTr("RinUI Gallery")
             description: qsTr("© 2026 RinLit. All rights reserved.")
-            icon.source: Qt.resolvedUrl("../assets/BA_Pic_Shiroko-chibi.png")
+            icon.source: Qt.resolvedUrl("../assets/gallery.png")
             icon.size: 28
 
             content: Text {
@@ -233,6 +233,17 @@ FluentPage {
                 Hyperlink {
                     text: qsTr("MIT License")
                     openUrl: "https://github.com/RinLit-233-shiroko/Rin-UI/blob/master/LICENSE"
+                }
+            }
+             SettingItem {
+                title: qsTr("Image & Asset Copyright Notice")
+                Text {
+                    typography: Typography.Caption
+                    horizontalAlignment: Text.AlignRight
+                    Layout.fillWidth: true
+                    opacity: 0.8
+                    text: qsTr("Some images and other visual assets displayed in RinUI Gallery are sourced from the Internet and are used for demonstration and showcase purposes only. The copyrights of these images and assets belong to their respective authors or copyright holders and are not owned by RinUI or its developers.  \n" +
+                        "If you believe any content infringes your copyright or is used without proper authorization, please contact the project maintainers and we will address the issue promptly.")
                 }
             }
         }

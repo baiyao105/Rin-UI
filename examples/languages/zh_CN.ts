@@ -68,7 +68,7 @@
 <context>
     <name>AllSamples</name>
     <message>
-        <location filename="../pages/AllSamples.qml" line="55"/>
+        <location filename="../pages/AllSamples.qml" line="62"/>
         <source>All samples</source>
         <translation>所有示例</translation>
     </message>
@@ -669,75 +669,75 @@ but with wrapping.</source>
 <context>
     <name>Dialog</name>
     <message>
-        <location filename="../pages/controls/Dialog.qml" line="14"/>
+        <location filename="../pages/controls/Dialog.qml" line="15"/>
         <source>This is a dialog</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pages/controls/Dialog.qml" line="18"/>
+        <location filename="../pages/controls/Dialog.qml" line="19"/>
         <source>This a dialog with basic content. 
 Meow</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pages/controls/Dialog.qml" line="34"/>
+        <location filename="../pages/controls/Dialog.qml" line="46"/>
         <source>Dialog Meow</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pages/controls/Dialog.qml" line="39"/>
+        <location filename="../pages/controls/Dialog.qml" line="51"/>
         <source>This a dialog with custom content.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pages/controls/Dialog.qml" line="44"/>
+        <location filename="../pages/controls/Dialog.qml" line="56"/>
         <source>Attention</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pages/controls/Dialog.qml" line="45"/>
+        <location filename="../pages/controls/Dialog.qml" line="57"/>
         <source>You can customize the title, text, and severity to popup a custom InfoBar.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pages/controls/Dialog.qml" line="57"/>
+        <location filename="../pages/controls/Dialog.qml" line="69"/>
         <source>InfoBarTitle</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pages/controls/Dialog.qml" line="58"/>
+        <location filename="../pages/controls/Dialog.qml" line="70"/>
         <source>Custom Title</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pages/controls/Dialog.qml" line="63"/>
+        <location filename="../pages/controls/Dialog.qml" line="75"/>
         <source>InfoBarText</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pages/controls/Dialog.qml" line="64"/>
+        <location filename="../pages/controls/Dialog.qml" line="76"/>
         <source>Custom Text</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pages/controls/Dialog.qml" line="70"/>
+        <location filename="../pages/controls/Dialog.qml" line="82"/>
         <source>Severity</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pages/controls/Dialog.qml" line="98"/>
+        <location filename="../pages/controls/Dialog.qml" line="110"/>
         <source>Use a ContentDialog to show relavant information or to provide a modal dialog experience that can show any QML content.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pages/controls/Dialog.qml" line="117"/>
-        <location filename="../pages/controls/Dialog.qml" line="141"/>
+        <location filename="../pages/controls/Dialog.qml" line="129"/>
+        <location filename="../pages/controls/Dialog.qml" line="153"/>
         <source>Show Dialog</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pages/controls/Dialog.qml" line="123"/>
-        <location filename="../pages/controls/Dialog.qml" line="147"/>
+        <location filename="../pages/controls/Dialog.qml" line="135"/>
+        <location filename="../pages/controls/Dialog.qml" line="159"/>
         <source>← Nyaa~ Click this Button ~UwU~</source>
         <translation type="unfinished"></translation>
     </message>
@@ -971,87 +971,87 @@ Meow</source>
 <context>
     <name>Home</name>
     <message>
-        <location filename="../pages/Home.qml" line="77"/>
+        <location filename="../pages/Home.qml" line="78"/>
         <source>A Fluent Design-like UI library for Qt Quick</source>
         <translation>Fluent Design 的 Qt Quick UI 库</translation>
     </message>
     <message>
-        <location filename="../pages/Home.qml" line="83"/>
+        <location filename="../pages/Home.qml" line="84"/>
         <source>RinUI Gallery</source>
         <translation>RinUI 组件库</translation>
     </message>
     <message>
-        <location filename="../pages/Home.qml" line="109"/>
+        <location filename="../pages/Home.qml" line="110"/>
         <source>Getting Started</source>
         <translation>快速上手</translation>
     </message>
     <message>
-        <location filename="../pages/Home.qml" line="110"/>
+        <location filename="../pages/Home.qml" line="111"/>
         <source>Get started with RinUI and explore detailed documentation.</source>
         <translation>上手 RinUI 并浏览详细文档。</translation>
     </message>
     <message>
-        <location filename="../pages/Home.qml" line="112"/>
+        <location filename="../pages/Home.qml" line="113"/>
         <source>https://ui.rinlit.cn/guide/getting-started.html</source>
         <translation>https://ui.rinlit.cn/zh/guide/getting-started.html</translation>
     </message>
     <message>
-        <location filename="../pages/Home.qml" line="115"/>
+        <location filename="../pages/Home.qml" line="116"/>
         <source>Documentation</source>
         <translation>开发文档</translation>
     </message>
     <message>
-        <location filename="../pages/Home.qml" line="116"/>
+        <location filename="../pages/Home.qml" line="117"/>
         <source>Explore the comprehensive documentation for RinUI components.</source>
         <translation>探索 RinUI 组件的开发文档。</translation>
     </message>
     <message>
-        <location filename="../pages/Home.qml" line="118"/>
+        <location filename="../pages/Home.qml" line="119"/>
         <source>https://ui.rinlit.cn/</source>
         <translation>https://ui.rinlit.cn/zh</translation>
     </message>
     <message>
-        <location filename="../pages/Home.qml" line="121"/>
+        <location filename="../pages/Home.qml" line="122"/>
         <source>RinUI on GitHub</source>
         <translation>RinUI 在 GitHub</translation>
     </message>
     <message>
-        <location filename="../pages/Home.qml" line="122"/>
+        <location filename="../pages/Home.qml" line="123"/>
         <source>Explore the RinUI source code and repository.</source>
         <translation>探索 RinUI 的源代码和仓库。</translation>
     </message>
     <message>
-        <location filename="../pages/Home.qml" line="169"/>
+        <location filename="../pages/Home.qml" line="170"/>
         <source>Recent</source>
         <translation>最近</translation>
     </message>
     <message>
-        <location filename="../pages/Home.qml" line="181"/>
+        <location filename="../pages/Home.qml" line="182"/>
         <source>Favorite</source>
         <translation>收藏</translation>
     </message>
     <message>
-        <location filename="../pages/Home.qml" line="272"/>
+        <location filename="../pages/Home.qml" line="273"/>
         <source>Recently visited</source>
         <translation>最近查看</translation>
     </message>
     <message>
-        <location filename="../pages/Home.qml" line="315"/>
+        <location filename="../pages/Home.qml" line="316"/>
         <source>Recently added</source>
         <translation>最近增加</translation>
     </message>
     <message>
-        <location filename="../pages/Home.qml" line="337"/>
+        <location filename="../pages/Home.qml" line="338"/>
         <source>Recently updated</source>
         <translation>最近更新</translation>
     </message>
     <message>
-        <location filename="../pages/Home.qml" line="394"/>
+        <location filename="../pages/Home.qml" line="395"/>
         <source>No favorites yet</source>
         <translation>暂无收藏</translation>
     </message>
     <message>
-        <location filename="../pages/Home.qml" line="400"/>
+        <location filename="../pages/Home.qml" line="401"/>
         <source>Favorite samples by clicking the star icon on the sample page.</source>
         <translation>在示例页面上点击星形图标，收藏您最喜欢的示例。</translation>
     </message>
@@ -1465,7 +1465,7 @@ Meow</source>
     </message>
     <message>
         <location filename="../assets/ItemData.qml" line="135"/>
-        <location filename="../assets/ItemData.qml" line="358"/>
+        <location filename="../assets/ItemData.qml" line="372"/>
         <source>A configurable control that lets a user pick a time value.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1486,7 +1486,7 @@ Meow</source>
     </message>
     <message>
         <location filename="../assets/ItemData.qml" line="150"/>
-        <location filename="../assets/ItemData.qml" line="283"/>
+        <location filename="../assets/ItemData.qml" line="290"/>
         <source>A container with a header that can be expanded to show a body with more content.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1638,111 +1638,141 @@ Meow</source>
     </message>
     <message>
         <location filename="../assets/ItemData.qml" line="281"/>
-        <source>SettingExpander</source>
+        <source>SettingCard</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../assets/ItemData.qml" line="283"/>
+        <source>A control that can be used to display settings in your experience.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../assets/ItemData.qml" line="288"/>
-        <source>Slider</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../assets/ItemData.qml" line="290"/>
-        <source>A control that lets the user select from a range of values by moving a Thumb control along a track.</source>
+        <source>SettingExpander</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../assets/ItemData.qml" line="295"/>
-        <source>SpinBox</source>
+        <source>Slider</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../assets/ItemData.qml" line="297"/>
-        <source>A text control used for numeric input and evaluation of algebraic equations.</source>
+        <source>A control that lets the user select from a range of values by moving a Thumb control along a track.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../assets/ItemData.qml" line="302"/>
-        <source>PillButton</source>
+        <source>SpinBox</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../assets/ItemData.qml" line="304"/>
-        <source>A button that can toggled between 2 states like a ToggleButton.</source>
+        <source>A text control used for numeric input and evaluation of algebraic equations.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../assets/ItemData.qml" line="309"/>
-        <source>Segmented</source>
+        <source>SwipeView</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../assets/ItemData.qml" line="311"/>
+        <source>Present a collection of items that the user can swipe through, one item at a time.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../assets/ItemData.qml" line="317"/>
+        <source>PillButton</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../assets/ItemData.qml" line="319"/>
+        <source>A button that can toggled between 2 states like a ToggleButton.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../assets/ItemData.qml" line="324"/>
+        <source>Segmented</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../assets/ItemData.qml" line="326"/>
         <source>A common UI control to configure a view or setting.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../assets/ItemData.qml" line="316"/>
+        <location filename="../assets/ItemData.qml" line="331"/>
         <source>ToggleButton</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../assets/ItemData.qml" line="318"/>
+        <location filename="../assets/ItemData.qml" line="333"/>
         <source>A button that can toggled between 2 states like a CheckBox.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../assets/ItemData.qml" line="323"/>
+        <location filename="../assets/ItemData.qml" line="338"/>
         <source>Switch</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../assets/ItemData.qml" line="325"/>
+        <location filename="../assets/ItemData.qml" line="340"/>
         <source>A switch that can toggled between 2 states.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../assets/ItemData.qml" line="341"/>
+        <location filename="../assets/ItemData.qml" line="345"/>
+        <source>TableView</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../assets/ItemData.qml" line="347"/>
+        <source>The DataGrid control provides a flexible way to display a collection of data in rows and columns.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../assets/ItemData.qml" line="355"/>
         <source>TextArea</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../assets/ItemData.qml" line="343"/>
+        <location filename="../assets/ItemData.qml" line="357"/>
         <source>A multi-line plain text field.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../assets/ItemData.qml" line="348"/>
+        <location filename="../assets/ItemData.qml" line="362"/>
         <source>TextField</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../assets/ItemData.qml" line="350"/>
+        <location filename="../assets/ItemData.qml" line="364"/>
         <source>A single-lineplain text field.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../assets/ItemData.qml" line="356"/>
+        <location filename="../assets/ItemData.qml" line="370"/>
         <source>TimePicker</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../assets/ItemData.qml" line="363"/>
+        <location filename="../assets/ItemData.qml" line="377"/>
         <source>TitleBar</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../assets/ItemData.qml" line="365"/>
+        <location filename="../assets/ItemData.qml" line="379"/>
         <source>An example showing a custom UIElement used as the titlebar for the app&apos;s window.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../assets/ItemData.qml" line="370"/>
+        <location filename="../assets/ItemData.qml" line="384"/>
         <source>ToolTip</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../assets/ItemData.qml" line="372"/>
+        <location filename="../assets/ItemData.qml" line="386"/>
         <source>Display information for an element in a pop-up window.</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1758,102 +1788,97 @@ Meow</source>
 <context>
     <name>ListView</name>
     <message>
-        <location filename="../pages/controls/ListView.qml" line="11"/>
-        <source>Experimental</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <location filename="../pages/controls/ListView.qml" line="17"/>
         <source>The ListView lets know you show a collection of items in a list that scrolls vertically. </source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../pages/controls/ListView.qml" line="24"/>
-        <location filename="../pages/controls/ListView.qml" line="159"/>
+        <location filename="../pages/controls/ListView.qml" line="161"/>
         <source>Aikiyo Fuuka</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../pages/controls/ListView.qml" line="25"/>
-        <location filename="../pages/controls/ListView.qml" line="160"/>
+        <location filename="../pages/controls/ListView.qml" line="162"/>
         <source>Hayase Yuuka</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../pages/controls/ListView.qml" line="26"/>
-        <location filename="../pages/controls/ListView.qml" line="161"/>
+        <location filename="../pages/controls/ListView.qml" line="163"/>
         <source>Hanaoka Yuzu</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../pages/controls/ListView.qml" line="27"/>
-        <location filename="../pages/controls/ListView.qml" line="162"/>
+        <location filename="../pages/controls/ListView.qml" line="164"/>
         <source>Kuromi Serika</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../pages/controls/ListView.qml" line="28"/>
-        <location filename="../pages/controls/ListView.qml" line="163"/>
+        <location filename="../pages/controls/ListView.qml" line="165"/>
         <source>Kurosaki Koyuki</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../pages/controls/ListView.qml" line="29"/>
-        <location filename="../pages/controls/ListView.qml" line="164"/>
+        <location filename="../pages/controls/ListView.qml" line="166"/>
         <source>Kuda Izuna</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../pages/controls/ListView.qml" line="30"/>
-        <location filename="../pages/controls/ListView.qml" line="165"/>
+        <location filename="../pages/controls/ListView.qml" line="167"/>
         <source>Okusora Ayane</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../pages/controls/ListView.qml" line="31"/>
-        <location filename="../pages/controls/ListView.qml" line="166"/>
+        <location filename="../pages/controls/ListView.qml" line="168"/>
         <source>Saiba Midori</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../pages/controls/ListView.qml" line="32"/>
-        <location filename="../pages/controls/ListView.qml" line="167"/>
+        <location filename="../pages/controls/ListView.qml" line="169"/>
         <source>Saiba Momoi</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../pages/controls/ListView.qml" line="33"/>
-        <location filename="../pages/controls/ListView.qml" line="168"/>
+        <location filename="../pages/controls/ListView.qml" line="170"/>
         <source>Shiromi Iori</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../pages/controls/ListView.qml" line="34"/>
-        <location filename="../pages/controls/ListView.qml" line="169"/>
+        <location filename="../pages/controls/ListView.qml" line="171"/>
         <source>Shishidou Nonomi</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../pages/controls/ListView.qml" line="35"/>
-        <location filename="../pages/controls/ListView.qml" line="170"/>
+        <location filename="../pages/controls/ListView.qml" line="172"/>
         <source>Sunaookami Shiroko</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../pages/controls/ListView.qml" line="36"/>
-        <location filename="../pages/controls/ListView.qml" line="171"/>
+        <location filename="../pages/controls/ListView.qml" line="173"/>
         <source>Tendou Aris</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../pages/controls/ListView.qml" line="37"/>
-        <location filename="../pages/controls/ListView.qml" line="172"/>
+        <location filename="../pages/controls/ListView.qml" line="174"/>
         <source>Ushio Noa</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../pages/controls/ListView.qml" line="38"/>
-        <location filename="../pages/controls/ListView.qml" line="173"/>
+        <location filename="../pages/controls/ListView.qml" line="175"/>
         <source>Yutori Natsu</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1888,37 +1913,37 @@ Meow</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pages/controls/ListView.qml" line="159"/>
-        <location filename="../pages/controls/ListView.qml" line="168"/>
+        <location filename="../pages/controls/ListView.qml" line="161"/>
+        <location filename="../pages/controls/ListView.qml" line="170"/>
         <source>Gehenna</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pages/controls/ListView.qml" line="160"/>
-        <location filename="../pages/controls/ListView.qml" line="161"/>
+        <location filename="../pages/controls/ListView.qml" line="162"/>
         <location filename="../pages/controls/ListView.qml" line="163"/>
-        <location filename="../pages/controls/ListView.qml" line="166"/>
-        <location filename="../pages/controls/ListView.qml" line="167"/>
-        <location filename="../pages/controls/ListView.qml" line="171"/>
-        <location filename="../pages/controls/ListView.qml" line="172"/>
+        <location filename="../pages/controls/ListView.qml" line="165"/>
+        <location filename="../pages/controls/ListView.qml" line="168"/>
+        <location filename="../pages/controls/ListView.qml" line="169"/>
+        <location filename="../pages/controls/ListView.qml" line="173"/>
+        <location filename="../pages/controls/ListView.qml" line="174"/>
         <source>Millennium</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pages/controls/ListView.qml" line="162"/>
-        <location filename="../pages/controls/ListView.qml" line="169"/>
-        <location filename="../pages/controls/ListView.qml" line="170"/>
+        <location filename="../pages/controls/ListView.qml" line="164"/>
+        <location filename="../pages/controls/ListView.qml" line="171"/>
+        <location filename="../pages/controls/ListView.qml" line="172"/>
         <source>Abydos</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pages/controls/ListView.qml" line="164"/>
+        <location filename="../pages/controls/ListView.qml" line="166"/>
         <source>Hyakkiyako</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pages/controls/ListView.qml" line="165"/>
-        <location filename="../pages/controls/ListView.qml" line="173"/>
+        <location filename="../pages/controls/ListView.qml" line="167"/>
+        <location filename="../pages/controls/ListView.qml" line="175"/>
         <source>Trinity</source>
         <translation type="unfinished"></translation>
     </message>
@@ -2421,28 +2446,17 @@ Meow</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pages/controls/PageIndicator.qml" line="40"/>
+        <location filename="../pages/controls/PageIndicator.qml" line="90"/>
+        <source>Caret</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Home</source>
-        <translation type="unfinished">主页</translation>
+        <translation type="obsolete">主页</translation>
     </message>
     <message>
-        <location filename="../pages/controls/PageIndicator.qml" line="43"/>
-        <source>Discover</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../pages/controls/PageIndicator.qml" line="46"/>
-        <source>Activity</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../pages/controls/PageIndicator.qml" line="70"/>
+        <location filename="../pages/controls/PageIndicator.qml" line="78"/>
         <source>PageIndicator with switch to change its button visibility</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location filename="../pages/controls/PageIndicator.qml" line="82"/>
-        <source>Carel</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -2882,6 +2896,44 @@ Determinate - shows how much progress has been made on a known amount of work.</
     </message>
 </context>
 <context>
+    <name>SettingCard</name>
+    <message>
+        <location filename="../pages/controls/SettingCard.qml" line="8"/>
+        <source>SettingCard</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../pages/controls/SettingCard.qml" line="9"/>
+        <source>Extra+</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../pages/controls/SettingCard.qml" line="15"/>
+        <source>SettingsCard is a control that can be used to display settings in your experience. </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../pages/controls/SettingCard.qml" line="26"/>
+        <source>SettingCards with actions in the ColumnLayout</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../pages/controls/SettingCard.qml" line="37"/>
+        <source>A SettingCard within an SettingExpander</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../pages/controls/SettingCard.qml" line="41"/>
+        <source>Button</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../pages/controls/SettingCard.qml" line="103"/>
+        <source>Disable SettingCards</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>SettingExpander</name>
     <message>
         <location filename="../pages/controls/SettingExpander.qml" line="8"/>
@@ -2901,7 +2953,7 @@ Determinate - shows how much progress has been made on a known amount of work.</
     </message>
     <message>
         <location filename="../pages/controls/SettingExpander.qml" line="27"/>
-        <source>An Expander with text in the header and content areas</source>
+        <source>An Expander with ComboBox in the header and SettingItems</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -2920,48 +2972,58 @@ Determinate - shows how much progress has been made on a known amount of work.</
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pages/controls/SettingExpander.qml" line="67"/>
-        <location filename="../pages/controls/SettingExpander.qml" line="71"/>
+        <location filename="../pages/controls/SettingExpander.qml" line="63"/>
+        <source>This SettingItem can be clicked</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../pages/controls/SettingExpander.qml" line="64"/>
+        <source>SettingCard control can be clicked too!</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../pages/controls/SettingExpander.qml" line="72"/>
+        <location filename="../pages/controls/SettingExpander.qml" line="76"/>
         <source>A CheckBox within an SettingExpander</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pages/controls/SettingExpander.qml" line="76"/>
+        <location filename="../pages/controls/SettingExpander.qml" line="81"/>
         <source>SettingItem</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pages/controls/SettingExpander.qml" line="77"/>
+        <location filename="../pages/controls/SettingExpander.qml" line="82"/>
         <source>ItemType: Switch</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pages/controls/SettingExpander.qml" line="82"/>
+        <location filename="../pages/controls/SettingExpander.qml" line="87"/>
         <source>Test</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pages/controls/SettingExpander.qml" line="83"/>
+        <location filename="../pages/controls/SettingExpander.qml" line="88"/>
         <source>ItemType: Hyperlink</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pages/controls/SettingExpander.qml" line="86"/>
+        <location filename="../pages/controls/SettingExpander.qml" line="91"/>
         <source>What is BlueArchive?</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pages/controls/SettingExpander.qml" line="95"/>
+        <location filename="../pages/controls/SettingExpander.qml" line="100"/>
         <source>Disable Expander</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pages/controls/SettingExpander.qml" line="99"/>
+        <location filename="../pages/controls/SettingExpander.qml" line="104"/>
         <source>Expanded</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../pages/controls/SettingExpander.qml" line="104"/>
+        <location filename="../pages/controls/SettingExpander.qml" line="109"/>
         <source>ExpandDirection</source>
         <translation type="unfinished"></translation>
     </message>
@@ -3108,6 +3170,18 @@ Determinate - shows how much progress has been made on a known amount of work.</
         <translation>© 2026 RinLit. 保留所有权利.</translation>
     </message>
     <message>
+        <location filename="../pages/Settings.qml" line="239"/>
+        <source>Image &amp; Asset Copyright Notice</source>
+        <translation>图片与素材版权声明</translation>
+    </message>
+    <message>
+        <location filename="../pages/Settings.qml" line="245"/>
+        <source>Some images and other visual assets displayed in RinUI Gallery are sourced from the Internet and are used for demonstration and showcase purposes only. The copyrights of these images and assets belong to their respective authors or copyright holders and are not owned by RinUI or its developers.  
+If you believe any content infringes your copyright or is used without proper authorization, please contact the project maintainers and we will address the issue promptly.</source>
+        <translation>RinUI Gallery 中展示的部分图片及其他视觉素材来源于互联网，仅用于示例与展示。相关图片及素材的版权归其原作者或版权所有者所有，并不归 RinUI 或其开发者所有。  
+如相关内容存在版权或授权问题，请联系项目维护者，我们会及时处理。</translation>
+    </message>
+    <message>
         <source>© 2025 RinLit. All rights reserved.</source>
         <translation type="vanished">© 2025 RinLit. 保留所有权利.</translation>
     </message>
@@ -3117,14 +3191,13 @@ Determinate - shows how much progress has been made on a known amount of work.</
         <translation>克隆这个存储库</translation>
     </message>
     <message>
-        <location filename="../pages/Settings.qml" line="194"/>
+        <location filename="../pages/Settings.qml" line="195"/>
         <source>File a bug or request new sample</source>
         <translation>提出 Bug 或请求新示例</translation>
     </message>
     <message>
-        <location filename="../pages/Settings.qml" line="197"/>
         <source>Create an issue on GitHub</source>
-        <translation>在 GitHub 发起议题</translation>
+        <translation type="vanished">在 GitHub 发起议题</translation>
     </message>
     <message>
         <location filename="../pages/Settings.qml" line="205"/>
@@ -3132,37 +3205,37 @@ Determinate - shows how much progress has been made on a known amount of work.</
         <translation>依赖与引用</translation>
     </message>
     <message>
-        <location filename="../pages/Settings.qml" line="208"/>
+        <location filename="../pages/Settings.qml" line="212"/>
         <source>Qt &amp; Qt Quick</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../pages/Settings.qml" line="212"/>
+        <location filename="../pages/Settings.qml" line="216"/>
         <source>Fluent Design System</source>
         <translation>Fluent 设计系统</translation>
     </message>
     <message>
-        <location filename="../pages/Settings.qml" line="216"/>
+        <location filename="../pages/Settings.qml" line="220"/>
         <source>Fluent UI System Icons</source>
         <translation>Fluent UI 系统图标</translation>
     </message>
     <message>
-        <location filename="../pages/Settings.qml" line="220"/>
+        <location filename="../pages/Settings.qml" line="224"/>
         <source>WinUI 3 Gallery</source>
         <translation></translation>
     </message>
     <message>
-        <location filename="../pages/Settings.qml" line="226"/>
+        <location filename="../pages/Settings.qml" line="230"/>
         <source>License</source>
         <translation>开源许可协议</translation>
     </message>
     <message>
-        <location filename="../pages/Settings.qml" line="227"/>
+        <location filename="../pages/Settings.qml" line="231"/>
         <source>This project is licensed under the MIT license</source>
         <translation>本项目采用 MIT 开源许可协议</translation>
     </message>
     <message>
-        <location filename="../pages/Settings.qml" line="230"/>
+        <location filename="../pages/Settings.qml" line="234"/>
         <source>MIT License</source>
         <translation>MIT 许可</translation>
     </message>
@@ -3275,6 +3348,29 @@ Determinate - shows how much progress has been made on a known amount of work.</
     </message>
 </context>
 <context>
+    <name>SwipeView</name>
+    <message>
+        <location filename="../pages/controls/SwipeView.qml" line="8"/>
+        <source>SwipeView</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../pages/controls/SwipeView.qml" line="13"/>
+        <source>The SwipeView lets you swipe through a collection of items, one at a time. It&apos;s great for displaying images from a gallery, pages of a magazine, or similar items.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../pages/controls/SwipeView.qml" line="24"/>
+        <source>A simple SwipeView with items.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../pages/controls/SwipeView.qml" line="60"/>
+        <source>Vertical SwipeView</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>Switch</name>
     <message>
         <location filename="../pages/controls/Switch.qml" line="8"/>
@@ -3316,8 +3412,166 @@ Determinate - shows how much progress has been made on a known amount of work.</
 <context>
     <name>TableView</name>
     <message>
-        <location filename="../pages/controls/TableView.qml" line="16"/>
-        <source>TableView is a component that allows you to display a collection of data in a tabular format. </source>
+        <location filename="../pages/controls/TableView.qml" line="12"/>
+        <source>Experimental</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../pages/controls/TableView.qml" line="18"/>
+        <source>The TableView displays a collection of data in rows and columns.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../pages/controls/TableView.qml" line="31"/>
+        <source>Aikiyo Fuuka</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../pages/controls/TableView.qml" line="31"/>
+        <location filename="../pages/controls/TableView.qml" line="40"/>
+        <source>Gehenna</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../pages/controls/TableView.qml" line="31"/>
+        <source>School Lunch Club</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../pages/controls/TableView.qml" line="32"/>
+        <source>Hayase Yuuka</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../pages/controls/TableView.qml" line="32"/>
+        <location filename="../pages/controls/TableView.qml" line="33"/>
+        <location filename="../pages/controls/TableView.qml" line="35"/>
+        <location filename="../pages/controls/TableView.qml" line="38"/>
+        <location filename="../pages/controls/TableView.qml" line="39"/>
+        <location filename="../pages/controls/TableView.qml" line="43"/>
+        <location filename="../pages/controls/TableView.qml" line="44"/>
+        <source>Millennium</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../pages/controls/TableView.qml" line="32"/>
+        <location filename="../pages/controls/TableView.qml" line="35"/>
+        <location filename="../pages/controls/TableView.qml" line="44"/>
+        <source>Seminar</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../pages/controls/TableView.qml" line="33"/>
+        <source>Hanaoka Yuzu</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../pages/controls/TableView.qml" line="33"/>
+        <location filename="../pages/controls/TableView.qml" line="38"/>
+        <location filename="../pages/controls/TableView.qml" line="39"/>
+        <location filename="../pages/controls/TableView.qml" line="43"/>
+        <source>Game Development Department</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../pages/controls/TableView.qml" line="34"/>
+        <source>Kuromi Serika</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../pages/controls/TableView.qml" line="34"/>
+        <location filename="../pages/controls/TableView.qml" line="37"/>
+        <location filename="../pages/controls/TableView.qml" line="41"/>
+        <location filename="../pages/controls/TableView.qml" line="42"/>
+        <source>Abydos</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../pages/controls/TableView.qml" line="34"/>
+        <location filename="../pages/controls/TableView.qml" line="37"/>
+        <location filename="../pages/controls/TableView.qml" line="41"/>
+        <location filename="../pages/controls/TableView.qml" line="42"/>
+        <source>Foreclosure Task Force</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../pages/controls/TableView.qml" line="35"/>
+        <source>Kurosaki Koyuki</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../pages/controls/TableView.qml" line="36"/>
+        <source>Kuda Izuna</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../pages/controls/TableView.qml" line="36"/>
+        <source>Hyakkiyako</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../pages/controls/TableView.qml" line="36"/>
+        <source>Ninjutsu Research Club</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../pages/controls/TableView.qml" line="37"/>
+        <source>Okusora Ayane</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../pages/controls/TableView.qml" line="38"/>
+        <source>Saiba Midori</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../pages/controls/TableView.qml" line="39"/>
+        <source>Saiba Momoi</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../pages/controls/TableView.qml" line="40"/>
+        <source>Shiromi Iori</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../pages/controls/TableView.qml" line="40"/>
+        <source>Prefect Team</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../pages/controls/TableView.qml" line="41"/>
+        <source>Shishidou Nonomi</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../pages/controls/TableView.qml" line="42"/>
+        <source>Sunaookami Shiroko</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../pages/controls/TableView.qml" line="43"/>
+        <source>Tendou Aris</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../pages/controls/TableView.qml" line="44"/>
+        <source>Ushio Noa</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../pages/controls/TableView.qml" line="45"/>
+        <source>Yutori Natsu</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../pages/controls/TableView.qml" line="45"/>
+        <source>Trinity</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../pages/controls/TableView.qml" line="45"/>
+        <source>After-School Sweets Club</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -3530,17 +3784,27 @@ Determinate - shows how much progress has been made on a known amount of work.</
         <translation>这个页面不是 &lt;b&gt;Bug&lt;/b&gt; ，而是 RinUI 在加载页面出错时的演示界面。</translation>
     </message>
     <message>
-        <location filename="../gallery.qml" line="77"/>
+        <location filename="../gallery.qml" line="81"/>
+        <source>Image &amp; Asset Copyright Notice</source>
+        <translation>图片与素材版权声明</translation>
+    </message>
+    <message>
+        <location filename="../gallery.qml" line="82"/>
+        <source>Some images are copyrighted by their respective authors or copyright holders. RinUI does not claim ownership of these copyrights.</source>
+        <translation>部分图片素材版权归其原作者或版权所有者所有，RinUI 不主张拥有相关版权。</translation>
+    </message>
+    <message>
+        <location filename="../gallery.qml" line="88"/>
         <source>Home</source>
         <translation>主页</translation>
     </message>
     <message>
-        <location filename="../gallery.qml" line="83"/>
+        <location filename="../gallery.qml" line="94"/>
         <source>Design guidance</source>
         <translation>设计指南</translation>
     </message>
     <message>
-        <location filename="../gallery.qml" line="87"/>
+        <location filename="../gallery.qml" line="98"/>
         <source>Iconography</source>
         <translation>图标</translation>
     </message>
@@ -3549,67 +3813,67 @@ Determinate - shows how much progress has been made on a known amount of work.</
         <translation type="vanished">所有示例</translation>
     </message>
     <message>
-        <location filename="../gallery.qml" line="97"/>
+        <location filename="../gallery.qml" line="108"/>
         <source>All</source>
         <translation>全部</translation>
     </message>
     <message>
-        <location filename="../gallery.qml" line="103"/>
+        <location filename="../gallery.qml" line="114"/>
         <source>Basic Input</source>
         <translation>基本输入</translation>
     </message>
     <message>
-        <location filename="../gallery.qml" line="109"/>
+        <location filename="../gallery.qml" line="120"/>
         <source>Collections</source>
         <translation>集合</translation>
     </message>
     <message>
-        <location filename="../gallery.qml" line="115"/>
+        <location filename="../gallery.qml" line="126"/>
         <source>Date &amp; Time</source>
         <translation>日期与时间</translation>
     </message>
     <message>
-        <location filename="../gallery.qml" line="121"/>
+        <location filename="../gallery.qml" line="132"/>
         <source>Dialogs &amp; Flyouts</source>
         <translation>弹窗和浮窗</translation>
     </message>
     <message>
-        <location filename="../gallery.qml" line="127"/>
+        <location filename="../gallery.qml" line="138"/>
         <source>Layout</source>
         <translation>布局</translation>
     </message>
     <message>
-        <location filename="../gallery.qml" line="133"/>
+        <location filename="../gallery.qml" line="144"/>
         <source>Media</source>
         <translation>媒体</translation>
     </message>
     <message>
-        <location filename="../gallery.qml" line="139"/>
+        <location filename="../gallery.qml" line="150"/>
         <source>Menus &amp; Toolbars</source>
         <translation>菜单与工具栏</translation>
     </message>
     <message>
-        <location filename="../gallery.qml" line="145"/>
+        <location filename="../gallery.qml" line="156"/>
         <source>Navigation</source>
         <translation>导航</translation>
     </message>
     <message>
-        <location filename="../gallery.qml" line="151"/>
+        <location filename="../gallery.qml" line="162"/>
         <source>Scrolling</source>
         <translation>滚动</translation>
     </message>
     <message>
-        <location filename="../gallery.qml" line="157"/>
+        <location filename="../gallery.qml" line="168"/>
         <source>Status &amp; Info</source>
         <translation>状态与信息</translation>
     </message>
     <message>
-        <location filename="../gallery.qml" line="163"/>
+        <location filename="../gallery.qml" line="174"/>
         <source>Styles</source>
         <translation>样式</translation>
     </message>
     <message>
-        <location filename="../gallery.qml" line="169"/>
+        <location filename="../gallery.qml" line="180"/>
         <source>Text</source>
         <translation>文本</translation>
     </message>
@@ -3618,12 +3882,12 @@ Determinate - shows how much progress has been made on a known amount of work.</
         <translation type="vanished">文字与排版</translation>
     </message>
     <message>
-        <location filename="../gallery.qml" line="175"/>
+        <location filename="../gallery.qml" line="186"/>
         <source>Error Interface Test</source>
         <translation>错误页面测试</translation>
     </message>
     <message>
-        <location filename="../gallery.qml" line="180"/>
+        <location filename="../gallery.qml" line="191"/>
         <source>Settings</source>
         <translation>设置</translation>
     </message>

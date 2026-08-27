@@ -103,7 +103,7 @@ Frame {
             }
 
             Item {
-                Layout.fillWidth: true
+                Layout.fillWidth: leftContent.visible
             }
 
             RowLayout {

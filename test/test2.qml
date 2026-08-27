@@ -11,7 +11,9 @@ ApplicationWindow {
     height: 480
     title: qsTr("HeaderView")
 
-
+    StackView {
+        anchors.fill: parent
+    }
 
     RowLayout {
         ComboBox {
